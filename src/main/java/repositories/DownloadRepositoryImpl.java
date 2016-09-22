@@ -101,7 +101,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		
 		AggregationResults<BinLatencyDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinLatencyDownload.class);
 		List<BinLatencyDownload> mappedResult = results.getMappedResults();
-		System.out.println(mappedResult);
+
 		return mappedResult;
 	}
 
@@ -132,7 +132,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").lt(end)),
 				project("server_domain", "size"),
 				group("server_domain").sum("size").as("size"),
-				project("server_domain", "size")
+				project("size").and("server_domain").previousOperation()
 			);
 		
 		AggregationResults<SizeDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", SizeDownload.class);

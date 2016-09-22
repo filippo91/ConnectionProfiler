@@ -66,7 +66,7 @@ public class MyDownloadService implements DownloadService {
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
-		
+		System.out.println(start + " - " + end);
 		return downloadRepository.getFrequencyAccessesByDomain(uuid, start, end);
 	}
 
@@ -126,11 +126,22 @@ public class MyDownloadService implements DownloadService {
 			date = date.withDayOfMonth(1).plusMonths(1);
 			break;
 		case months:
-			date = date.withDayOfMonth(1).plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
+			date = date.withDayOfMonth(1).minusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
 			break;
 		}
 		
 		return date.toDate();
+	}
+
+	@Override
+	public Collection<BinLatencyDownload> getBinLatencyDownloads(int year, int month, int day, View view,
+			int bin_width) {
+		Date start, end;
+		
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getLatencyBins(bin_width, start, end);
 	}
 	
 }

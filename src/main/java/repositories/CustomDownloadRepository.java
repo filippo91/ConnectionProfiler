@@ -10,6 +10,8 @@ import models.FrequencyAccess;
 import models.SizeDownload;
 
 public interface CustomDownloadRepository {
+	Collection<BinLatencyDownload> getLatencyBins(int bin_width, Date start, Date end);
+
 	/**
 	 * 
 	 * @param uuid user unique identifier

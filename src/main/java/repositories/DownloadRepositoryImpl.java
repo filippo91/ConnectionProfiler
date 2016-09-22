@@ -38,7 +38,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 				
-				project("asnum", "download_speed", "timestamp").and("timestamp").extractDayOfMonth().as("day"),//.and("timestamp").extractDayOfMonth().as("day"),
+				project("asnum", "download_speed", "timestamp").and("timestamp").extractDayOfMonth().as("day"),
 				group("asnum", "day").avg("download_speed").as("speed").min("timestamp").as("timestamp").count().as("count"),
 				project("asnum", "speed", "count", "timestamp")
 			);
@@ -88,8 +88,6 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	
 	@Override
 	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end) {
-		//log.debug("start: "+ start.getTime() + " end: " + end.getTime());
-		
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
@@ -138,6 +136,23 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		AggregationResults<SizeDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", SizeDownload.class);
 		List<SizeDownload> mappedResult = results.getMappedResults();
 		
+		return mappedResult;
+	}
+
+	@Override
+	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, Date start, Date end) {
+		
+		Aggregation agg = newAggregation(
+				match(Criteria.where("timestamp").gte(start)),
+				match(Criteria.where("timestamp").lt(end)),
+				project("asnum").and("connect_time").divide(bin_width).as("bin"),
+				group("asnum", "bin").count().as("nRecords"),
+				project("asnum", "bin", "nRecords")
+			);
+		
+		AggregationResults<BinLatencyDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinLatencyDownload.class);
+		List<BinLatencyDownload> mappedResult = results.getMappedResults();
+
 		return mappedResult;
 	}
 }

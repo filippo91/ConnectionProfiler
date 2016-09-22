@@ -10,6 +10,7 @@ import models.BinSpeedDownload;
 import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
+import services.DownloadService.View;
 
 public interface DownloadService {
 	public static final int NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW = 3;
@@ -55,4 +56,7 @@ public interface DownloadService {
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view);
 
 	public Download saveDownload(Download download);
+
+	public Collection<BinLatencyDownload> getBinLatencyDownloads(int year, int month, int day, View view,
+			int bin_width);
 }

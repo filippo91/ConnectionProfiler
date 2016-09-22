@@ -78,7 +78,7 @@ public class MyDownloadService implements DownloadService {
 	}
 	
 	@Override
-	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view) {
+	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width) {
 		DateTime inputDate, start, end;
 
 		inputDate = new DateTime(year, month, day, 0, 0);
@@ -98,7 +98,7 @@ public class MyDownloadService implements DownloadService {
 			break;
 		}
 		
-		return downloadRepository.getLatencyBins(LATENCY_BIN_WIDTH, uuid, start, end);
+		return downloadRepository.getLatencyBins(bin_width, uuid, start.toDate(), end.toDate());
 	}
 
 	@Override

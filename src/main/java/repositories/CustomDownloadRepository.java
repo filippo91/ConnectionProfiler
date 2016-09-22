@@ -38,7 +38,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return bin size differentiated by ISP, considering the provided time span
 	 */
-	Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, DateTime start, DateTime end);
+	Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end);
 	
 	/**
 	 * 

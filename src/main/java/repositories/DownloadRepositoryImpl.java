@@ -88,21 +88,21 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 	
 	@Override
-	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, DateTime start, DateTime end) {
+	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end) {
 		//log.debug("start: "+ start.getTime() + " end: " + end.getTime());
 		
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				project("asnum").and("connect_time").mod(bin_width).as("bin"),
+				project("asnum").and("connect_time").divide(bin_width).as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("asnum", "bin").and("nRecords")
+				project("asnum", "bin", "nRecords")
 			);
 		
 		AggregationResults<BinLatencyDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinLatencyDownload.class);
 		List<BinLatencyDownload> mappedResult = results.getMappedResults();
-		
+		System.out.println(mappedResult);
 		return mappedResult;
 	}
 

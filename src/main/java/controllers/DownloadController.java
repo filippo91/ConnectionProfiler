@@ -78,15 +78,16 @@ public class DownloadController {
 		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view);
 	}
 	
-	@RequestMapping("/latencyHistogram/{year}/{month}/{day}/{view}")
+	@RequestMapping("/latencyHistogram/{year}/{month}/{day}/{view}/{bin_width}")
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 
 			@PathVariable int day,
-			@PathVariable View view){
+			@PathVariable View view,
+			@PathVariable int bin_width){
 		int uuid = 0;
 		
-		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view);
+		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
 	}
 	
 	@RequestMapping("/pieAccesses/{year}/{month}/{day}/{view}")

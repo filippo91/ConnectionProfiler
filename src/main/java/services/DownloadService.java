@@ -46,7 +46,7 @@ public interface DownloadService {
 
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view);
 
-	Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view);
+	Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width);
 
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view);
 

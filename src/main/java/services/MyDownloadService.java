@@ -74,7 +74,7 @@ public class MyDownloadService implements DownloadService {
 			break;
 		}
 		
-		return downloadRepository.getDownloadsSpeedBins(SPEED_BIN_WIDTH, uuid, start, end);
+		return downloadRepository.getDownloadsSpeedBins(SPEED_BIN_WIDTH, uuid, start.toDate(), end.toDate());
 	}
 	
 	@Override
@@ -103,8 +103,27 @@ public class MyDownloadService implements DownloadService {
 
 	@Override
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view) {
-		// TODO Auto-generated method stub
-		return null;
+
+		DateTime inputDate, start, end;
+
+		inputDate = new DateTime(year, month, day, 0, 0);
+		start = end = null;
+		switch(view){
+		case week:
+			start = inputDate.withDayOfWeek(1);
+			end = start.plusWeeks(1);
+			break;
+		case month:
+			start = inputDate.withDayOfMonth(1);
+			end = start.plusMonths(1);
+			break;
+		case months:
+			start = inputDate.withDayOfMonth(1);
+			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
+			break;
+		}
+		
+		return downloadRepository.getFrequencyAccessesByDomain(uuid, start.toDate(), end.toDate());
 	}
 
 	@Override

@@ -16,6 +16,10 @@ public class FrequencyAccess {
 	public void setServer_domain(String server_domain) {
 		this.server_domain = server_domain;
 	}
+	@Override
+	public String toString() {
+		return "FrequencyAccess [nRecords=" + nRecords + ", server_domain=" + server_domain + "]";
+	}
 	
 	
 }

@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +69,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 	
 	@Override
-	public Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, DateTime start, DateTime end) {
+	public Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
@@ -107,15 +106,17 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 
 	@Override
-	public Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, DateTime start, DateTime end) {
+	public Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
-				match(Criteria.where("timestamp").lt(end)),
+				match(Criteria.where("timestamp").lt(end)), 
 				project("server_domain"),
 				group("server_domain").count().as("nRecords"),
-				project("server_domain", "nRecords")
+				project("nRecords").and("server_domain").previousOperation()
+
 			);
+		
 		
 		AggregationResults<FrequencyAccess> results = mongoTemplate.aggregate(agg, "DOWNLOADS", FrequencyAccess.class);
 		List<FrequencyAccess> mappedResult = results.getMappedResults();
@@ -124,7 +125,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 
 	@Override
-	public Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, DateTime start, DateTime end) {
+	public Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),

@@ -3,8 +3,6 @@ package repositories;
 import java.util.Collection;
 import java.util.Date;
 
-import org.joda.time.DateTime;
-
 import models.AvgDaySpeedDownload;
 import models.BinLatencyDownload;
 import models.BinSpeedDownload;
@@ -28,7 +26,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return bin size differentiated by ISP, considering the provided time span
 	 */
-	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, DateTime start, DateTime end);
+	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, Date start, Date end);
 	
 	/**
 	 * 
@@ -47,7 +45,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return number of visits for each domain in the given time span 
 	 */
-	Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, DateTime start, DateTime end);
+	Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, Date start, Date end);
 	
 	/**
 	 * 
@@ -56,6 +54,6 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return downloads' size for each domain in the given time span
 	 */
-	Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, DateTime start, DateTime end);
+	Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, Date start, Date end);
 	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(Date start, Date end);
 }

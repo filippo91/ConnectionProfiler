@@ -86,7 +86,7 @@ public class DownloadRepositoryImplTest {
 		long timestamp = 1453978031888L;
 		DateTime start = new DateTime(timestamp-10);
 		DateTime end = new DateTime(timestamp+10);
-		Collection<FrequencyAccess> result = repo.getFrequencyAccessesByDomain(uuid, start, end);
+		Collection<FrequencyAccess> result = repo.getFrequencyAccessesByDomain(uuid, start.toDate(), end.toDate());
 		assertEquals(result.size(), 1);
 	}
 	
@@ -96,7 +96,7 @@ public class DownloadRepositoryImplTest {
 		long timestamp = 1453978031888L;
 		DateTime start = new DateTime(timestamp-10);
 		DateTime end = new DateTime(timestamp+10);
-		Collection<SizeDownload> result = repo.getSizeDownloadsByDomain(uuid, start, end);
+		Collection<SizeDownload> result = repo.getSizeDownloadsByDomain(uuid, start.toDate(), end.toDate());
 		assertEquals(result.size(), 1);
 	}
 	
@@ -107,7 +107,7 @@ public class DownloadRepositoryImplTest {
 		DateTime start = new DateTime(timestamp-10);
 		DateTime end = new DateTime(timestamp+10);
 		int bin_width = 10;
-		Collection<BinLatencyDownload> result = repo.getLatencyBins(bin_width, uuid, start, end);
+		Collection<BinLatencyDownload> result = repo.getLatencyBins(bin_width, uuid, start.toDate(), end.toDate());
 		assertEquals(result.size(), 1);
 	}
 	
@@ -118,7 +118,7 @@ public class DownloadRepositoryImplTest {
 		DateTime start = new DateTime(timestamp-10);
 		DateTime end = new DateTime(timestamp+10);
 		int bin_width = 10;
-		Collection<BinSpeedDownload> result = repo.getDownloadsSpeedBins(bin_width, uuid, start, end);
+		Collection<BinSpeedDownload> result = repo.getDownloadsSpeedBins(bin_width, uuid, start.toDate(), end.toDate());
 		assertEquals(result.size(), 1);
 	}
 	

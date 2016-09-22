@@ -3,6 +3,9 @@ package controllers;
 
 import java.util.Collection;
 
+import javax.validation.constraints.Min;
+
+import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -36,8 +39,11 @@ public class DownloadController {
 	
 	@RequestMapping("/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getDownloadsSpeed(
+			@Min(2015)
 			@PathVariable int year, 
+			@Range(min=0, max=11)
 			@PathVariable int month, 
+			@Range(min=0, max=30)
 			@PathVariable int day,
 			@PathVariable View view){
 		//get uuid from spring security

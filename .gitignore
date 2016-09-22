@@ -82,3 +82,4 @@ mvn*
 mock*
 
 #properties file
+src/main/resources/application.properties

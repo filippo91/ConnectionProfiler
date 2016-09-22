@@ -1,6 +1,7 @@
 package services;
 
 import java.util.Collection;
+import java.util.Date;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,152 +32,105 @@ public class MyDownloadService implements DownloadService {
 
 	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, int year, int month, int day, View view) {
-		DateTime inputDate, start, end;
-
-		inputDate = new DateTime(year, month, day, 0, 0);
-		start = end = null;
-		switch(view){
-		case week:
-			start = inputDate.withDayOfWeek(1);
-			end = start.plusWeeks(1);
-			break;
-		case month:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(1);
-			break;
-		case months:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
-			break;
-		}
+		Date start, end;
 		
-		return downloadRepository.getAvgDayDownloadsSpeed(uuid, start.toDate(), end.toDate());
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getAvgDayDownloadsSpeed(uuid, start, end);
 	}
 
 	@Override
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view) {
-		DateTime inputDate, start, end;
-
-		inputDate = new DateTime(year, month, day, 0, 0);
-		start = end = null;
-		switch(view){
-		case week:
-			start = inputDate.withDayOfWeek(1);
-			end = start.plusWeeks(1);
-			break;
-		case month:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(1);
-			break;
-		case months:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
-			break;
-		}
+		Date start, end;
 		
-		return downloadRepository.getDownloadsSpeedBins(SPEED_BIN_WIDTH, uuid, start.toDate(), end.toDate());
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getDownloadsSpeedBins(SPEED_BIN_WIDTH, uuid, start, end);
 	}
 	
 	@Override
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width) {
-		DateTime inputDate, start, end;
-
-		inputDate = new DateTime(year, month, day, 0, 0);
-		start = end = null;
-		switch(view){
-		case week:
-			start = inputDate.withDayOfWeek(1);
-			end = start.plusWeeks(1);
-			break;
-		case month:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(1);
-			break;
-		case months:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
-			break;
-		}
+		Date start, end;
 		
-		return downloadRepository.getLatencyBins(bin_width, uuid, start.toDate(), end.toDate());
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getLatencyBins(bin_width, uuid, start, end);
 	}
 
 	@Override
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view) {
-
-		DateTime inputDate, start, end;
-
-		inputDate = new DateTime(year, month, day, 0, 0);
-		start = end = null;
-		switch(view){
-		case week:
-			start = inputDate.withDayOfWeek(1);
-			end = start.plusWeeks(1);
-			break;
-		case month:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(1);
-			break;
-		case months:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
-			break;
-		}
+		Date start, end;
 		
-		return downloadRepository.getFrequencyAccessesByDomain(uuid, start.toDate(), end.toDate());
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getFrequencyAccessesByDomain(uuid, start, end);
 	}
 
 	@Override
 	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view) {
-		// TODO Auto-generated method stub
-		return null;
+		Date start, end;
+		
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getSizeDownloadsByDomain(uuid, start, end);
 	}
-	/*
-	DateTime getStartDate(int year, int month, int day, View view){
-		switch(view){
-		case WEEK:
-			start = inputDate.withDayOfWeek(1);
-			end = start.plusWeeks(1);
-			break;
-		case MONTH:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(1);
-			break;
-		case MULTI_MONTHS:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
-			break;
-		}
-		return null;
-	}
-	*/
 
 	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view) {
-		DateTime inputDate, start, end;
-
-		inputDate = new DateTime(year, month, day, 0, 0);
-		start = end = null;
-		switch(view){
-		case week:
-			start = inputDate.withDayOfWeek(1);
-			end = start.plusWeeks(1);
-			break;
-		case month:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(1);
-			break;
-		case months:
-			start = inputDate.withDayOfMonth(1);
-			end = start.plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
-			break;
-		}
+		Date start, end;
 		
-		return downloadRepository.getAvgDayDownloadsSpeed(start.toDate(), end.toDate());
+		start = getStartDate(year, month, day, view);
+		end = getEndDate(year, month, day, view);
+		
+		return downloadRepository.getAvgDayDownloadsSpeed(start, end);
 	}
 
 	@Override
 	public Download saveDownload(Download download) {
 		return downloadRepository.save(download);
 	}
+	
+	private Date getStartDate(int year, int month, int day, View view) {
+		DateTime date;
+		date = new DateTime(year, month, day, 0, 0);
+		
+		switch(view){
+		case week:
+			date = date.withDayOfWeek(1);
+			break;
+		case month:
+			date = date.withDayOfMonth(1);
+			break;
+		case months:
+			date = date.withDayOfMonth(1);
+			break;
+		}
+		
+		return date.toDate();
+	}
+
+	private Date getEndDate(int year, int month, int day, View view) {
+		DateTime date;
+		date = new DateTime(year, month, day, 0, 0);
+		
+		switch(view){
+		case week:
+			date = date.withDayOfWeek(1).plusWeeks(1);
+			break;
+		case month:
+			date = date.withDayOfMonth(1).plusMonths(1);
+			break;
+		case months:
+			date = date.withDayOfMonth(1).plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
+			break;
+		}
+		
+		return date.toDate();
+	}
+	
 }

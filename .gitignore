@@ -80,3 +80,5 @@ mvn*
 
 # mock data
 mock*
+
+#properties file

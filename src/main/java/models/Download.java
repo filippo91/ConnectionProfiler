@@ -23,6 +23,7 @@ public class Download {
 	private Integer uuid;
 	private String client_address;
 	private Integer asnum;
+	private String asname;
 	private String server_address;
 	private String server_domain;
 	private String url;
@@ -248,6 +249,16 @@ public class Download {
 	 */
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	
+	
+	public String getAsname() {
+		return asname;
+	}
+
+	public void setAsname(String asname) {
+		this.asname = asname;
 	}
 
 	@Override

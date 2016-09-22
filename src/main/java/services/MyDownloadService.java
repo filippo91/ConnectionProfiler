@@ -155,4 +155,9 @@ public class MyDownloadService implements DownloadService {
 		
 		return downloadRepository.getAvgDayDownloadsSpeed(start.toDate(), end.toDate());
 	}
+
+	@Override
+	public Download saveDownload(Download download) {
+		return downloadRepository.save(download);
+	}
 }

@@ -4,9 +4,13 @@ package controllers;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import models.AvgDaySpeedDownload;
@@ -105,5 +109,14 @@ public class DownloadController {
 		int uuid = 0;
 		
 		return downloadService.getDomainSizeDownload(uuid, year, month, day, view);
+	}
+	
+	@RequestMapping(value="/download", method=RequestMethod.POST)
+	@ResponseStatus(value=HttpStatus.CREATED)
+	public Download saveDownload(@RequestBody Download download)
+	{
+		System.out.println(download);
+		Download download_created = downloadService.saveDownload(download);
+		return download_created;
 	}
 }

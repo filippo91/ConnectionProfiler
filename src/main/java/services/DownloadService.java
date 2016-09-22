@@ -53,4 +53,6 @@ public interface DownloadService {
 	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view);
 
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view);
+
+	public Download saveDownload(Download download);
 }

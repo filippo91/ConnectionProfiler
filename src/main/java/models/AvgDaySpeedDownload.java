@@ -5,9 +5,9 @@ import java.util.Date;
 
 public class AvgDaySpeedDownload {
 	private Date timestamp;
-	private int asnum;
-	private int speed;
-	private int count;
+	private Integer asnum;
+	private Integer speed;
+	private Integer count;
 	
 	public AvgDaySpeedDownload(int asnum, int speed, int count, Date timestamp){
 		this.asnum = asnum;
@@ -31,32 +31,29 @@ public class AvgDaySpeedDownload {
 		this.timestamp = timestamp;
 	}
 
-	public int getAsnum() {
+	public Integer getAsnum() {
 		return asnum;
 	}
 
-	public void setAsnum(int asnum) {
+	public void setAsnum(Integer asnum) {
 		this.asnum = asnum;
 	}
 
-	public int getSpeed() {
+	public Integer getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(int speed) {
+	public void setSpeed(Integer speed) {
 		this.speed = speed;
 	}
-	
-	public int getCount() {
+
+	public Integer getCount() {
 		return count;
 	}
 
-	public void setCount(int count) {
+	public void setCount(Integer count) {
 		this.count = count;
 	}
 
-	@Override
-	public String toString() {
-		return "SpeedDownload [speed=" + speed + ", asnum=" + asnum + ", timestamp=" + timestamp +"]";
-	}
+	
 }

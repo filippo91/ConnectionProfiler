@@ -1,12 +1,13 @@
 package models;
 
 public class SizeDownload {
-	private int size;
+	private Integer size;
 	private String server_domain;
-	public int getSize() {
+	
+	public Integer getSize() {
 		return size;
 	}
-	public void setSize(int size) {
+	public void setSize(Integer size) {
 		this.size = size;
 	}
 	public String getServer_domain() {

@@ -1,12 +1,13 @@
 package models;
 
 public class FrequencyAccess {
-	private int nRecords;
+	private Integer nRecords;
 	private String server_domain;
-	public int getnRecords() {
+	
+	public Integer getnRecords() {
 		return nRecords;
 	}
-	public void setnRecords(int nRecords) {
+	public void setnRecords(Integer nRecords) {
 		this.nRecords = nRecords;
 	}
 	public String getServer_domain() {
@@ -14,7 +15,7 @@ public class FrequencyAccess {
 	}
 	public void setServer_domain(String server_domain) {
 		this.server_domain = server_domain;
-	} 
+	}
 	
 	
 }

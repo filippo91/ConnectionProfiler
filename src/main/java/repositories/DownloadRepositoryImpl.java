@@ -12,10 +12,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+
 
 import models.AvgDaySpeedDownload;
 import models.BinLatencyDownload;
@@ -23,13 +25,14 @@ import models.BinSpeedDownload;
 import models.FrequencyAccess;
 import models.SizeDownload;
 
+
 public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	private static final Logger log = LoggerFactory.getLogger(DownloadRepositoryImpl.class);
 	
 	@Autowired
 	private MongoTemplate mongoTemplate;
 	
-	@Override
+
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, Date start, Date end) {
 		log.debug("start: "+ start + " end: " + end);
 		
@@ -49,7 +52,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 	
-	@Override
+
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(Date start, Date end) {
 		log.debug("start: "+ start + " end: " + end);
 		
@@ -68,7 +71,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 	
-	@Override
+
 	public Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -86,7 +89,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 	
-	@Override
+
 	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -103,7 +106,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 
-	@Override
+
 	public Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -122,7 +125,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 
-	@Override
+
 	public Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -139,7 +142,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 
-	@Override
+
 	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, Date start, Date end) {
 		
 		Aggregation agg = newAggregation(

@@ -3,12 +3,15 @@ package repositories;
 import java.util.Collection;
 import java.util.Date;
 
+import org.springframework.data.repository.NoRepositoryBean;
+
 import models.AvgDaySpeedDownload;
 import models.BinLatencyDownload;
 import models.BinSpeedDownload;
 import models.FrequencyAccess;
 import models.SizeDownload;
 
+@NoRepositoryBean
 public interface CustomDownloadRepository {
 	Collection<BinLatencyDownload> getLatencyBins(int bin_width, Date start, Date end);
 

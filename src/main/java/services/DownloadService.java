@@ -10,7 +10,6 @@ import models.BinSpeedDownload;
 import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
-import services.DownloadService.View;
 
 public interface DownloadService {
 	public static final int NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW = 3;

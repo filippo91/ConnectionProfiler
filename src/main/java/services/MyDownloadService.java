@@ -23,14 +23,13 @@ public class MyDownloadService implements DownloadService {
 	@Autowired
 	private DownloadRepository downloadRepository;
 	
-	@Override
 	public Collection<Download> getDownloadsSpeed(int uuid, int page, int pageSize) {
 		Page<Download> resultPage = downloadRepository.findAllByUuidOrderByTimestampDesc(uuid, new PageRequest(page, pageSize));
 		Collection<Download> downloads = resultPage.getContent();
 		return downloads;
 	}
 
-	@Override
+	
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -40,7 +39,7 @@ public class MyDownloadService implements DownloadService {
 		return downloadRepository.getAvgDayDownloadsSpeed(uuid, start, end);
 	}
 
-	@Override
+	
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -50,7 +49,7 @@ public class MyDownloadService implements DownloadService {
 		return downloadRepository.getDownloadsSpeedBins(SPEED_BIN_WIDTH, uuid, start, end);
 	}
 	
-	@Override
+
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width) {
 		Date start, end;
 		
@@ -60,7 +59,7 @@ public class MyDownloadService implements DownloadService {
 		return downloadRepository.getLatencyBins(bin_width, uuid, start, end);
 	}
 
-	@Override
+
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -70,7 +69,7 @@ public class MyDownloadService implements DownloadService {
 		return downloadRepository.getFrequencyAccessesByDomain(uuid, start, end);
 	}
 
-	@Override
+
 	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -80,7 +79,7 @@ public class MyDownloadService implements DownloadService {
 		return downloadRepository.getSizeDownloadsByDomain(uuid, start, end);
 	}
 
-	@Override
+
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -90,7 +89,7 @@ public class MyDownloadService implements DownloadService {
 		return downloadRepository.getAvgDayDownloadsSpeed(start, end);
 	}
 
-	@Override
+
 	public Download saveDownload(Download download) {
 		return downloadRepository.save(download);
 	}
@@ -133,7 +132,7 @@ public class MyDownloadService implements DownloadService {
 		return date.toDate();
 	}
 
-	@Override
+
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(int year, int month, int day, View view,
 			int bin_width) {
 		Date start, end;

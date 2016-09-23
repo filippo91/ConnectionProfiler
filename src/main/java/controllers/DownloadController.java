@@ -3,16 +3,14 @@ package controllers;
 
 import java.util.Collection;
 
-import javax.validation.constraints.Min;
-
-import org.hibernate.validator.constraints.Range;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,14 +34,13 @@ public class DownloadController {
 		return new Download();
 	}
 	
-	
-	@RequestMapping("/speedGraph/{year}/{month}/{day}/{view}")
+	/*
+	 * @RequestMapping(method=GET) = @GetMapping
+	 */
+	@GetMapping("/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getDownloadsSpeed(
-			@Min(2015)
 			@PathVariable int year, 
-			@Range(min=0, max=11)
 			@PathVariable int month, 
-			@Range(min=0, max=30)
 			@PathVariable int day,
 			@PathVariable View view){
 		//get uuid from spring security
@@ -52,7 +49,7 @@ public class DownloadController {
 		return downloadService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}
 	
-	@RequestMapping("/speedGraphPublic/{year}/{month}/{day}/{view}")
+	@GetMapping("/speedGraphPublic/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getDownloadsSpeedPublic(
 			@PathVariable int year, 
 			@PathVariable int month, 
@@ -63,7 +60,7 @@ public class DownloadController {
 		return downloadService.getAvgDayDownloadsSpeed(year, month, day, view);
 	}
 	
-	@RequestMapping("/speedTable/{page}/{size}")
+	@GetMapping("/speedTable/{page}/{size}")
 	public Collection<Download> getDownloadsSpeedByWeek(
 			@PathVariable int page, 
 			@PathVariable int size){
@@ -73,7 +70,7 @@ public class DownloadController {
 		return downloadService.getDownloadsSpeed(uuid, page, size);
 	}
 	
-	@RequestMapping("/speedHistogram/{year}/{month}/{day}/{view}")
+	@GetMapping("/speedHistogram/{year}/{month}/{day}/{view}")
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 
@@ -84,7 +81,7 @@ public class DownloadController {
 		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view);
 	}
 	
-	@RequestMapping("/latencyHistogram/{year}/{month}/{day}/{view}/{bin_width}")
+	@GetMapping("/latencyHistogram/{year}/{month}/{day}/{view}/{bin_width}")
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 
@@ -96,7 +93,7 @@ public class DownloadController {
 		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
 	}
 	
-	@RequestMapping("/latencyHistogramPublic/{year}/{month}/{day}/{view}/{bin_width}")
+	@GetMapping("/latencyHistogramPublic/{year}/{month}/{day}/{view}/{bin_width}")
 	public Collection<BinLatencyDownload> getBinLatencyDownloadsPublic(
 			@PathVariable int year, 
 			@PathVariable int month, 
@@ -107,7 +104,7 @@ public class DownloadController {
 		return downloadService.getBinLatencyDownloads(year, month, day, view, bin_width);
 	}
 	
-	@RequestMapping("/pieAccesses/{year}/{month}/{day}/{view}")
+	@GetMapping("/pieAccesses/{year}/{month}/{day}/{view}")
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(
 			@PathVariable int year, 
 			@PathVariable int month, 
@@ -118,7 +115,7 @@ public class DownloadController {
 		return downloadService.getDomainFrequencyAccess(uuid, year, month, day, view);
 	}
 	
-	@RequestMapping("/pieSize/{year}/{month}/{day}/{view}")
+	@GetMapping("/pieSize/{year}/{month}/{day}/{view}")
 	public Collection<SizeDownload> getDomainSizeDownload(
 			@PathVariable int year, 
 			@PathVariable int month, 
@@ -129,7 +126,7 @@ public class DownloadController {
 		return downloadService.getDomainSizeDownload(uuid, year, month, day, view);
 	}
 	
-	@RequestMapping(value="/download", method=RequestMethod.POST)
+	@PostMapping(path="/download")
 	@ResponseStatus(value=HttpStatus.CREATED)
 	public Download saveDownload(@RequestBody Download download)
 	{

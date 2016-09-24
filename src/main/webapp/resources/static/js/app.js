@@ -34,21 +34,7 @@ config(['$locationProvider', '$routeProvider', '$httpProvider', function($locati
 
 controller('home', function($http) {
   var self = this;
-  /*
-  $http.get('http://localhost:8080/greeting').then(function(data) {
-    self.juve = data;
-  }, function(response) {
-    self.juve = response;
-  });
-  */
-  var prom  = $http.get('http://localhost:8090/greeting');
-  prom.success(function (data) {
-    self.juve = data;
-  });
-
-  prom.error(function (data) {
-    self.juve = data;
-  });
+  
 }).
 
 controller('navigation',
@@ -64,7 +50,7 @@ controller('navigation',
 
             console.log(headers);
 
-            $http.get('http://localhost:8090/user', {headers : headers}).then(function(response) {
+            $http.get('http://localhost:8080/connectionProfiler/user', {headers : headers}).then(function(response) {
               if (response.data.name) {
                 $rootScope.authenticated = true;
               } else {
@@ -92,7 +78,7 @@ controller('navigation',
             });
           };
           self.logout = function() {
-            $http.post('logout', {}).finally(function() {
+            $http.post('http://localhost:8080/connectionProfiler/logout', {}).finally(function() {
               $rootScope.authenticated = false;
               $location.path("/");
             });

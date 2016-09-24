@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -22,15 +23,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
-				.antMatchers("/index.html", "/css/**", "/js/**", "/partials/public/**", "/logout").permitAll()
+				.antMatchers("/index.html", "/css/**", "/js/**", "/partials/public/**").permitAll()
 				.anyRequest().authenticated()
-/*
- * These instruction are to provide a login form instead of the browser authentication dialog.
- * But, with AngularJs, the process is different
- * 				.and()
- * 			.formLogin()
- */
-			
+				.and()
+			.csrf()
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 				.and()
 			.httpBasic();
 	}

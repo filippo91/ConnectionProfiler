@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,19 +14,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import models.Authority;
 import models.User;
 import repositories.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService{
+	private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+	
 	@Autowired UserRepository userRepository;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findByUsername(username);
+		User user = userRepository.findOne(username);
 		
-		System.out.println(user);
+		log.info("Load user from user repository: " + user);
 		if(user == null){
+			log.error("User "+ username + " not found");
 			throw new UsernameNotFoundException(username);
 		}
 		
@@ -44,12 +50,12 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	}
 
 	private List<GrantedAuthority> getAuthorities(User user) {
-		Set<String> roles = user.getRoles();
+		Set<Authority> roles = user.getRoles();
 		
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         
-        for (String role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role));
+        for (Authority role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
         }
         
         return authorities;

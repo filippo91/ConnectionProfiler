@@ -3,25 +3,44 @@ package models;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
-@Document(collection="USERS")
+
+
+@Entity(name="users")
 public class User {	
 	@Id
-    private String id;
-	
-	@Indexed(unique = true)
 	private  String username;
+	
+	private String email;
+	
     private String password;
-    
+
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Integer id;
+	
     private boolean accountNonExpired;
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
+    
+
     private boolean enabled;
     
-    private Set<String> roles = new HashSet<String>();
+	@ManyToMany
+	@JoinTable(
+			name="user_authority",
+			inverseJoinColumns=@JoinColumn(name="authorities", referencedColumnName="authority"),
+			joinColumns=@JoinColumn(name="users", referencedColumnName="username"))
+    private Set<Authority> roles = new HashSet<Authority>();
+    
+    public User() {
+	}
     
 	public String getUsername() {
 		return username;
@@ -31,11 +50,11 @@ public class User {
 		this.username = username;
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -79,25 +98,22 @@ public class User {
 		this.enabled = enabled;
 	}
 
-	public Set<String> getRoles() {
+	public Set<Authority> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(Set<String> roles) {
+	public void setRoles(Set<Authority> roles) {
 		this.roles = roles;
 	}
 
-	public void addRole(String role) {
-		roles.add(role);
-	}
-
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", accountNonExpired=" + accountNonExpired
-				+ ", accountNonLocked=" + accountNonLocked + ", credentialsNonExpired=" + credentialsNonExpired
-				+ ", enabled=" + enabled + ", roles=" + roles + ", pass="+password+ "]";
+	public void setEmail(String email){
+		this.email = email;
 	}
 	
+	public String getEmail() {
+		return email;
+	}
+
 	
 }
 

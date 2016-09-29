@@ -1,7 +1,5 @@
 package models;
 
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.Entity;
@@ -10,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
+import org.joda.time.DateTime;
 
 @Entity(name="verificationToken")
 public class VerificationToken {
@@ -40,10 +40,10 @@ public class VerificationToken {
     }
      
     private Date calculateExpiryDate(int expiryTimeInMinutes) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Timestamp(cal.getTime().getTime()));
-        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
-        return new Date(cal.getTime().getTime());
+    	DateTime now = DateTime.now();
+    	DateTime expiryDate = now.plusMinutes(expiryTimeInMinutes);
+    	
+        return new Date(expiryDate.getMillis());
     }
 	public Long getId() {
 		return id;

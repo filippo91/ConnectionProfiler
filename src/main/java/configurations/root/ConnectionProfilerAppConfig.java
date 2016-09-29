@@ -72,5 +72,18 @@ public class ConnectionProfilerAppConfig {
 	    txManager.setEntityManagerFactory(factory);
 	    return txManager;
 	  }
+	  
+	  @Bean
+	    public JavaMailSender javaMailService() {
+	        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+	        String host = "localhost";
+			javaMailSender.setHost(host);
+	        int port = 25; //smtp server port 
+			javaMailSender.setPort(port);
+	        
+	        return javaMailSender;
+	    }
 
+	      
+	  
 }

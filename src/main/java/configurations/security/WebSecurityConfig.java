@@ -17,18 +17,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
     private UserDetailsServiceImpl customUserDetailsService;
 	
+	@Override
 	@Autowired
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth
 		.userDetailsService(customUserDetailsService)
 		.passwordEncoder(new BCryptPasswordEncoder());
+	
 	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
-				.antMatchers("/index.html", "/css/**", "/js/**", "/partials/public/**").permitAll()
+				.antMatchers("/index.html", "/newUser", "/css/**", "/js/**", "/partials/public/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.csrf()

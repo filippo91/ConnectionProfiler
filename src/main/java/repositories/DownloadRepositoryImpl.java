@@ -19,12 +19,8 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 
 
-import models.AvgDaySpeedDownload;
-import models.BinLatencyDownload;
-import models.BinSpeedDownload;
-import models.FrequencyAccess;
-import models.SizeDownload;
 
+import models.*;
 
 public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	private static final Logger log = LoggerFactory.getLogger(DownloadRepositoryImpl.class);
@@ -33,6 +29,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	private MongoTemplate mongoTemplate;
 	
 
+	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, Date start, Date end) {
 		log.debug("start: "+ start + " end: " + end);
 		
@@ -53,6 +50,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 	
 
+	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(Date start, Date end) {
 		log.debug("start: "+ start + " end: " + end);
 		
@@ -72,6 +70,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 	
 
+	@Override
 	public Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -90,6 +89,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 	
 
+	@Override
 	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -107,6 +107,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 
 
+	@Override
 	public Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -126,6 +127,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 
 
+	@Override
 	public Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("uuid").is(uuid)),
@@ -143,6 +145,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 	}
 
 
+	@Override
 	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, Date start, Date end) {
 		
 		Aggregation agg = newAggregation(

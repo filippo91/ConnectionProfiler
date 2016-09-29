@@ -9,13 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import models.AvgDaySpeedDownload;
-import models.BinLatencyDownload;
-import models.BinSpeedDownload;
-import models.Download;
-import models.FrequencyAccess;
-import models.SizeDownload;
+
+import models.*;
 import repositories.DownloadRepository;
+
 
 @Service
 public class MyDownloadService implements DownloadService {
@@ -23,6 +20,7 @@ public class MyDownloadService implements DownloadService {
 	@Autowired
 	private DownloadRepository downloadRepository;
 	
+	@Override
 	public Collection<Download> getDownloadsSpeed(int uuid, int page, int pageSize) {
 		Page<Download> resultPage = downloadRepository.findAllByUuidOrderByTimestampDesc(uuid, new PageRequest(page, pageSize));
 		Collection<Download> downloads = resultPage.getContent();
@@ -30,6 +28,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 	
+	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -40,6 +39,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 	
+	@Override
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -50,6 +50,7 @@ public class MyDownloadService implements DownloadService {
 	}
 	
 
+	@Override
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width) {
 		Date start, end;
 		
@@ -60,6 +61,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 
+	@Override
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -70,6 +72,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 
+	@Override
 	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -80,6 +83,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 
+	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view) {
 		Date start, end;
 		
@@ -90,6 +94,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 
+	@Override
 	public Download saveDownload(Download download) {
 		return downloadRepository.save(download);
 	}
@@ -133,6 +138,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 
+	@Override
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(int year, int month, int day, View view,
 			int bin_width) {
 		Date start, end;

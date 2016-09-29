@@ -6,16 +6,14 @@ angular.module('myApp', [
   'ngRoute',
   'myApp.domainsByAccesses',
   'myApp.domainsBySize',
-]).
-config(['$locationProvider', '$routeProvider', '$httpProvider', function($locationProvider, $routeProvider, $httpProvider) {
+])
+
+.config(['$locationProvider', '$routeProvider', '$httpProvider', function($locationProvider, $routeProvider, $httpProvider) {
   $locationProvider.hashPrefix('!');
 /*
-  $routeProvider.when('/', {
-    templateUrl : 'index.html',
-    controller : 'home',
-    controllerAs: 'controller'
-  });
-*/
+ * $routeProvider.when('/', { templateUrl : 'index.html', controller : 'home',
+ * controllerAs: 'controller' });
+ */
   $routeProvider.
   when('/login', {
     templateUrl : 'partials/public/login.html',
@@ -27,17 +25,22 @@ config(['$locationProvider', '$routeProvider', '$httpProvider', function($locati
     controller : 'home',
     controllerAs: 'controller'
   }).
+  when('/register', {
+	    templateUrl : 'partials/public/register.html',
+	    controller : 'register',
+	    controllerAs: 'controller'
+	  }).
   otherwise('/');
 
   $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
-}]).
+}])
 
-controller('home', function($http) {
+.controller('home', function($http) {
   var self = this;
   
-}).
+})
 
-controller('navigation',
+.controller('navigation',
   function($rootScope, $http, $location) {
 
           var self = this;
@@ -84,4 +87,28 @@ controller('navigation',
             });
           }
 
-        });
+        })
+
+.controller('register',
+		function($rootScope, $http, $location) {
+		        var self = this;
+		self.user = {};
+		self.user.username = "pippo";
+		 		self.user.password = "";
+		var createUser = function(user) { 
+			$http.post('http://localhost:8080/connectionProfiler/newUser', user).then(function () {
+				                        $location.path('/login');
+				                    }, function(){
+					$location.path('/');
+				                        self.dataLoading = false;
+				                    }
+				                );
+		}
+		
+		self.register = function() {
+		       self.dataLoading = true;
+				createUser(self.user);
+		                
+		        };
+		    }
+);

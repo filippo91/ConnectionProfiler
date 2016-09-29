@@ -28,49 +28,59 @@ public class SimpleUserService implements UserService {
 	public void register(User user) {
 		log.info("Try to register a new user with the following information: " + user);
 		
+		/*
+		 * Fill the spring related fields for a user object and 
+		 * save it in the repository.
+		 */
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		String password = encoder.encode(user.getPassword());
 		user.setPassword(password);
-		user.setEnabled(true);
+		user.setEnabled(false);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         
 		userRepository.save(user);
 		
-		String appUrl = "http://localhost:8080/connectionProfiler/";
+		// create and save a verification token for this user
 		String token = UUID.randomUUID().toString();
-		createVerificationToken(user, token);
+		createAndPersistVerificationToken(user, token);
+		
+		/* set up an event that causes the system to send an email
+		 * to the user in order to verify his account through the 
+		 * verification token just created.
+		 */
+		String appUrl = "http://localhost:8080/connectionProfiler/";
 		
 		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl, token));
 	}
 
-
-	
-	@Override
-    public void createVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
-    }
-
-
-
 	@Override
 	public void confirmRegistration(String token) {
-		// TODO Auto-generated method stub
 		VerificationToken verificatioToken = tokenRepository.findByToken(token);
+		
 		if(verificatioToken == null){
+			//the token doesn't exist: bad user
 			//TODO: throw exception
 		}
 		
 		DateTime now = DateTime.now();
 		
 		if(now.isAfter(verificatioToken.getExpiryDate().getTime())){
+			//the token has already expired: bad user
 			//TODO: throw exception
 		}
 		
+		/*
+		 * The user has presented a correct token: we can set his
+		 * status to enabled
+		 */
 		User user = verificatioToken.getUser();
 		user.setEnabled(true);
 	}
 
+    private void createAndPersistVerificationToken(User user, String token) {
+        VerificationToken myToken = new VerificationToken(token, user);
+        tokenRepository.save(myToken);
+    }
 }

@@ -10,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.Email;
 
 
 /**
@@ -23,10 +26,13 @@ import javax.persistence.ManyToMany;
 @Entity(name="users")
 public class User {
 	@Id
+	@Size(min=3, max=10)
 	private  String username;
 	
+	@Email
 	private String email;
 	
+	@Size(min=3, max=10)
     private String password;
 
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

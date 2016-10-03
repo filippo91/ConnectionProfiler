@@ -12,9 +12,16 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 
-
+/**
+ * This class represents a user of the system. 
+ * Each user has the username/password pair and an email address.
+ * The system will also automatically assign a unique user identifier.
+ * 
+ * @author philip
+ *
+ */
 @Entity(name="users")
-public class User {	
+public class User {
 	@Id
 	private  String username;
 	
@@ -29,7 +36,6 @@ public class User {
     private boolean accountNonLocked;
     private boolean credentialsNonExpired;
     
-
     private boolean enabled;
     
 	@ManyToMany
@@ -113,8 +119,4 @@ public class User {
 	public String getEmail() {
 		return email;
 	}
-
-	
 }
-
-// db.USERS.insert({username:'phil', password: 'pippo', accountNonExpired: true, accountNonLocked: true, credentialsNonExpired: true, enabled: true, roles: ['USER']})

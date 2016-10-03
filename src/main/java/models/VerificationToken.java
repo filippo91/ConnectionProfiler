@@ -13,8 +13,6 @@ import org.joda.time.DateTime;
 
 @Entity(name="verificationToken")
 public class VerificationToken {
-	private static final int EXPIRATION = 60 * 24;
-	 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -31,11 +29,12 @@ public class VerificationToken {
     public VerificationToken() {
         super();
     }
-    public VerificationToken(String token, User user) {
+    
+    public VerificationToken(String token, User user, int expiration) {
         super();
         this.token = token;
         this.user = user;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
+        this.expiryDate = calculateExpiryDate(expiration);
         this.verified = false;
     }
      
@@ -75,6 +74,9 @@ public class VerificationToken {
 	public void setVerified(boolean verified) {
 		this.verified = verified;
 	}
-    
-    
+	
+	public boolean isExpired(){
+		DateTime now = DateTime.now();
+		return now.isAfter(expiryDate.getTime());
+	}
 }

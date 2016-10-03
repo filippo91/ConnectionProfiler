@@ -2,11 +2,11 @@ package services;
 
 import java.util.UUID;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +19,8 @@ import repositories.VerificationTokenRepository;
 @Service
 public class SimpleUserService implements UserService {
 	private static final Logger log = LoggerFactory.getLogger(SimpleUserService.class);
+	
+	private static final int VERIFICATION_TOKEN_EXPIRATION = 60 * 24; //in minutes
 	
 	@Autowired UserRepository userRepository;
 	@Autowired VerificationTokenRepository tokenRepository;
@@ -61,14 +63,14 @@ public class SimpleUserService implements UserService {
 		
 		if(verificatioToken == null){
 			//the token doesn't exist: bad user
-			//TODO: throw exception
+			//TODO: throw meaningful exception
+			throw new Error("Bad user");
 		}
 		
-		DateTime now = DateTime.now();
-		
-		if(now.isAfter(verificatioToken.getExpiryDate().getTime())){
+		if(verificatioToken.isExpired()){
 			//the token has already expired: bad user
-			//TODO: throw exception
+			//TODO: throw meaningful exception
+			throw new Error("Bad user");
 		}
 		
 		/*
@@ -77,10 +79,22 @@ public class SimpleUserService implements UserService {
 		 */
 		User user = verificatioToken.getUser();
 		user.setEnabled(true);
+		userRepository.save(user);
 	}
 
     private void createAndPersistVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
+        VerificationToken myToken = new VerificationToken(token, user, VERIFICATION_TOKEN_EXPIRATION);
         tokenRepository.save(myToken);
     }
+
+	@Override
+	public User getCurrentUser() {
+		/* 
+		 * leverage spring security mechanism to get the current
+		 * user from the security context.
+		 */
+		User user = (User)SecurityContextHolder.getContext().getAuthentication();
+		
+		return user;
+	}
 }

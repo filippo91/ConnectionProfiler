@@ -26,38 +26,37 @@ import services.UserService;
 @RestController
 public class UserController {
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
-	
+
 	@Autowired UserService userService;
-	
+
 	@GetMapping("/user")
 	public Principal user(Principal user) {
-		
 		return user;
 	}
 
 	@PostMapping("/newUser")
-	@ResponseStatus(value=HttpStatus.CREATED)
+	@ResponseStatus(value = HttpStatus.CREATED)
 	public void register(@RequestBody @Validated User user, BindingResult bindingResult) {
-		if(bindingResult.hasErrors()){
+		if (bindingResult.hasErrors()) {
 			log.error("Binding Result contains errors.");
 		}
-		
+
 		userService.register(user);
-		
+
 		log.info("User successfully registered.");
 		log.info("New user details: " + user);
 	}
-	
-	  // Convert a predefined exception to an HTTP Status code
-	  @ResponseStatus(value=HttpStatus.CONFLICT,
-	                  reason="Data integrity violation")  // 409
-	  @ExceptionHandler(MongoException.class)
-	  public void conflict() {
-	    // Nothing to do
-	  }
-	  
-	  @PostMapping(value = "/registrationConfirm")
-	  public void confirmRegistration(@RequestBody String token){
-		  userService.confirmRegistration(token);
-	  }
+
+	@PostMapping(value = "/registrationConfirm")
+	public void confirmRegistration(@RequestBody String token) {
+		userService.confirmRegistration(token);
+	}
+
+	// Convert a predefined exception to an HTTP Status code
+	@ResponseStatus(value = HttpStatus.CONFLICT, reason = "Data integrity violation") // 409
+	@ExceptionHandler(MongoException.class)
+	public void conflict() {
+		// Nothing to do
+	}
+
 }

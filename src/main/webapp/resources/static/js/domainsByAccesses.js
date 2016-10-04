@@ -15,13 +15,15 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
 
         $scope.trigger = {arrived:false};
+        $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
+        /*
         setTimeout(myf, 500);
         function myf() {
             console.log("faccio");
             $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
             $scope.$apply(function(){$scope.trigger.arrived = true;});
         }
-        /*
+
         $scope.changeView = function(ele){
             var currentParam = $routeParams;
             switch(ele) {
@@ -56,26 +58,29 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
     }])
 
     .factory('domainsDownloadFactory',['$resource', function($resource){
-        var requestURI = "http://169.254.84.99:8080/pieAccesses/:year/:month/:day/:view";
+        var pieAccessUri = "http://localhost:8080/pieAccesses/:year/:month/:day/:view";
+        var pieSizeUri = "http://localhost:8080/pieSize/:year/:month/:day/:view";
         var factory = {};
-        /*
+
         factory.getDomainsAccessData = function(year, month, day, view, trigger){
-            return $resource(requestURI).query({year : year, month : month, day : day, view : view}, function (domainList) {
+            return $resource(pieAccessUri).query({year : year, month : month, day : day, view : view}, function (domainList) {
                 console.log("getDomainsAccessData: " + JSON.stringify(domainList));
                 trigger.arrived = true;
             });
         };
-        */
+        /*
         factory.getDomainsAccessData = function(year, month, day, view, trigger){
             var data = [{nRecords:10,server_domain:'google.it'},
                 {nRecords:13,server_domain:'gmail.it'},
                 {nRecords:2,server_domain:'hotmail.it'}];
             return data;
         };
-        factory.getDomainsSizeData = function(){
-          return [{size:33,server_domain:'google.it'},
-              {size:13,server_domain:'gmail.it'},
-              {size:89,server_domain:'hotmail.it'}];
+        */
+        factory.getDomainsSizeData = function(year, month, day, view, trigger){
+            return $resource(pieSizeUri).query({year : year, month : month, day : day, view : view}, function (domainList) {
+                console.log("getDomainsSizeData: " + JSON.stringify(domainList));
+                trigger.arrived = true;
+            });
         };
         return factory;
     }])

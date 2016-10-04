@@ -4,7 +4,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -24,7 +22,7 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
 @Configuration
-@ComponentScan(basePackages={"services", "configurations.security", "listeners"})
+@ComponentScan(basePackages={"services", "configurations.security", "listeners", "configurations.root"})
 @EnableMongoRepositories(basePackages={"repositories"})
 @EnableJpaRepositories(basePackages={"repositories"})
 @EnableTransactionManagement
@@ -49,20 +47,19 @@ public class ConnectionProfilerAppConfig {
 	
 	
 	  public @Bean EntityManagerFactory entityManagerFactory(DataSource dataSource) {
-
+		
 	    HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-	    vendorAdapter.setDatabase(Database.MYSQL);
 	    vendorAdapter.setGenerateDdl(true);
 	    
 	    LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 	    factory.setJpaVendorAdapter(vendorAdapter);
 	    factory.setPackagesToScan("models");
 	    factory.setDataSource(dataSource);
-	    factory.setPersistenceProviderClass(HibernatePersistenceProvider.class);  
-	    //factory.setJpaProperties(new);
+	    
 	    factory.afterPropertiesSet();
 
 	    return factory.getObject();
+	   
 	  }
 
 

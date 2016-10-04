@@ -1,5 +1,6 @@
 package services;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -41,7 +42,7 @@ public class SimpleUserService implements UserService {
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
-        
+        user.setRole("ROLE_USER");
 		userRepository.save(user);
 		
 		// create and save a verification token for this user
@@ -59,15 +60,18 @@ public class SimpleUserService implements UserService {
 
 	@Override
 	public void confirmRegistration(String token) {
-		VerificationToken verificatioToken = tokenRepository.findByToken(token);
+		System.out.println("fisajflkadjflasfskldjfklsjdfklasjfkljklsdfjlaksfjlskdjfkl");
+		VerificationToken verificationToken = tokenRepository.findByToken(token);
 		
-		if(verificatioToken == null){
+		//VerificationToken verificatioToken = verificatioTokenList.get(0);
+		System.out.println(verificationToken);
+		if(verificationToken == null){
 			//the token doesn't exist: bad user
 			//TODO: throw meaningful exception
 			throw new Error("Bad user");
 		}
 		
-		if(verificatioToken.isExpired()){
+		if(verificationToken.isExpired()){
 			//the token has already expired: bad user
 			//TODO: throw meaningful exception
 			throw new Error("Bad user");
@@ -77,7 +81,7 @@ public class SimpleUserService implements UserService {
 		 * The user has presented a correct token: we can set his
 		 * status to enabled
 		 */
-		User user = verificatioToken.getUser();
+		User user = verificationToken.getUser();
 		user.setEnabled(true);
 		userRepository.save(user);
 	}

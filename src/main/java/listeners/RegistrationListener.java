@@ -15,6 +15,9 @@ import services.UserService;
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 	Logger log = LoggerFactory.getLogger(RegistrationListener.class);
 	
+	private final static String EMAIL_SUBJECT = "Confirm your email address";
+	private final static String EMAIL_FROM = "phil@pippo.com";
+	
 	@Autowired JavaMailSender mailSender;
 	
 	@Autowired UserService userService;
@@ -28,15 +31,13 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 		User user = event.getUser();
 		String url = event.getAppUrl() + "confirmRegistration";
 		String token = event.getToken();
+		String recipientAddress = user.getEmail();
 		
 		SimpleMailMessage email = new SimpleMailMessage();
-		String recipientAddress = user.getEmail();
 		email.setTo(recipientAddress);
-		String subject = "Confirm your email address";
-		email.setSubject(subject);
-
+		email.setSubject(EMAIL_SUBJECT);
 		email.setText(url + " " + token);
-		email.setFrom("phil@pippo.com");
+		email.setFrom(EMAIL_FROM);
 		mailSender.send(email);
 	}
 

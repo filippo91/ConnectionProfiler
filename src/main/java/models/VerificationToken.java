@@ -16,11 +16,12 @@ public class VerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-     
+    
+    
     private String token;
    
     @OneToOne(targetEntity = User.class)
-    @JoinColumn(nullable = false, name = "id")
+    @JoinColumn(nullable = false, name = "username")
     private User user;
      
     private Date expiryDate;
@@ -79,4 +80,12 @@ public class VerificationToken {
 		DateTime now = DateTime.now();
 		return now.isAfter(expiryDate.getTime());
 	}
+
+	@Override
+	public String toString() {
+		return "VerificationToken [id=" + id + ", token=" + token + ", user=" + user + ", expiryDate=" + expiryDate
+				+ ", verified=" + verified + "]";
+	}
+	
+	
 }

@@ -1,0 +1,26 @@
+
+    <div class="btn-group row " id="btnDivHist">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               Public Asnums <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="btn btn-default" id="public-showAll" ng-click="showAllAsnum('public');"  isvisible="false">Show All</a></li>
+                <li isVisible="false" ng-repeat="ele in speedDataPublicSplitted" id="general-hist-asnum-{{ele.asnum}}">
+                    <a class="btn btn-default public-asnumButton" id="public-button-{{ele.asnum}}" ng-click="showAsnum(ele.asnum, 'public')">{{ele.asnum}}</a>
+                </li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                User Asnums <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsnum('user');">Hide All</a></li>
+                <li isvisible="false" ng-repeat="ele in speedDataUserSplitted" id="asnum-{{ele.asnum}}">
+                    <a class="btn btn-default user-asnumButton active" id="user-button-{{ele.asnum}}" ng-click="showAsnum(ele.asnum, 'user')">{{ele.asnum}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <speed-histogram class="row"></speed-histogram>

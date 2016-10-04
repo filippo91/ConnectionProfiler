@@ -1,19 +1,11 @@
 package models;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.Length;
 
 
 /**
@@ -27,16 +19,17 @@ import org.hibernate.validator.constraints.Length;
 @Entity(name="users")
 public class User {
 	@Id
-	@Size(min=3, max=10)
+	@Size(min=3, max=20)
 	private  String username;
 	
 	@Email
+	@Column(unique=true)
 	private String email;
 	
-	@Length(min=3, max=10)
+	//@Length(min=3, max=20)
     private String password;
 
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(unique=true)
 	private Integer id;
 	
     private boolean accountNonExpired;
@@ -45,14 +38,10 @@ public class User {
     
     private boolean enabled;
     
-	@ManyToMany
-	@JoinTable(
-			name="user_authority",
-			inverseJoinColumns=@JoinColumn(name="authorities", referencedColumnName="authority"),
-			joinColumns=@JoinColumn(name="users", referencedColumnName="username"))
-    private Set<Authority> roles = new HashSet<Authority>();
+    private String role;
     
     public User() {
+    	id = (int)(Math.random()*1000);
 	}
     
 	public String getUsername() {
@@ -110,19 +99,19 @@ public class User {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-
-	public Set<Authority> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(Set<Authority> roles) {
-		this.roles = roles;
-	}
-
+	
 	public void setEmail(String email){
 		this.email = email;
 	}
 	
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
 	public String getEmail() {
 		return email;
 	}

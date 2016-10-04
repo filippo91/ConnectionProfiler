@@ -3,14 +3,18 @@ package controllers;
 
 import java.util.Collection;
 
+import javax.validation.constraints.Min;
+
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,31 +24,39 @@ import models.BinSpeedDownload;
 import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
+import models.User;
 import services.DownloadService;
 import services.DownloadService.View;
+import services.UserService;
 
 @CrossOrigin
 @RestController
 public class DownloadController {
 	@Autowired private DownloadService downloadService;
-	
-	@RequestMapping("/greeting")
-	public Download greeting(){
-		System.out.println("hello");
-		return new Download();
-	}
+	@Autowired private UserService userService;
 	
 	/*
 	 * @RequestMapping(method=GET) = @GetMapping
 	 */
 	@GetMapping("/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getDownloadsSpeed(
-			@PathVariable int year, 
+			@PathVariable @Min(2016) int year, 
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
-		//get uuid from spring security
-		int uuid = 0;
+		
+		DateTime d = null;
+		try{
+			d = new DateTime(year, month, day, 0, 0);
+		}catch(IllegalArgumentException iae){
+			//TODO: bad date
+			return null;
+		}finally{
+			d = null;
+		}
+		
+		User user = userService.getCurrentUser();
+		int uuid = user.getId();
 		
 		return downloadService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}
@@ -55,7 +67,6 @@ public class DownloadController {
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
-		//get uuid from spring security
 		
 		return downloadService.getAvgDayDownloadsSpeed(year, month, day, view);
 	}
@@ -64,8 +75,8 @@ public class DownloadController {
 	public Collection<Download> getDownloadsSpeedByWeek(
 			@PathVariable int page, 
 			@PathVariable int size){
-		//get uuid from spring security
-		int uuid = 0;
+		User user = userService.getCurrentUser();
+		int uuid = user.getId();
 		
 		return downloadService.getDownloadsSpeed(uuid, page, size);
 	}
@@ -76,7 +87,8 @@ public class DownloadController {
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
-		int uuid = 0;
+		User user = userService.getCurrentUser();
+		int uuid = user.getId();
 		
 		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view);
 	}
@@ -88,7 +100,8 @@ public class DownloadController {
 			@PathVariable int day,
 			@PathVariable View view,
 			@PathVariable int bin_width){
-		int uuid = 0;
+		User user = userService.getCurrentUser();
+		int uuid = user.getId();
 		
 		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
 	}
@@ -110,7 +123,8 @@ public class DownloadController {
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
-		int uuid = 0;
+		User user = userService.getCurrentUser();
+		int uuid = user.getId();
 		
 		return downloadService.getDomainFrequencyAccess(uuid, year, month, day, view);
 	}
@@ -121,17 +135,30 @@ public class DownloadController {
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
-		int uuid = 0;
+		User user = userService.getCurrentUser();
+		int uuid = user.getId();
 		
 		return downloadService.getDomainSizeDownload(uuid, year, month, day, view);
 	}
 	
+	
 	@PostMapping(path="/download")
-	@ResponseStatus(value=HttpStatus.CREATED)
+	@ResponseStatus(value=HttpStatus.CREATED)	
 	public Download saveDownload(@RequestBody Download download)
 	{
-		System.out.println(download);
-		Download download_created = downloadService.saveDownload(download);
-		return download_created;
+		/*
+		 * security concerns: downloadService.setUuid(download);
+		 * make sure the authenticated user is uploading the download
+		 * without messing with the record
+		 */
+		Download downloadCreated = downloadService.saveDownload(download);
+		sendDownload(downloadCreated);
+		return downloadCreated;
+	}
+
+	@MessageMapping("/downloads")
+	@SendTo("/topic/downloads")
+	public Download sendDownload(Download download){
+		return download;
 	}
 }

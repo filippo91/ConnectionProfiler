@@ -1,0 +1,6 @@
+<button class="btn btn-default" ng-click="controller.prevDownload()">-</button>
+<button class="btn btn-default" ng-click="controller.succDownload()">+</button>
+<table class="table table-striped graph" style="position: relative; top: 40px;" id="download-table">
+    <tr><th>#</th><th>Date</th><th>Donwload Speed</th></tr>
+    <tr ng-repeat="ele in controller.downloadList"><th>{{$index + 1}}</th><td>{{ele.timestamp | date:'dd-MM-yyyy'}}</td><td>{{ele.download_speed }}</td></tr>
+</table>

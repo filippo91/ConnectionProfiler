@@ -26,14 +26,22 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = userRepository.findOne(username);
+		User user = userRepository.findByUsername(username);
 		
 		log.info("Load user from user repository: " + user);
+		
 		if(user == null){
 			log.error("User "+ username + " not found");
 			throw new UsernameNotFoundException(username);
 		}
 		
+		
+		if(user.isEnabled()){
+			log.info("Abilitato ");
+		}else{
+			log.info("Non Abilitato ");
+		}
+
 		org.springframework.security.core.userdetails.User userDetails = null;
 		
 		userDetails = new org.springframework.security.core.userdetails.User(
@@ -50,14 +58,13 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 	}
 
 	private List<GrantedAuthority> getAuthorities(User user) {
-		Set<Authority> roles = user.getRoles();
+		String role = user.getRole();
 		
         List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         
-        for (Authority role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getAuthority()));
-        }
+            authorities.add(new SimpleGrantedAuthority(role));
         
         return authorities;
 	}
+
 }

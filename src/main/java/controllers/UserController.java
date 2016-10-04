@@ -2,6 +2,8 @@ package controllers;
 
 import java.security.Principal;
 
+import javax.validation.ConstraintViolationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,7 @@ public class UserController {
 		log.info("New user details: " + user);
 	}
 
-	@PostMapping(value = "/registrationConfirm")
+	@PostMapping(value = "/newUser/confirmRegistration")
 	public void confirmRegistration(@RequestBody String token) {
 		userService.confirmRegistration(token);
 	}
@@ -59,4 +61,9 @@ public class UserController {
 		// Nothing to do
 	}
 
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
+	@ExceptionHandler(ConstraintViolationException.class)
+	public void badNewUser() {
+		// Nothing to do
+	}
 }

@@ -1,0 +1,12 @@
+<div>
+<form name="form" ng-submit="controller.confirmRegistration()" role="form">
+	<div class="form-group" ng-class="{ 'has-error': form.token.$dirty && form.token.$error.required }">
+            <label for="email">token</label>
+            <input type="text" name="token" id="token" class="form-control" ng-model="controller.token" required />
+            <span ng-show="form.token.$dirty && form.token.$error.required" class="help-block">Username is required</span>
+    </div>
+    <div class="form-actions">
+            <button type="submit" ng-disabled="form.$invalid || self.dataLoading" class="btn btn-primary">confirm</button>
+    </div>
+</form>
+</div>

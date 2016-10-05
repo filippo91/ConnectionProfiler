@@ -15,14 +15,16 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         $scope.trigger = {arrived: false};
         $scope.latencyData = [];
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
-        //$scope.latencyData = latencyFactory.getLatencyData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width);
+        $scope.latencyData = latencyFactory.getLatencyData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
+        $scope.latencyDataSplitted = latencyFactory.splitByAsnum($scope.latencyData);
+
+        /*
         setTimeout(myf, 2000);
         function myf() {
             $scope.latencyData = latencyFactory.getLatencyData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width);
             $scope.latencyDataSplitted = latencyFactory.splitByAsnum($scope.latencyData);
             $scope.$apply(function(){$scope.trigger.arrived = true;});
         }
-        /*
         $scope.changeView = function(ele){
             var currentParam = $routeParams;
             switch(ele) {
@@ -83,11 +85,12 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
     .factory('latencyFactory',['$resource', function($resource){
         var requestURL = "latencyHistogram/:year/:month/:day/:view/:bin_width";
         var factory = {};
-        /*factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
+        factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
             var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width});
             trigger.arrived = true;
             return data;
-        };*/
+        };
+        /*
         factory.getLatencyData = function(){
           return [{asnum: "alice", bin : 0, nRecords : 1 },
               {asnum: "alice", bin : 1, nRecords : 11 },
@@ -109,6 +112,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
               {asnum: "fastweb", bin : 9, nRecords : 2 }
           ];
         };
+        */
         factory.splitByAsnum = function(values){
             var ret = [];
             for(var i = 0;i<values.length; i++){

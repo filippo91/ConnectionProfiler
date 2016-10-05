@@ -14,13 +14,16 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
         $("#" + $routeParams.view + "Btn").addClass("active");
 
         $scope.trigger = {arrived:false};
-        setTimeout(myf, 2000);
+        //setTimeout(myf, 2000);
+        
+        $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
+
+        /*
         function myf() {
             $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
             console.log($scope.domainSizeList);
             $scope.$apply(function(){$scope.trigger.arrived = true;});
         }
-        /*
         $scope.changeView = function(ele){
             var currentParam = $routeParams;
             switch(ele) {
@@ -102,7 +105,12 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                         .attr("height", 64);
 
                     var drawPie = function(){
-
+                        svg.selectAll(".arc").remove();
+                        svg.selectAll(".noData").remove();
+                        svg.selectAll(".loading").remove();
+                        svg.selectAll("text").remove();
+                        svg.selectAll("path").remove();
+                        
                         var data =  scope.domainSizeList;
                         if(data === undefined || data.length === 0){
                             svg.append('defs')
@@ -132,11 +140,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             return;
                         }
 
-                        svg.selectAll(".arc").remove();
-                        svg.selectAll(".noData").remove();
-                        svg.selectAll(".loading").remove();
-                        svg.selectAll("text").remove();
-                        svg.selectAll("path").remove();
+
 
                         var g = svg.selectAll(".arc")
                             .data(pie(data))

@@ -62,8 +62,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
     }])
     .factory('speedGraph_downloadManager', ['$resource', function($resource) {
-            var serverURI_user = "http://169.254.84.99:8080/speedGraph/:year/:month/:day/:view",//http://169.254.84.99:8080/speedTable/:page/:size/";
-                serverURI_public = "http://169.254.84.99:8080/speedGraphPublic/:year/:month/:day/:view";
+            var serverURI_user = "http://localhost:8080/connectionProfile/speedGraph/:year/:month/:day/:view",
+                serverURI_public = "http://localhost:8080/connectionProfile/publicSpeedGraph/:year/:month/:day/:view";
             var factory = {};
 
             factory.splitByAsnum = function(downloadList){
@@ -83,6 +83,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 console.log(JSON.stringify(asnumList));
                 return asnumList;
             };
+
+        /*
             factory.getUserDownloads = function (year,month,day,view,trigger, callback) {
                 var date = moment().year(year).month(month).date(day);
                 return [{
@@ -116,14 +118,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     "timestamp": date.subtract(5,'days').valueOf(),
                     "count" : 1
                 }];
-                /*
+         };
                 $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                     downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
                     callback(downloadList);
                     trigger.startDataArrived = ++trigger.count === 2;
                 });
-                */
-            };
+
+         */
             factory.getPublicDownloads = function (year,month,day,view,trigger, callback) {
                 var date = moment().year(year).month(month).date(day);
                 return [{

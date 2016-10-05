@@ -58,8 +58,8 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
     }])
 
     .factory('domainsDownloadFactory',['$resource', function($resource){
-        var pieAccessUri = "http://localhost:8080/pieAccesses/:year/:month/:day/:view";
-        var pieSizeUri = "http://localhost:8080/pieSize/:year/:month/:day/:view";
+        var pieAccessUri = "http://localhost:8080/connectionProfiler/pieAccesses/:year/:month/:day/:view";
+        var pieSizeUri = "http://localhost:8080/connectionProfiler/pieSize/:year/:month/:day/:view";
         var factory = {};
 
         factory.getDomainsAccessData = function(year, month, day, view, trigger){
@@ -134,7 +134,12 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
 
                     var drawPie = function(){
-
+                        svg.selectAll(".arc").remove();
+                        svg.selectAll(".noData").remove();
+                        svg.selectAll(".loading").remove();
+                        svg.selectAll("text").remove();
+                        svg.selectAll("path").remove();
+                        
                         var data =  scope.domainList;
                         if(data === undefined || data.length === 0){
                             svg.append('defs')
@@ -164,11 +169,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                             return;
                         }
 
-                        svg.selectAll(".arc").remove();
-                        svg.selectAll(".noData").remove();
-                        svg.selectAll(".loading").remove();
-                        svg.selectAll("text").remove();
-                        svg.selectAll("path").remove();
+
 
                         var g = svg.selectAll(".arc")
                             .data(pie(data))

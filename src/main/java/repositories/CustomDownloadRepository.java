@@ -61,4 +61,6 @@ public interface CustomDownloadRepository {
 	 */
 	Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, Date start, Date end);
 	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(Date start, Date end);
+
+	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, Date start, Date end);
 }

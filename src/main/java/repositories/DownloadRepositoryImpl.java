@@ -45,7 +45,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		
 		AggregationResults<AvgDaySpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", AvgDaySpeedDownload.class);
 		List<AvgDaySpeedDownload> mappedResult = results.getMappedResults();
-		
+		System.out.println(mappedResult);
 		return mappedResult;
 	}
 	
@@ -88,7 +88,23 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		return mappedResult;
 	}
 	
-
+	@Override
+	public Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, Date start, Date end) {
+		Aggregation agg = newAggregation(
+				match(Criteria.where("timestamp").gte(start)),
+				match(Criteria.where("timestamp").lt(end)),
+		
+				project("asnum").and("download_speed").mod(bin_width).as("bin"),
+				group("asnum", "bin").count().as("nRecords"),
+				project("asnum", "bin").and("nRecords")
+			);
+		
+		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
+		List<BinSpeedDownload> mappedResult = results.getMappedResults();
+		
+		return mappedResult;
+	}
+	
 	@Override
 	public Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end) {
 		Aggregation agg = newAggregation(
@@ -123,6 +139,8 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		AggregationResults<FrequencyAccess> results = mongoTemplate.aggregate(agg, "DOWNLOADS", FrequencyAccess.class);
 		List<FrequencyAccess> mappedResult = results.getMappedResults();
 		
+		System.out.println("getFrequencyAccessesByDomain: " + mappedResult);
+		
 		return mappedResult;
 	}
 
@@ -140,7 +158,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		
 		AggregationResults<SizeDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", SizeDownload.class);
 		List<SizeDownload> mappedResult = results.getMappedResults();
-		
+		log.debug(mappedResult.toString());
 		return mappedResult;
 	}
 

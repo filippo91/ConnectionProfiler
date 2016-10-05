@@ -14,15 +14,20 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         $("#" + $routeParams.view + "Btn").addClass("active");
         $("#timeManager").show();
 
+        var speedDataUser = speedFactory.getSpeedDataUser($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
+        $scope.speedDataUserSplitted = speedFactory.splitByAsnum(speedDataUser);
+        var speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
+        $scope.speedDataPublicSplitted = speedFactory.splitByAsnum(speedDataPublic);
+        $scope.$apply(function(){$scope.trigger.arrived = true;});
+    /*
         setTimeout(myf, 2000);
         function myf() {
-            var speedDataUser = speedFactory.getSpeedDataUser($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width);
+
             $scope.speedDataUserSplitted = speedFactory.splitByAsnum(speedDataUser);
             var speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width);
             $scope.speedDataPublicSplitted = speedFactory.splitByAsnum(speedDataPublic);
             $scope.$apply(function(){$scope.trigger.arrived = true;});
         }
-        /*
         $scope.changeView = function(ele){
             var currentParam = $routeParams;
             switch(ele) {
@@ -81,13 +86,20 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         };
 }])
     .factory('speedFactory',['$resource', function($resource){
-        var requestURL = "latencyHistogram/:year/:month/:day/:view/:bin_width";
+        var userUri = "http://localhost:8080/connectionProfile/speedHistogram/:year/:month/:day/:view/:bin_width";
+        var publicUri = "http://localhost:8080/connectionProfile/publicSpeedHistogram/:year/:month/:day/:view/:bin_width";
         var factory = {};
-        /*factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
-         var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width});
+        factory.getSpeedDataUser = function(year, month, day, view, bin_width, trigger){
+         var data =  $resource(userUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width});
          trigger.arrived = true;
          return data;
-         };*/
+         };
+        factory.getSpeedDataPublic = function(year, month, day, view, bin_width, trigger){
+            var data =  $resource(publicUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width});
+            trigger.arrived = true;
+            return data;
+        };
+        /*
         factory.getSpeedDataUser = function(){
             return [{asnum: "alice", bin : 0, nRecords : 1 },
                 {asnum: "alice", bin : 1, nRecords : 11 },
@@ -145,7 +157,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 {asnum: "megaWeb", bin : 8, nRecords : 1 },
                 {asnum: "megaWeb", bin : 9, nRecords : 1 }
             ];
-        };
+        }; */
         factory.splitByAsnum = function(values){
             var ret = [];
             for(var i = 0;i<values.length; i++){

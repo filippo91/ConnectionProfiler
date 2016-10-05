@@ -97,8 +97,8 @@ public class SimpleUserService implements UserService {
 		 * leverage spring security mechanism to get the current
 		 * user from the security context.
 		 */
-		User user = (User)SecurityContextHolder.getContext().getAuthentication();
-		
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		User user = userRepository.findByUsername(username);
 		return user;
 	}
 }

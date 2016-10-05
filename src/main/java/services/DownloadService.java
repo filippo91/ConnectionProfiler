@@ -2,6 +2,8 @@ package services;
 
 import java.util.Collection;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 //import org.springframework.security.access.prepost.PreAuthorize;
 
 import models.AvgDaySpeedDownload;
@@ -30,7 +32,7 @@ public interface DownloadService {
 	 * @param pageSize
 	 * @return
 	 */
-	//@PreAuthorize(value = "hasRole('USER')")
+	@PreAuthorize("isAuthenticated()")
 	public Collection<Download> getDownloadsSpeed(int uuid, int page, int pageSize);
 	
 	/**
@@ -42,20 +44,29 @@ public interface DownloadService {
 	 * @param end
 	 * @return
 	 */
-	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, int year, int month, int day, View view);
-
-	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view);
-
-	Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width);
-
-	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view);
-
-	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view);
-
+	@PreAuthorize("isAuthenticated()")
+	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, int year, int month, int day, View view);
+	
+	@PreAuthorize("isAuthenticated()")
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view);
-
+	
+	@PreAuthorize("isAuthenticated()")
+	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width);
+	
+	@PreAuthorize("isAuthenticated()")
+	public Collection<BinSpeedDownload> getBinSpeedDownloads(int year, int month, int day, View view, int speedBinWidth);
+	
+	@PreAuthorize("isAuthenticated()")
+	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view,
+			int speedBinWidth);
+	
+	@PreAuthorize("isAuthenticated()")
+	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view);
+	
+	@PreAuthorize("isAuthenticated()")
+	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view);
+	
+	@PreAuthorize("isAuthenticated()")
 	public Download saveDownload(Download download);
 
-	public Collection<BinLatencyDownload> getBinLatencyDownloads(int year, int month, int day, View view,
-			int bin_width);
-}
+	}

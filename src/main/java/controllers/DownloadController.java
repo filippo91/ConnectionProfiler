@@ -6,6 +6,8 @@ import java.util.Collection;
 import javax.validation.constraints.Min;
 
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,6 +27,7 @@ import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
 import models.User;
+import repositories.DownloadRepositoryImpl;
 import services.DownloadService;
 import services.DownloadService.View;
 import services.UserService;
@@ -32,6 +35,8 @@ import services.UserService;
 @CrossOrigin
 @RestController
 public class DownloadController {
+	private static final Logger log = LoggerFactory.getLogger(DownloadController.class);
+	
 	@Autowired private DownloadService downloadService;
 	@Autowired private UserService userService;
 	
@@ -61,8 +66,8 @@ public class DownloadController {
 		return downloadService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}
 	
-	@GetMapping("/speedGraphPublic/{year}/{month}/{day}/{view}")
-	public Collection<AvgDaySpeedDownload> getDownloadsSpeedPublic(
+	@GetMapping("/publicSpeedGraph/{year}/{month}/{day}/{view}")
+	public Collection<AvgDaySpeedDownload> getPublicDownloadsSpeed(
 			@PathVariable int year, 
 			@PathVariable int month, 
 			@PathVariable int day,
@@ -81,16 +86,28 @@ public class DownloadController {
 		return downloadService.getDownloadsSpeed(uuid, page, size);
 	}
 	
-	@GetMapping("/speedHistogram/{year}/{month}/{day}/{view}")
+	@GetMapping("/speedHistogram/{year}/{month}/{day}/{view}/{width}")
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 
 			@PathVariable int day,
-			@PathVariable View view){
+			@PathVariable View view,
+			@PathVariable int width){
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
 		
-		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view);
+		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view, width);
+	}
+	
+	@GetMapping("/publicSpeedHistogram/{year}/{month}/{day}/{view}/{width}")
+	public Collection<BinSpeedDownload> getPublicBinSpeedDownloads(
+			@PathVariable int year, 
+			@PathVariable int month, 
+			@PathVariable int day,
+			@PathVariable View view,
+			@PathVariable int width){
+		
+		return downloadService.getBinSpeedDownloads(year, month, day, view, width);
 	}
 	
 	@GetMapping("/latencyHistogram/{year}/{month}/{day}/{view}/{bin_width}")
@@ -104,17 +121,6 @@ public class DownloadController {
 		int uuid = user.getId();
 		
 		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
-	}
-	
-	@GetMapping("/latencyHistogramPublic/{year}/{month}/{day}/{view}/{bin_width}")
-	public Collection<BinLatencyDownload> getBinLatencyDownloadsPublic(
-			@PathVariable int year, 
-			@PathVariable int month, 
-			@PathVariable int day,
-			@PathVariable View view,
-			@PathVariable int bin_width){
-		
-		return downloadService.getBinLatencyDownloads(year, month, day, view, bin_width);
 	}
 	
 	@GetMapping("/pieAccesses/{year}/{month}/{day}/{view}")
@@ -138,6 +144,7 @@ public class DownloadController {
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
 		
+		log.debug("getDomainSizeDownload for " + uuid);
 		return downloadService.getDomainSizeDownload(uuid, year, month, day, view);
 	}
 	

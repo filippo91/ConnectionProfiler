@@ -22,7 +22,7 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
         };
 }])
 .factory('speedTable_downloadManager', ['$resource', function($resource) {
-        var serverURI = "http://169.254.84.99:8080/speedTable/:page/:size/";
+        var serverURI = "http://localhost:8080/connectionProfiler/speedTable/:page/:size";
         var factory = {};
         factory.getDownloads = function (page,size) {
             return $resource(serverURI).query({page: page, size: size}, function (downloadList) {

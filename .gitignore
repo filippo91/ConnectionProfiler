@@ -78,11 +78,5 @@ mvn*
 # Code Recommenders
 .recommenders/
 
-# mock data
-mock*
-
-#properties file
-src/main/resources/application.properties
-
 #webstorm
 .idea

@@ -111,7 +111,7 @@ public class MyDownloadService implements DownloadService {
 	
 	private Date getEndDate(int year, int month, int day, View view) {
 		DateTime date;
-		date = new DateTime(year, month, day, 0, 0);
+		date = new DateTime(year, month+1, day, 0, 0);
 		
 		switch(view){
 		case week:
@@ -130,7 +130,7 @@ public class MyDownloadService implements DownloadService {
 
 	private Date getStartDate(int year, int month, int day, View view) {
 		DateTime date;
-		date = new DateTime(year, month, day, 0, 0);
+		date = new DateTime(year, month+1, day, 0, 0);
 		
 		switch(view){
 		case week:

@@ -166,12 +166,14 @@ public class DownloadController {
 		 */
 		Download downloadCreated = downloadService.saveDownload(download);
 		sendDownload(downloadCreated);
+		System.out.println(downloadCreated);
 		return downloadCreated;
 	}
 
 	@MessageMapping("/downloads")
 	@SendTo("/topic/downloads")
 	public Download sendDownload(Download download){
+		System.out.println("sending record");
 		return download;
 	}
 }

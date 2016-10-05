@@ -13,7 +13,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
         $("#timeManager").show();
         $("#" + $routeParams.view + "Btn").addClass("active");
 
-        $scope.trigger = {arrived:false};
+        $scope.trigger = {arrived:false, newAccess: undefined};
         //setTimeout(myf, 2000);
         
         $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
@@ -104,7 +104,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                         .attr("width", 64)
                         .attr("height", 64);
 
-                    var drawPie = function(){
+                    var drawPie = function(animation){
                         svg.selectAll(".arc").remove();
                         svg.selectAll(".noData").remove();
                         svg.selectAll(".loading").remove();
@@ -149,10 +149,13 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                         var path  = g.append("path")
                             .attr("d", arc)
-                            .style("fill", function(d) { return color(d.data.server_domain); })
-                            .transition()
-                            .duration(750)
-                            .attrTween("d", tweenPie);
+                            .style("fill", function(d) { return color(d.data.server_domain); });
+
+                        if(animation) {
+                            path.transition()
+                                .duration(750)
+                                .attrTween("d", tweenPie);
+                        }
 
                         g.append("text")
                             .attr("transform", function(d) {return "translate(" + labelArc.centroid(d) + ")"; })
@@ -193,13 +196,13 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                     scope.$watch('trigger.arrived', function (newVal) {
                         if(newVal === true) {
                             console.log("Change");
-                            drawPie();
+                            drawPie(true);
                         }
                     });
-                    scope.$watch('newUserAsnumDailyAVG_trigger',function(asnum){
-                        if(asnum !== undefined) {
+                    scope.$watch('trigger.newSize',function(newVal){
+                        if(newVal !== undefined) {
                             console.log("disegno pie!");
-                            drawPie();
+                            drawPie(false);
                         }
                     });
 

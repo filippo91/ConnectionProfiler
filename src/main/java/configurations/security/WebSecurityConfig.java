@@ -33,9 +33,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/connection-profiler-websocket/**", "img/**", "/index.html", "/newUser/**", "/css/**", "/js/**", "/partials/public/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
+				.httpBasic().and()
 			.csrf()
-				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+				.disable();
+				/*.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 				.and()
-			.httpBasic();
+			.httpBasic();*/
 	}
 }

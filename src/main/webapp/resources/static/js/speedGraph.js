@@ -10,7 +10,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
     }])
     .controller('speedGraph', ['$route', '$routeParams', '$scope', 'speedGraph_downloadManager', '$rootScope', function($route, $routeParams, $scope, downloadManager,$rootScope) {
 
-        $scope.trigger = {arrived:false, count: 0};
+        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined};
         $("#timeManager").show();
 
         function updateRootScopeCallback(data, t){
@@ -46,6 +46,20 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             console.log(JSON.stringify($scope.publicDownloadList));
             $scope.$apply(function(){$scope.trigger.publicDataArrived = true;});
         },350); */
+
+        function websocketCallbackPublic(){
+            var download;
+            downloadManager.updateDownloads($rootScope.rowPublicDownloadList, download);
+            $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
+            $scope.trigger.newSpeedDataPublic = true;
+        }
+
+        function websocketCallbackUser(){
+            var download;
+            downloadManager.updateDownloads($rootScope.rowUserDownloadList, download);
+            $scope.userDownloadList = downloadManager.splitByAsnum($rootScope.rowUserDownloadList);
+            $scope.trigger.newSpeedDataUser = true;
+        }
 
         $scope.showAllAsnum = function(aType){
             var ele = $('#'+aType+'-showAll');
@@ -110,6 +124,17 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 callback(downloadList,false);
                 trigger.arrived = ++trigger.count === 2;
             });
+        };
+        factory.updateDownloads = function(downloadList, download){
+            var i;
+            for(i = 0; i< downloadList.length; i++){
+                if(downloadList[i].asnum === download.asnum && downloadList[i].timestamp === download.timestamp){
+                    download[i].speed = (downloadList[i].count * downloadList[i].speed + download.speed) / (downloadList[i] + 1);
+                    break;
+                }
+            }
+            if(i === downloadList.length)
+                downloadList.push({asnum : download.asnum, count : 1,speed : download.speed, timestamp : download.timestamp})
         };
         /*
             factory.getUserDownloads = function (year,month,day,view,trigger, callback) {

@@ -13,13 +13,13 @@ function setConnected(connected) {
 }
 
 function connect() {
-    var socket = new SockJS('/connectionProfiler/connection-profiler-websocket');
+    var socket = new SockJS('http:/connectionProfiler/connection-profiler-websocket');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
         stompClient.subscribe('/topic/downloads', function (download) {
-            showGreeting(JSON.parse(download.body).content);
+           console.log("dow : " + download)
         });
     });
 }

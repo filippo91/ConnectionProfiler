@@ -97,7 +97,6 @@ angular.module('myApp', [
 
               self.currentDate = moment();
 
-          
           ////////////////
           
           var authenticate = function(credentials, callback) {

@@ -88,34 +88,10 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
             var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width}, function(latencyData){
             	trigger.arrived = true;
-                console.log(JSON.stringify(data));  
                 console.log(JSON.stringify(latencyData)); 
             });
             return data;
         };
-        /*
-        factory.getLatencyData = function(){
-          return [{asnum: "alice", bin : 0, nRecords : 1 },
-              {asnum: "alice", bin : 1, nRecords : 11 },
-              {asnum: "alice", bin : 2, nRecords : 12 },
-              {asnum: "alice", bin : 3, nRecords : 14 },
-              {asnum: "alice", bin : 4, nRecords : 15 },
-              {asnum: "alice", bin : 5, nRecords : 16 },
-              {asnum: "alice", bin : 7, nRecords : 14 },
-              {asnum: "alice", bin : 8, nRecords : 13 },
-              {asnum: "alice", bin : 9, nRecords : 12 },
-              {asnum: "fastweb", bin : 0, nRecords : 4 },
-              {asnum: "fastweb", bin : 1, nRecords : 3 },
-              {asnum: "fastweb", bin : 2, nRecords : 14 },
-              {asnum: "fastweb", bin : 3, nRecords : 1 },
-              {asnum: "fastweb", bin : 4, nRecords : 24 },
-              {asnum: "fastweb", bin : 5, nRecords : 17 },
-              {asnum: "fastweb", bin : 7, nRecords : 11 },
-              {asnum: "fastweb", bin : 8, nRecords : 1 },
-              {asnum: "fastweb", bin : 9, nRecords : 2 }
-          ];
-        };
-        */
         factory.splitByAsnum = function(values){
             var ret = [];
             console.log("values: " + JSON.stringify(values));
@@ -181,8 +157,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                             .attr('y', 0)
                             .attr('width', 10)
                             .attr('height', 10)
-                            .attr('opacity', 0.1)
-                            .attr("transform","translate(" + width/2 + ", " + height/2 + ")");
+                            .attr('opacity', 0.1);
 
                         svg.append("circle")
                             .attr("r", radius)
@@ -263,4 +238,18 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             });
         }
     }
-});
+})
+    .filter('getAsnumList',function(){
+        return function(input){
+            console.log("sdafdsafsdafasd");
+            var  ret = [];
+            if(input.length === 0) return ret;
+            input.forEach(function(download){
+                if(ret.indexOf(download.asnum) === -1)
+                    ret[ret.length] = (download.asnum);
+            });
+            console.log("split");
+            console.log(JSON.stringify(ret));
+            return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
+        };
+    });

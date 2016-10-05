@@ -6,8 +6,8 @@
             </button>
             <ul class="dropdown-menu">
                 <li><a class="btn btn-default" id="public-showAll" ng-click="showAllAsnum('public');"  isvisible="false">Show All</a></li>
-                <li isVisible="false" ng-repeat="ele in speedDataPublicSplitted" id="general-hist-asnum-{{ele.asnum}}">
-                    <a class="btn btn-default public-asnumButton" id="public-button-{{ele.asnum}}" ng-click="showAsnum(ele.asnum, 'public')">{{ele.asnum}}</a>
+                <li isVisible="false" ng-repeat="ele in (speedDataPublic | getAsnumList)" id="general-hist-asnum-{{ele}}">
+                    <a class="btn btn-default public-asnumButton" id="public-button-{{ele}}" ng-click="showAsnum(ele, 'public')">{{ele}}</a>
                 </li>
             </ul>
         </div>
@@ -17,8 +17,8 @@
             </button>
             <ul class="dropdown-menu">
                 <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsnum('user');">Hide All</a></li>
-                <li isvisible="false" ng-repeat="ele in speedDataUserSplitted" id="asnum-{{ele.asnum}}">
-                    <a class="btn btn-default user-asnumButton active" id="user-button-{{ele.asnum}}" ng-click="showAsnum(ele.asnum, 'user')">{{ele.asnum}}</a>
+                <li isvisible="false" ng-repeat="ele in (speedDataUser | getAsnumList)" id="asnum-{{ele}}">
+                    <a class="btn btn-default user-asnumButton active" id="user-button-{{ele}}" ng-click="showAsnum(ele, 'user')">{{ele}}</a>
                 </li>
             </ul>
         </div>

@@ -10,9 +10,21 @@ angular.module('myApp.speedGraph', ['ngRoute'])
     }])
     .controller('speedGraph', ['$route', '$routeParams', '$scope', 'speedGraph_downloadManager', '$rootScope', function($route, $routeParams, $scope, downloadManager,$rootScope) {
 
-        $scope.trigger = {publicDataArrived:false, userDataArrived: false};
+        $scope.trigger = {arrived:false, count: 0};
         $("#timeManager").show();
 
+        function updateRootScopeCallback(data, t){
+            if(t) {
+                $rootScope.rowUserDownloadList = $rootScope.rowUserDownloadList.concat(data);
+                $scope.userDownloadList = downloadManager.splitByAsnum( $rootScope.rowUserDownloadList);
+            }else {
+                $rootScope.rowPublicDownloadList = $rootScope.rowPublicDownloadList.concat(data);
+                $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
+            }
+        }
+        downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
+        downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
+/*
         setTimeout(function(){
             //$scope.userDownloadList = downloadManager.splitByAsnum(downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width));
             $rootScope.rowUserDownloadList = $rootScope.rowUserDownloadList.concat(
@@ -33,7 +45,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
             console.log(JSON.stringify($scope.publicDownloadList));
             $scope.$apply(function(){$scope.trigger.publicDataArrived = true;});
-        },350);
+        },350); */
 
         $scope.showAllAsnum = function(aType){
             var ele = $('#'+aType+'-showAll');
@@ -61,9 +73,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         };
 
     }])
+
     .factory('speedGraph_downloadManager', ['$resource', function($resource) {
-            var serverURI_user = "http://localhost:8080/connectionProfile/speedGraph/:year/:month/:day/:view",
-                serverURI_public = "http://localhost:8080/connectionProfile/publicSpeedGraph/:year/:month/:day/:view";
+            var serverURI_user = "http://localhost:8080/connectionProfiler/speedGraph/:year/:month/:day/:view",
+                serverURI_public = "http://localhost:8080/connectionProfiler/publicSpeedGraph/:year/:month/:day/:view";
             var factory = {};
 
             factory.splitByAsnum = function(downloadList){
@@ -84,6 +97,20 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 return asnumList;
             };
 
+        factory.getUserDownloads = function (year,month,day,view,trigger, callback){
+           return $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
+                downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                callback(downloadList,true);
+                trigger.arrived = ++trigger.count === 2;
+            });
+        };
+        factory.getPublicDownloads = function (year,month,day,view,trigger, callback){
+            return $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
+                downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                callback(downloadList,false);
+                trigger.arrived = ++trigger.count === 2;
+            });
+        };
         /*
             factory.getUserDownloads = function (year,month,day,view,trigger, callback) {
                 var date = moment().year(year).month(month).date(day);
@@ -125,7 +152,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     trigger.startDataArrived = ++trigger.count === 2;
                 });
 
-         */
+
             factory.getPublicDownloads = function (year,month,day,view,trigger, callback) {
                 var date = moment().year(year).month(month).date(day);
                 return [{
@@ -159,14 +186,12 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     "timestamp": date.subtract(5,'days').valueOf(),
                     "count" : 1
                 }];
-                /*
                 $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                     downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
                     callback(downloadList);
                     trigger.startDataArrived = ++trigger.count === 2;
                 });
-                */
-            };
+            };*/
             return factory;
         }])
     .factory('d3Service', ['$document', '$q', '$rootScope',
@@ -345,8 +370,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         //var userDownloadList = scope.userDownloadList;
                         //var publicDownloadList = scope.publicDownloadList;
 
-                        console.log(userDownloadList);
-                        console.log(publicDownloadList);
+                        console.log("user: " + JSON.stringify(userDownloadList));
+                        console.log("public: " + JSON.stringify(publicDownloadList));
 
                         //max user
                         var maxList_y_user = [], maxList_y_pub = [], valueList_x_user = [], valueList_x_pub = [];
@@ -494,9 +519,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .style("top", (y - 28) + "px");
                         });
                     }
-                    scope.$watch('trigger.publicDataArrived', function (newVal) {
+                    scope.$watch('trigger.arrived', function (newVal) {
                         if (newVal === true) {
-                            drawGraph(scope.userDownloadList, scope.publicDownloadList, $rootScope.rowPublicDownloadList);
+                            console.log("disegno");
+                            drawGraph(
+                                scope.userDownloadList,
+                                scope.publicDownloadList,
+                                $rootScope.rowPublicDownloadList
+                            );
                         }
                     });
                 });

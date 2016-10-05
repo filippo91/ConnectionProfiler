@@ -13,8 +13,8 @@
     </button>
     <ul class="dropdown-menu">
         <li ><a class="btn btn-default active" id="showAll" ng-click="showAllAsnum();">Hide All</a></li>
-        <li isvisible="false" ng-repeat="ele in latencyDataSplitted" id="asnum-{{ele.asnum}}">
-            <a class="btn btn-default asnumButton active" id="button-{{ele.asnum}}" ng-click="showAsnum(ele.asnum)">{{ele.asnum}}</a>
+        <li isvisible="false" ng-repeat="ele in (latencyData | getAsnumList)" id="asnum-{{ele}}">
+            <a class="btn btn-default asnumButton active" id="button-{{ele}}" ng-click="showAsnum(ele)">{{ele}}</a>
         </li>
     </ul>
 </div>

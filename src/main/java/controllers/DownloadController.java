@@ -36,6 +36,8 @@ import services.UserService;
 @RestController
 public class DownloadController {
 	private static final Logger log = LoggerFactory.getLogger(DownloadController.class);
+
+	private static final int ONE_MBIT = 1000000;
 	
 	@Autowired private DownloadService downloadService;
 	@Autowired private UserService userService;
@@ -45,7 +47,7 @@ public class DownloadController {
 	 */
 	@GetMapping("/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getDownloadsSpeed(
-			@PathVariable @Min(2016) int year, 
+			@PathVariable int year, 
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
@@ -96,6 +98,8 @@ public class DownloadController {
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
 		
+		width *= ONE_MBIT;
+		
 		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view, width);
 	}
 	
@@ -106,6 +110,8 @@ public class DownloadController {
 			@PathVariable int day,
 			@PathVariable View view,
 			@PathVariable int width){
+		
+		width *= ONE_MBIT;
 		
 		return downloadService.getBinSpeedDownloads(year, month, day, view, width);
 	}

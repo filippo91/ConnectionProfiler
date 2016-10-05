@@ -79,7 +79,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		
 				project("asnum").and("download_speed").divide(bin_width).as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("asnum", "bin", "nRecords")
+				project("nRecords").and("asnum").previousOperation().and("bin").previousOperation()
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
@@ -98,7 +98,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		
 				project("asnum").and("download_speed").divide(bin_width).as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("asnum", "bin", "nRecords")
+				project("nRecords").and("asnum").previousOperation().and("bin").previousOperation()
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);

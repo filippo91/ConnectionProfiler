@@ -22,6 +22,10 @@ public class BinSpeedDownload {
 	public void setnRecords(Integer nRecords) {
 		this.nRecords = nRecords;
 	}
+	@Override
+	public String toString() {
+		return "BinSpeedDownload [asnum=" + asnum + ", bin=" + bin + ", nRecords=" + nRecords + "]";
+	}
 	
 	
 	

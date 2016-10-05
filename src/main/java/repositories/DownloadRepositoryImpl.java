@@ -77,13 +77,15 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 		
-				project("asnum").and("download_speed").mod(bin_width).as("bin"),
+				project("asnum").and("download_speed").divide(bin_width).as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("asnum", "bin").and("nRecords")
+				project("asnum", "bin", "nRecords")
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
 		List<BinSpeedDownload> mappedResult = results.getMappedResults();
+		
+		System.out.println(mappedResult);
 		
 		return mappedResult;
 	}
@@ -94,13 +96,15 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 		
-				project("asnum").and("download_speed").mod(bin_width).as("bin"),
+				project("asnum").and("download_speed").divide(bin_width).as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("asnum", "bin").and("nRecords")
+				project("asnum", "bin", "nRecords")
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
 		List<BinSpeedDownload> mappedResult = results.getMappedResults();
+		
+		System.out.println(mappedResult);
 		
 		return mappedResult;
 	}

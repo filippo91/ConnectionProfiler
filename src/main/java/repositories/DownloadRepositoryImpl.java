@@ -118,7 +118,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		
 		AggregationResults<BinLatencyDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinLatencyDownload.class);
 		List<BinLatencyDownload> mappedResult = results.getMappedResults();
-
+		System.out.println(mappedResult);
 		return mappedResult;
 	}
 

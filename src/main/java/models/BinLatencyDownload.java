@@ -22,6 +22,10 @@ public class BinLatencyDownload {
 	public void setnRecords(Integer nRecords) {
 		this.nRecords = nRecords;
 	}
+	@Override
+	public String toString() {
+		return "BinLatencyDownload [asnum=" + asnum + ", bin=" + bin + ", nRecords=" + nRecords + "]";
+	}
 	
 	
 }

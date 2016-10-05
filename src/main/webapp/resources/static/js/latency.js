@@ -16,7 +16,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         $scope.latencyData = [];
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
         $scope.latencyData = latencyFactory.getLatencyData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
-        $scope.latencyDataSplitted = latencyFactory.splitByAsnum($scope.latencyData);
+        //$scope.latencyDataSplitted = latencyFactory.splitByAsnum($scope.latencyData);
 
         /*
         setTimeout(myf, 2000);
@@ -83,11 +83,14 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
     }])
 
     .factory('latencyFactory',['$resource', function($resource){
-        var requestURL = "latencyHistogram/:year/:month/:day/:view/:bin_width";
+        var requestURL = "http://localhost:8080/connectionProfiler/latencyHistogram/:year/:month/:day/:view/:bin_width";
         var factory = {};
         factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
-            var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width});
-            trigger.arrived = true;
+            var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width}, function(latencyData){
+            	trigger.arrived = true;
+                console.log(JSON.stringify(data));  
+                console.log(JSON.stringify(latencyData)); 
+            });
             return data;
         };
         /*
@@ -115,6 +118,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         */
         factory.splitByAsnum = function(values){
             var ret = [];
+            console.log("values: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
                     if(values[i].asnum === ret[j].asnum){
@@ -130,7 +134,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         return factory;
     }])
 
-.directive('latencyHistogram',function($route, $routeParams,d3Service){
+.directive('latencyHistogram',function($route, $routeParams,d3Service,latencyFactory){
     return {
         restrict: 'E',
         link: function(scope,element){
@@ -138,7 +142,8 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                 var margin = {top: 10, right: 30, bottom: 30, left: 30},
                     width = 960 - margin.left - margin.right,
-                    height = 500 - margin.top - margin.bottom;
+                    height = 500 - margin.top - margin.bottom,
+                    radius = Math.min(width, height) / 2;
 
                 var color = d3.scale.category10();
 
@@ -161,7 +166,35 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                     svg.selectAll(".loading").remove();
                     var values = scope.latencyData;
-                    var values_arr = scope.latencyDataSplitted;
+                    var values_arr = latencyFactory.splitByAsnum(values);
+                    if(values === undefined || values.length === 0){
+                        svg.append('defs')
+                            .append('pattern')
+                            .attr('id', 'diagonalHatch')
+                            .attr('patternUnits', 'userSpaceOnUse')
+                            .attr('class', 'noData')
+                            .attr('width', 10)
+                            .attr('height', 10)
+                            .append('image')
+                            .attr('xlink:href', 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxMCcgaGVpZ2h0PScxMCc+CiAgPHJlY3Qgd2lkdGg9JzEwJyBoZWlnaHQ9JzEwJyBmaWxsPSdibGFjaycvPgogIDxwYXRoIGQ9J00tMSwxIGwyLC0yCiAgICAgICAgICAgTTAsMTAgbDEwLC0xMAogICAgICAgICAgIE05LDExIGwyLC0yJyBzdHJva2U9J3doaXRlJyBzdHJva2Utd2lkdGg9JzInLz4KPC9zdmc+')
+                            .attr('x', 0)
+                            .attr('y', 0)
+                            .attr('width', 10)
+                            .attr('height', 10)
+                            .attr('opacity', 0.1)
+                            .attr("transform","translate(" + width/2 + ", " + height/2 + ")");
+
+                        svg.append("circle")
+                            .attr("r", radius)
+                            .attr('fill', 'url(#diagonalHatch)');
+
+                        svg.append("text")
+                            .style("text-anchor", "middle")
+                            .style("font-family", "sans-serif")
+                            .style("font-size", "20px")
+                            .text("No data to show");
+                        return;
+                    }
                     var maxBin = d3.max(values,function(e){return e.bin;}), maxValueX = (maxBin + 1) * $routeParams.bin_width, maxValueY = d3.max(values, function(e){ return e.nRecords});
 
                     console.log("max x : " + maxValueX);

@@ -77,9 +77,10 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 		
-				project("asnum").and("download_speed").divide(bin_width).as("bin"),
+				project("asnum").and("download_speed").divide(bin_width).as("binFloat"),
+				project("asnum").andExpression("binFloat - binFloat % 1").as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("nRecords").and("asnum").previousOperation().and("bin").previousOperation()
+				project("nRecords", "asnum", "bin")
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
@@ -96,9 +97,10 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 		
-				project("asnum").and("download_speed").divide(bin_width).as("bin"),
+				project("asnum").and("download_speed").divide(bin_width).as("binFloat"),
+				project("asnum").andExpression("binFloat - binFloat % 1").as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
-				project("nRecords").and("asnum").previousOperation().and("bin").previousOperation()
+				project("nRecords", "asnum", "bin")
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
@@ -115,7 +117,8 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				project("asnum").and("connect_time").divide(bin_width).as("bin"),
+				project("asnum").and("connect_time").divide(bin_width).as("binFloat"),
+				project("asnum").andExpression("binFloat - binFloat % 1").as("bin"),
 				group("asnum", "bin").count().as("nRecords"),
 				project("asnum", "bin", "nRecords")
 			);

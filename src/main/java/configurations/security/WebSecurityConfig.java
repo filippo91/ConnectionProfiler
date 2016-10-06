@@ -28,14 +28,31 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		/*
 		http
+			.authorizeRequests()
+			.anyRequest()
+			.permitAll()
+			.and()
+			.csrf()
+			.disable();
+				*/
+		http
+		
 			.authorizeRequests()
 				.antMatchers("/connection-profiler-websocket/**", "img/**", "/index.html", "/newUser/**", "/css/**", "/js/**", "/partials/public/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
+			.httpBasic()
+				.and()
+			.csrf()
+				.disable();
+	
+				/*
 			.csrf()
 				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 				.and()
 			.httpBasic();
+			*/
 	}
 }

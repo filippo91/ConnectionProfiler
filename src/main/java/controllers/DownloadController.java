@@ -1,17 +1,17 @@
+
 package controllers;
 
 
+import java.security.Principal;
 import java.util.Collection;
-
-import javax.validation.constraints.Min;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +27,6 @@ import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
 import models.User;
-import repositories.DownloadRepositoryImpl;
 import services.DownloadService;
 import services.DownloadService.View;
 import services.UserService;
@@ -36,7 +35,8 @@ import services.UserService;
 @RestController
 public class DownloadController {
 	private static final Logger log = LoggerFactory.getLogger(DownloadController.class);
-
+	
+	@Autowired private SimpMessagingTemplate messagingTemplate;
 	private static final int ONE_MBIT = 1000000;
 	
 	@Autowired private DownloadService downloadService;
@@ -157,7 +157,7 @@ public class DownloadController {
 	
 	@PostMapping(path="/download")
 	@ResponseStatus(value=HttpStatus.CREATED)	
-	public Download saveDownload(@RequestBody Download download)
+	public Download saveDownload(@RequestBody Download download, Principal principal)
 	{
 		/*
 		 * security concerns: downloadService.setUuid(download);
@@ -165,13 +165,10 @@ public class DownloadController {
 		 * without messing with the record
 		 */
 		Download downloadCreated = downloadService.saveDownload(download);
-		sendDownload(downloadCreated);
+	
+		messagingTemplate.convertAndSend("/topic/downloads", new GenericMessage<Download>(downloadCreated));
+		messagingTemplate.convertAndSendToUser(principal.getName(), "/downloads", new GenericMessage<Download>(downloadCreated));
+		
 		return downloadCreated;
-	}
-
-	@MessageMapping("/downloads")
-	@SendTo("/topic/downloads")
-	public Download sendDownload(Download download){
-		return download;
 	}
 }

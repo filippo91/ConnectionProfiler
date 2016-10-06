@@ -22,13 +22,16 @@ import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
 @Configuration
-@ComponentScan(basePackages={"services", "configurations.security", "listeners", "configurations.root"})
+@ComponentScan(basePackages={"services", "configurations.security", "listeners", "configurations.root", "controllers"})
 @EnableMongoRepositories(basePackages={"repositories"})
 @EnableJpaRepositories(basePackages={"repositories"})
 @EnableTransactionManagement
+//@PropertySource("classpath:application.properties")
 public class ConnectionProfilerAppConfig {
+	
 	//RootContext
 	public @Bean Mongo mongo() throws Exception {
+		
 		return new MongoClient("localhost");
 	}
 	

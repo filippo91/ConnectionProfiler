@@ -1,3 +1,4 @@
+
 'use strict';
 
 // Declare app level module which depends on views, and components
@@ -44,16 +45,62 @@ angular.module('myApp', [
   $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
 }])
 
-.controller('home', function($http) {
+.controller('home', function($rootScope, $http) {
   var self = this;
   
+  var publicSubscription = null;
+  var privateSubscription = null;
+  
+  self.msg = "default message";
+  self.connectPublic = function () {
+	  var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+	  var stompClient = Stomp.over(socket);
+	    stompClient.connect({}, function (frame) {
+	        console.log('Connected: ' + frame);
+	        publicSubscription = stompClient.subscribe('/topic/downloads', function (download) {
+	            console.log(JSON.parse(download.body));
+	        });
+	    });
+	};
+	
+	self.connectPrivate = function () {
+		var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+		 var stompClient = Stomp.over(socket);
+	    stompClient.connect({}, function (frame) {
+	        console.log('Connected: ' + frame);
+	        privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (download) {
+	        	console.log(JSON.parse(download.body));
+	        });
+	    });
+	};
+	
+	self.send = function(){
+		stompClient.send("/app/hello", {}, "ciao");
+				
+	};
+	
+	
+	self.disconnectPublic = function(){
+		if(publicSubscription != null){
+			publicSubscription.unsubscribe();
+			publicSubscription = null;
+		}
+	};
+	
+	self.disconnectPrivate = function(){
+		if(privateSubscription != null){
+			privateSubscription.unsubscribe();
+			privateSubscription = null;
+		}
+	};
+	
 })
 
 .controller('navigation',
   function($rootScope, $http, $location, $route, $routeParams) {
 
           var self = this;
-
+          $rootScope.user = {};
           /////////////////
           
           $rootScope.rowUserDownloadList =[];
@@ -111,12 +158,15 @@ angular.module('myApp', [
             $http.get('http://localhost:8080/connectionProfiler/user', {headers : headers}).then(function(response) {
               if (response.data.name) {
                 $rootScope.authenticated = true;
+                $rootScope.user.name = response.data.name;
               } else {
                 $rootScope.authenticated = false;
+                $rootScope.user.name = "";
               }
               callback && callback();
             }, function() {
               $rootScope.authenticated = false;
+              $rootScope.user.name = "";
               callback && callback();
             });
 

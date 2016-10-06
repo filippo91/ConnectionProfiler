@@ -14,8 +14,29 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
         $("#timeManager").show();
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
 
-        $scope.trigger = {arrived:false};
+        $scope.trigger = {arrived:false, newAccess : undefined};
         $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
+        var stompClient = null;
+        $scope.connect = function(){
+            var socket = new SockJS('/connectionProfiler/connection-profiler-websocket');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/downloads', function (download) {
+                    console.log("download: " + download);
+                    domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
+                    console.log("dopo update:");
+                    console.log("domainList: " + JSON.stringify(domainList));
+                    $scope.trigger.newAccess = true;
+                });
+            });
+        };
+       $scope.$on('$destroy',function(){
+           if (stompClient != null) {
+               stompClient.disconnect();
+           }
+       });
+
         /*
         setTimeout(myf, 500);
         function myf() {
@@ -82,6 +103,28 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                 trigger.arrived = true;
             });
         };
+        factory.updateDomainAccessList = function(domainList,download){
+            var i;
+            for(i=0;i<domainList.length;i++){
+                if(domainList[i].asnum === download.asnum && domainList[i].domain === download.domain){
+                    domainList[i].nRecords++; break;
+                }
+            }
+            if(i === domainList.length)
+                domainList.push({asnum:download.asnum, domain: download.domain, nRecords: 1});
+            console.log("domainList: " + JSON.stringify(domainList));
+        };
+        factory.updateDomainSizeList = function(domainSizeList,download){
+            var i;
+            for(i=0;i<domainSizeList.length;i++){
+                if(domainSizeList[i].asnum === download.asnum && domainSizeList[i].domain === download.domain){
+                    domainSizeList[i].size += download.size; break;
+                }
+            }
+            if(i === domainSizeList.length)
+                domainSizeList.push({asnum:download.asnum, domain: download.domain, size: download.size});
+            console.log("updateDomainSizeList: " + JSON.stringify(domainSizeList));
+        };
         return factory;
     }])
 
@@ -133,7 +176,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                         .attr("height", 64);
 
 
-                    var drawPie = function(){
+                    var drawPie = function(animation){
                         svg.selectAll(".arc").remove();
                         svg.selectAll(".noData").remove();
                         svg.selectAll(".loading").remove();
@@ -178,10 +221,12 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
                         var path  = g.append("path")
                             .attr("d", arc)
-                            .style("fill", function(d) { return color(d.data.server_domain); })
-                            .transition()
-                            .duration(750)
-                            .attrTween("d", tweenPie);
+                            .style("fill", function(d) { return color(d.data.server_domain); });
+                        if(animation) {
+                            path.transition()
+                                .duration(750)
+                                .attrTween("d", tweenPie);
+                        }
 
                         g.append("text")
                             .attr("transform", function(d) {return "translate(" + labelArc.centroid(d) + ")"; })
@@ -222,14 +267,13 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                     scope.$watch('trigger.arrived', function (newVal) {
                         if(newVal === true) {
                             console.log("Change");
-                            drawPie();
+                            drawPie(true);
                         }
                     });
-                    scope.$watch('newUserAsnumDailyAVG_trigger',function(asnum){
-
-                        if(asnum !== undefined) {
-                            console.log("disegno pie!");
-                            drawPie();
+                    scope.$watch('trigger.newAccess', function(newVal){
+                        if(newVal !== undefined) {
+                            console.log("aggiorno pie!");
+                            drawPie(false);
                         }
                     });
 

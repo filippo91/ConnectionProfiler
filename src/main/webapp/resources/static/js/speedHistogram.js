@@ -10,55 +10,15 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 }])
 
 .controller('speedHistogram',['$route', '$routeParams', 'speedFactory', '$scope', function($route, $routeParams, speedFactory, $scope) {
-        $scope.trigger = {arrived: false, count : 0};
+
+        $scope.trigger = {arrived: false, count : 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined};
+
         $("#" + $routeParams.view + "Btn").addClass("active");
         $("#timeManager").show();
-
 
         $scope.speedDataUser = speedFactory.getSpeedDataUser($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
         $scope.speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
 
-    /*
-        setTimeout(myf, 2000);
-        function myf() {
-
-            $scope.speedDataUserSplitted = speedFactory.splitByAsnum(speedDataUser);
-            var speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width);
-            $scope.speedDataPublicSplitted = speedFactory.splitByAsnum(speedDataPublic);
-            $scope.$apply(function(){$scope.trigger.arrived = true;});
-        }
-        $scope.changeView = function(ele){
-            var currentParam = $routeParams;
-            switch(ele) {
-                case 'weekBtn': currentParam.view = "week";  break;
-                case 'monthBtn': currentParam.view = "month";    break;
-                case 'monthsBtn': currentParam.view = "months";    break;
-            }
-            $route.updateParams(currentParam);
-
-        };
-        $scope.forward = function(){
-            var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            console.log(curDate.format("YYYY MM DD"));
-            switch($routeParams.view){
-                case "week":   curDate.add(7,"days");  break;
-                case "month":   curDate.add(1,"months"); break;
-                case "months": curDate.add(3, "months"); break;
-            }
-            $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
-        };
-        $scope.back = function(){
-            var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            console.log(curDate.format("YYYY MM DD"));
-            switch($routeParams.view){
-                case "week":   curDate.subtract(7,"days");  break;
-                case "month":   curDate.subtract(1,"months"); break;
-                case "months": curDate.subtract(3, "months"); break;
-            }
-            $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
-        };
-
-         */
         $scope.showAllAsnum = function(aType){
             var ele = $('#'+aType+'-showAll');
             if(ele.hasClass('active')){
@@ -83,6 +43,16 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 $(".bar-" + aType + "-" + asnum).fadeTo(500, 1);
             }
         };
+        function websocketCallbackUser(){
+            var userDownload;
+            $scope.speedDataUser = speedFactory.updateSpeedData($scope.speedDataUser,userDownload);
+            $scope.trigger.newSpeedDataUser = true;
+        }
+        function websocketCallbackPublic(){
+            var publicDownload;
+            $scope.speedDataPublic = speedFactory.updateSpeedData($scope.speedDataPublic,publicDownload);
+            $scope.trigger.newSpeedDataPublic = true;
+        }
 }])
     .factory('speedFactory',['$resource', function($resource){
         var userUri = "http://localhost:8080/connectionProfiler/speedHistogram/:year/:month/:day/:view/:bin_width";
@@ -90,10 +60,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         var factory = {};
         factory.getSpeedDataUser = function(year, month, day, view, bin_width, trigger){
          var data =  $resource(userUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width},function (domainList) {
-             console.log("speedHistogram: " + JSON.stringify(domainList));
-             trigger.count ++;
-             if(trigger.count == 2) trigger.arrived = true;
-
+                         console.log("speedHistogram: " + JSON.stringify(domainList));
+                         trigger.count ++;
+                         if(trigger.count == 2) trigger.arrived = true;
          });
          return data;
          };
@@ -177,6 +146,19 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             }
             return ret;
         };
+        factory.updateSpeedData = function(speedList, download){
+            var index = download.speed / ($routeParams.bin_width * 1000000);
+            var i;
+            for( i = 0; i<speedList.length; i++){
+                if(speedList[i].asnum === download.asnum && speedList[i].bin === index){
+                    speedList[i].nRecords++; break;
+                }
+            }
+            if(i === speedList.length)
+                speedList.push({asnum : download.asnum, bin : index, nRecords : 1});
+            console.log("userSpeedData: " + JSON.stringify(speedList));
+
+        };
         return factory;
     }])
 .directive('speedHistogram',function($route, $routeParams,d3Service,speedFactory){
@@ -209,11 +191,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                     var drawHistogram = function(){
 
                         svg.selectAll(".loading").remove();
-                        //var values = scope.speedData;
-                        console.log("ci passo");
+
                         var valuesUser = speedFactory.splitByAsnum(scope.speedDataUser);
                         var valuesPublic = speedFactory.splitByAsnum(scope.speedDataPublic);
-                        console.log("ci finisco");
 
                         var maxBin = d3.max(valuesUser.concat(valuesPublic),function(e){return d3.max(e.values,function(ee){return ee.bin;});}),
                             maxValueX = (maxBin + 1) * $routeParams.bin_width,
@@ -280,9 +260,14 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         }
                     });
 
-                    scope.$watch('newUserAsnumDailyAVG_trigger',function(asnum){
+                    scope.$watch('trigger.newSpeedDataUser',function(asnum){
                         if(asnum !== undefined) {
-                            drawHistogram();
+                            updateHistogram();
+                        }
+                    });
+                    scope.$watch('trigger.newSpeedDataPublic',function(asnum){
+                        if(asnum !== undefined) {
+                            updateHistogram();
                         }
                     });
                 });

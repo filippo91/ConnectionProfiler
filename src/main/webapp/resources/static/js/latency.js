@@ -12,11 +12,10 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
     .controller('latency', ['$route', '$routeParams', 'latencyFactory', '$scope', function($route, $routeParams, latencyFactory, $scope) {
         $("#timeManager").show();
 
-        $scope.trigger = {arrived: false};
+        $scope.trigger = {arrived: false, newData : undefined};
         $scope.latencyData = [];
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
         $scope.latencyData = latencyFactory.getLatencyData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
-        //$scope.latencyDataSplitted = latencyFactory.splitByAsnum($scope.latencyData);
 
         /*
         setTimeout(myf, 2000);
@@ -80,6 +79,13 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                 $(".bar-" + asnum).fadeTo(500, 1);
             }
         };
+
+        function websocketCallback(){
+            var download;
+            latencyFactory.updateLatencyData($scope.latencyData, download);
+            console.log("dopo: " + $scope.latencyData);
+            $scope.trigger.newData = true;
+        }
     }])
 
     .factory('latencyFactory',['$resource', function($resource){
@@ -106,6 +112,18 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             }
             console.log(JSON.stringify(ret));
             return ret;
+        };
+        factory.updateLatencyData = function(latencyData,download){
+            var index = parseInt(download.latency / $routeParams.bin_width);
+            var i;
+            for(i = 0; i < latencyData.length; i++){
+                if(latencyData.asnum === download.asnum && latencyData[i].bin === index){
+                    latencyData.nRecords++; break;
+                }
+            }
+            if(i === latencyData.length)
+                latencyData.push({asnum : download.asnum, bin : index, nRecords : 1});
+            console.log("latencyData: " + JSON.stringify(latencyData));
         };
         return factory;
     }])

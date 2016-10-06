@@ -10,7 +10,7 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
   });
 }])
 
-.controller('speedTable', ['$route', '$routeParams', 'speedTable_downloadManager', function($route, $routeParams, downloadManager) {
+.controller('speedTable', ['$route', '$routeParams', 'speedTable_downloadManager', '$rootScope', function($route, $routeParams, downloadManager, $rootScope) {
         $("#timeManager").hide();
         this.downloadList = downloadManager.getDownloads($routeParams.page,$routeParams.size);
         this.succDownload = function() {
@@ -20,6 +20,23 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
             if(parseInt($routeParams.page) > 0)
                 $route.updateParams({page: parseInt($routeParams.page) - 1, size: $routeParams.size});
         };
+
+
+        function websocketCallback(scope){
+            var download;
+            scope.downloadList.push({timestamp : download.timestamp, download_speed : download.download_speed});
+            downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+        }
+        /*
+        console.log($rootScope.stompClient);
+        this.connect = function connect() {
+            $rootScope.stompClient.connect($rootScope.socket, function (frame) {
+                console.log('Connected: ' + frame);
+                $rootScope.stompClient.subscribe('/topic/downloads', function (download) {
+                   console.log(download.body);
+                });
+            });
+        }*/
 }])
 .factory('speedTable_downloadManager', ['$resource', function($resource) {
         var serverURI = "http://localhost:8080/connectionProfiler/speedTable/:page/:size";

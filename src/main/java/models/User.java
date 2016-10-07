@@ -26,7 +26,6 @@ public class User {
 	@Column(unique=true)
 	private String email;
 	
-	//@Length(min=3, max=20)
     private String password;
 
     @Column(unique=true)

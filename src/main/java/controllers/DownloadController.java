@@ -9,10 +9,12 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,16 +53,8 @@ public class DownloadController {
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
-		
-		DateTime d = null;
-		try{
-			d = new DateTime(year, month, day, 0, 0);
-		}catch(IllegalArgumentException iae){
-			//TODO: bad date
-			return null;
-		}finally{
-			d = null;
-		}
+
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
@@ -74,6 +68,8 @@ public class DownloadController {
 			@PathVariable int month, 
 			@PathVariable int day,
 			@PathVariable View view){
+		
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		
 		return downloadService.getAvgDayDownloadsSpeed(year, month, day, view);
 	}
@@ -97,7 +93,7 @@ public class DownloadController {
 			@PathVariable int width){
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
-		
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		width *= ONE_MBIT;
 		
 		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view, width);
@@ -110,7 +106,7 @@ public class DownloadController {
 			@PathVariable int day,
 			@PathVariable View view,
 			@PathVariable int width){
-		
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		width *= ONE_MBIT;
 		
 		return downloadService.getBinSpeedDownloads(year, month, day, view, width);
@@ -125,7 +121,7 @@ public class DownloadController {
 			@PathVariable int bin_width){
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
-		
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
 	}
 	
@@ -137,7 +133,7 @@ public class DownloadController {
 			@PathVariable View view){
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
-		
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		return downloadService.getDomainFrequencyAccess(uuid, year, month, day, view);
 	}
 	
@@ -149,7 +145,7 @@ public class DownloadController {
 			@PathVariable View view){
 		User user = userService.getCurrentUser();
 		int uuid = user.getId();
-		
+		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		log.debug("getDomainSizeDownload for " + uuid);
 		return downloadService.getDomainSizeDownload(uuid, year, month, day, view);
 	}
@@ -170,5 +166,11 @@ public class DownloadController {
 		messagingTemplate.convertAndSendToUser(principal.getName(), "/downloads", new GenericMessage<Download>(downloadCreated));
 		
 		return downloadCreated;
+	}
+	
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
+	@ExceptionHandler(IllegalArgumentException.class)
+	public void duplicateInformationForNewUser() {
+		// Nothing to do
 	}
 }

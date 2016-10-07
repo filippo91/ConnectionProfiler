@@ -1,15 +1,16 @@
 package controllers;
 
+import java.security.InvalidParameterException;
 import java.security.Principal;
 
-import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.mongodb.MongoException;
 
 //import listeners.OnRegistrationCompleteEvent;
 import models.User;
@@ -37,14 +36,20 @@ public class UserController {
 	}
 
 	@PostMapping("/newUser")
-	@ResponseStatus(value = HttpStatus.CREATED)
-	public void register(@RequestBody @Validated User user, BindingResult bindingResult) {
+	//@ResponseStatus(value = HttpStatus.CREATED)
+	public void register(@RequestBody @Valid User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			log.error("Binding Result contains errors.");
+			log.error("Binding Result contains errors");
+			throw new InvalidParameterException();
 		}
 
-		userService.register(user);
-
+		try{
+			userService.register(user);
+		}catch(DataIntegrityViolationException ex){
+			log.info("Impossible to save the user into the DB");
+			throw ex;
+		}
+		
 		log.info("User successfully registered.");
 		log.info("New user details: " + user);
 	}
@@ -54,16 +59,16 @@ public class UserController {
 		userService.confirmRegistration(token);
 	}
 
-	// Convert a predefined exception to an HTTP Status code
-	@ResponseStatus(value = HttpStatus.CONFLICT, reason = "Data integrity violation") // 409
-	@ExceptionHandler(MongoException.class)
-	public void conflict() {
-		// Nothing to do
-	}
-
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
-	@ExceptionHandler(ConstraintViolationException.class)
-	public void badNewUser() {
+	@ExceptionHandler(InvalidParameterException.class)
+	public void badInputForNewUser() {
 		// Nothing to do
 	}
+	
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public void duplicateInformationForNewUser() {
+		// Nothing to do
+	}
+	
 }

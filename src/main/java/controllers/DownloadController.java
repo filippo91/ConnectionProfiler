@@ -1,15 +1,12 @@
 
 package controllers;
 
-
-import java.security.Principal;
 import java.util.Collection;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.support.GenericMessage;
@@ -153,17 +150,20 @@ public class DownloadController {
 	
 	@PostMapping(path="/download")
 	@ResponseStatus(value=HttpStatus.CREATED)	
-	public Download saveDownload(@RequestBody Download download, Principal principal)
+	public Download saveDownload(@RequestBody Download download)
 	{
 		/*
 		 * security concerns: downloadService.setUuid(download);
 		 * make sure the authenticated user is uploading the download
 		 * without messing with the record
 		 */
+		User user = userService.getCurrentUser();
+		download.setUuid(user.getId());
+		
 		Download downloadCreated = downloadService.saveDownload(download);
 	
 		messagingTemplate.convertAndSend("/topic/downloads", new GenericMessage<Download>(downloadCreated));
-		messagingTemplate.convertAndSendToUser(principal.getName(), "/downloads", new GenericMessage<Download>(downloadCreated));
+		messagingTemplate.convertAndSendToUser(user.getUsername(), "/downloads", new GenericMessage<Download>(downloadCreated));
 		
 		return downloadCreated;
 	}

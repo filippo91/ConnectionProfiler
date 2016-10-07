@@ -11,6 +11,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import exceptions.TokenExpiredException;
+import exceptions.TokenNotFoundException;
 import listeners.OnRegistrationCompleteEvent;
 import models.User;
 import models.VerificationToken;
@@ -60,21 +62,19 @@ public class SimpleUserService implements UserService {
 
 	@Override
 	public void confirmRegistration(String token) {
-		System.out.println("fisajflkadjflasfskldjfklsjdfklasjfkljklsdfjlaksfjlskdjfkl");
 		VerificationToken verificationToken = tokenRepository.findByToken(token);
 		
-		//VerificationToken verificatioToken = verificatioTokenList.get(0);
 		System.out.println(verificationToken);
 		if(verificationToken == null){
 			//the token doesn't exist: bad user
 			//TODO: throw meaningful exception
-			throw new Error("Bad user");
+			throw new TokenNotFoundException();
 		}
 		
 		if(verificationToken.isExpired()){
 			//the token has already expired: bad user
 			//TODO: throw meaningful exception
-			throw new Error("Bad user");
+			throw new TokenExpiredException();
 		}
 		
 		/*

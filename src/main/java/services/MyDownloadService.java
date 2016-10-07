@@ -3,6 +3,7 @@ package services;
 import java.util.Collection;
 import java.util.Date;
 
+import org.jboss.logging.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,7 @@ import repositories.DownloadRepository;
 
 @Service
 public class MyDownloadService implements DownloadService {
+	Logger log = Logger.getLogger(MyDownloadService.class);
 	
 	@Autowired
 	private DownloadRepository downloadRepository;
@@ -76,7 +78,9 @@ public class MyDownloadService implements DownloadService {
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
-		System.out.println("getDomainFrequencyAccess" + uuid + " " + start + " - " + end);
+		
+		log.info("Time span: " + uuid + " " + start + " - " + end);
+		
 		return downloadRepository.getFrequencyAccessesByDomain(uuid, start, end);
 	}
 
@@ -87,7 +91,8 @@ public class MyDownloadService implements DownloadService {
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
-		System.out.println("getDomainSizeDownload" + uuid + start + " - " + end);
+				
+		log.info("Time span: " + uuid + " " + start + " - " + end);	
 		
 		return downloadRepository.getSizeDownloadsByDomain(uuid, start, end);
 	}
@@ -99,6 +104,8 @@ public class MyDownloadService implements DownloadService {
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
+		
+		log.info("Time span: " + start + " - " + end);
 		
 		return downloadRepository.getAvgDayDownloadsSpeed(start, end);
 	}
@@ -115,13 +122,13 @@ public class MyDownloadService implements DownloadService {
 		
 		switch(view){
 		case week:
-			date = date.withDayOfWeek(1);
+			date = date.withDayOfWeek(1).plusWeeks(1);
 			break;
 		case month:
-			date = date.withDayOfMonth(1);
+			date = date.withDayOfMonth(1).plusMonths(1);
 			break;
 		case months:
-			date = date.withDayOfMonth(1);
+			date = date.withDayOfMonth(1).plusMonths(1);
 			break;
 		}
 		
@@ -134,13 +141,13 @@ public class MyDownloadService implements DownloadService {
 		
 		switch(view){
 		case week:
-			date = date.withDayOfWeek(1).minusWeeks(1);
+			date = date.withDayOfWeek(1);
 			break;
 		case month:
-			date = date.withDayOfMonth(1).minusMonths(1);
+			date = date.withDayOfMonth(1);
 			break;
 		case months:
-			date = date.withDayOfMonth(1).minusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
+			date = date.withDayOfMonth(1).minusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW-1);
 			break;
 		}
 		

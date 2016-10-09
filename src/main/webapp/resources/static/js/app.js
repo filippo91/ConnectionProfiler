@@ -13,7 +13,7 @@ angular.module('myApp', [
   'myApp.domainsBySize'
 ])
 
-.constant("PUBLIC_PAGES", ['/', '/login', '/register'])
+.constant("PUBLIC_PAGES", ['', '/', '/login', '/register', '/confirmRegistration'])
 
 .config(['$locationProvider', '$routeProvider', '$httpProvider', function($locationProvider, $routeProvider, $httpProvider) {
   $locationProvider.hashPrefix('!');
@@ -111,7 +111,8 @@ angular.module('myApp', [
           
           $rootScope.rowUserDownloadList =[];
           $rootScope.rowPublicDownloadList =[];
-
+          $rootScope.enableChangeView = false;
+          
           /**
            * Functions for controlling time
            */
@@ -222,10 +223,16 @@ angular.module('myApp', [
           //////////////////////////
           $rootScope.$on('$routeChangeStart', function (event, next, prev) {
         	  	console.info($location.url(), PUBLIC_PAGES);
+        	  	if(PUBLIC_PAGES.indexOf($location.url()) >= 0){
+        	  		$rootScope.enableChangeView = false;
+        	  	}else{
+        	  		$rootScope.enableChangeView = true;
+        	  	}
         	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf($location.url()) < 0) {
         	    	event.preventDefault();
         	        $rootScope.$evalAsync(function() {
         	        	$location.path("/login");
+        	        	$rootScope.enableChangeView = false;
         	        });
         	    	
         	    }

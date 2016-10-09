@@ -24,53 +24,67 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         }
         downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
         downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
-/*
-        setTimeout(function(){
-            //$scope.userDownloadList = downloadManager.splitByAsnum(downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width));
-            $rootScope.rowUserDownloadList = $rootScope.rowUserDownloadList.concat(
-                downloadManager.getUserDownloads(
-                    $routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width
-                )
-            );
-            $scope.userDownloadList = downloadManager.splitByAsnum($rootScope.rowUserDownloadList);
-            console.log("Arrivati user Donloads");
-            console.log(JSON.stringify($scope.userDownloadList));
-            $scope.$apply(function(){$scope.trigger.userDataArrived = true;});
-        }, 300);
-        setTimeout(function(){
-            //$scope.publicDownloadList = downloadManager.splitByAsnum(downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width));
-            //$scope.rowDownloadList = downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width);
-            $rootScope.rowPublicDownloadList = $rootScope.rowPublicDownloadList.concat(downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width));
-            console.log("Arrivati public Downloads");
-            $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
-            console.log(JSON.stringify($scope.publicDownloadList));
-            $scope.$apply(function(){$scope.trigger.publicDataArrived = true;});
-        },350); */
 
-        function websocketCallbackPublic(){
-            var download;
-            downloadManager.updateDownloads($rootScope.rowPublicDownloadList, download);
-            $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
-            $scope.trigger.newSpeedDataPublic = true;
-        }
+        /**
+         * Web Socket, 2 topics public and private
+         */
+        var privateSubscription = null;
+        var publicSubscription = null;
+        var socket = null;
+        $scope.connect = function () {
+            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    if(true){//$rootScope.isRelevant(download)) {
+                        downloadManager.updateDownloads($rootScope.rowUserDownloadList, download);
+                        $scope.userDownloadList = downloadManager.splitByAsnum($rootScope.rowUserDownloadList);
+                        $scope.$apply(function () {
+                            $scope.trigger.userAsnum = download.asnum;
+                            $scope.trigger.newSpeedDataUser = $scope.trigger.newSpeedDataUser !== true;
+                        });
+                    }
+                });
+                publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    if(true){//$rootScope.isRelevant(download)) {
+                        downloadManager.updateDownloads($rootScope.rowPublicDownloadList, download);
+                        $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
+                        $scope.$apply(function () {
+                            $scope.trigger.publicAsnum = download.asnum;
+                            $scope.trigger.newSpeedDataPublic = $scope.trigger.newSpeedDataPublic !== true;
+                        });
+                    }
+                });
+            });
+        };
+        $scope.disconnect = function(){
+            if(privateSubscription != null){
+                privateSubscription.unsubscribe();
+                privateSubscription = null;
+            }
+            if(publicSubscription != null){
+                publicSubscription.unsubscribe();
+                publicSubscription = null;
+            }
+        };
+        $scope.$on('$destroy', $scope.disconnect);
 
-        function websocketCallbackUser(){
-            var download;
-            downloadManager.updateDownloads($rootScope.rowUserDownloadList, download);
-            $scope.userDownloadList = downloadManager.splitByAsnum($rootScope.rowUserDownloadList);
-            $scope.trigger.newSpeedDataUser = true;
-        }
 
         $scope.showAllAsnum = function(aType){
-            var ele = $('#'+aType+'-showAll');
+            var ele = $('#'+aType+'-showAll'), graphEle = $("." + aType + "-graph");
             if(ele.hasClass('active')){
                 $("."+aType+"-asnumButton").removeClass("active");
-                $("." + aType + "-graph").fadeTo(200, 0);
+                graphEle.fadeTo(200, 0);
+                graphEle.attr("isvisible", "false");
                 ele.removeClass("active");
                 ele.text("Show All")
             }else {
                 $("."+aType+"-asnumButton").addClass("active");
-                $("." + aType + "-graph").fadeTo(200, 1);
+                graphEle.fadeTo(200, 1);
+                graphEle.attr("isvisible", "true");
                 ele.addClass("active");
                 ele.text("Hide All");
             }
@@ -127,14 +141,16 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         };
         factory.updateDownloads = function(downloadList, download){
             var i;
+            console.log("downloadList" + JSON.stringify(downloadList));
             for(i = 0; i< downloadList.length; i++){
                 if(downloadList[i].asnum === download.asnum && downloadList[i].timestamp === download.timestamp){
-                    download[i].speed = (downloadList[i].count * downloadList[i].speed + download.speed) / (downloadList[i] + 1);
+                    downloadList[i].speed = (downloadList[i].count * downloadList[i].speed + download.download_speed) / (downloadList[i].count + 1);
+                    console.log("new speed + " + downloadList[i].speed  );
                     break;
                 }
             }
             if(i === downloadList.length)
-                downloadList.push({asnum : download.asnum, count : 1,speed : download.speed, timestamp : download.timestamp})
+                downloadList.push({asnum : download.asnum, count : 1,speed : download.download_speed, timestamp : download.timestamp})
         };
         factory.getDownloadListByAsnum = function(asnum,downloadList){
             var ret = [], i;
@@ -145,87 +161,6 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             }
 
         };
-        /*
-            factory.getUserDownloads = function (year,month,day,view,trigger, callback) {
-                var date = moment().year(year).month(month).date(day);
-                return [{
-                    "asnum": 0,
-                    "speed": 1450,
-                    "timestamp": date.valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 0,
-                    "speed": 1050,
-                    "timestamp": date.subtract(1,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 0,
-                    "speed": 1900,
-                    "timestamp": date.subtract(2,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 1,
-                    "speed": 1450,
-                    "timestamp": date.subtract(3,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 1,
-                    "speed": 1050,
-                    "timestamp": date.subtract(4,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 1,
-                    "speed": 1900,
-                    "timestamp": date.subtract(5,'days').valueOf(),
-                    "count" : 1
-                }];
-         };
-                $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
-                    downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                    callback(downloadList);
-                    trigger.startDataArrived = ++trigger.count === 2;
-                });
-
-
-            factory.getPublicDownloads = function (year,month,day,view,trigger, callback) {
-                var date = moment().year(year).month(month).date(day);
-                return [{
-                    "asnum": 0,
-                    "speed": 1050,
-                    "timestamp": date.valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 0,
-                    "speed": 1111,
-                    "timestamp": date.subtract(1,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 0,
-                    "speed": 131,
-                    "timestamp": date.subtract(2,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 1,
-                    "speed": 2222,
-                    "timestamp": date.subtract(3,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 1,
-                    "speed": 3331,
-                    "timestamp": date.subtract(4,'days').valueOf(),
-                    "count" : 1
-                },{
-                    "asnum": 1,
-                    "speed": 1050,
-                    "timestamp": date.subtract(5,'days').valueOf(),
-                    "count" : 1
-                }];
-                $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
-                    downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                    callback(downloadList);
-                    trigger.startDataArrived = ++trigger.count === 2;
-                });
-            };*/
             return factory;
         }])
     .factory('d3Service', ['$document', '$q', '$rootScope',
@@ -336,6 +271,15 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         //.on('mouseover',rectMouseOver)
                         .call(zoom);
 
+                    focus.append("g")
+                        .attr("class", "x axis")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(xAxis);
+
+                    focus.append("g")
+                        .attr("class", "y axis")
+                        .call(yAxis);
+
                     //tooltip
                     var div = d3.select(element[0]).append("div")
                         .attr("class", "tooltip")
@@ -372,6 +316,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     function drawGraph(userDownloadList, publicDownloadList, rowDownloadList){
                         asnumList = publicDownloadList.map(function(d){return d.asnum;});
 
+                        console.log("ASNUM LIST " + JSON.stringify(asnumList));
                         asnumList.forEach(function (asn, i) {
                             $('#general-graph-button-' + asn).css('color', colors(i));
                             $('#user-graph-button-' + asn).css('color', colors(i));
@@ -395,8 +340,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         });
                         var valueList_x = valueList_x_pub.concat(valueList_x_user), maxList_y = maxList_y_pub.concat(maxList_y_user);
 
-                        console.log("x extend: " + d3.extent(valueList_x));
-                        console.log("y max: " + d3.max(maxList_y));
+                        //console.log("x extend: " + d3.extent(valueList_x));
+                        //console.log("y max: " + d3.max(maxList_y));
                         x.domain(d3.extent(valueList_x));
                         y.domain([0, d3.max(maxList_y) * 1.3]);
                         x2.domain(x.domain());
@@ -410,16 +355,16 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                          * */
                         publicDownloadList.forEach(function (asnum) {
                             var data = asnum.downloads;
-                            console.log(JSON.stringify(asnum.downloads));
+                            //console.log(JSON.stringify(asnum.downloads));
                             data.forEach(function (dd) {
                                 dd.timestamp = new Date(dd.timestamp);
                                 focus.append("circle").datum(dd)
                                     .attr("class", "point public-graph public-graph-" + asnum.asnum)
+                                    .attr("isvisible", "false")
                                     .attr("cx", function (d) {return x(d.timestamp)})
                                     .attr("cy", function (d) {return y(d.speed)})
                                     .attr("clip-path", "url(#clip)")
                                     .attr("r", circleSize)
-                                    .attr("isvisible", "false")
                                     .attr("ds", function (d) {return d.speed;})
                                     .attr("ts", function (d) {return formatTime(d.timestamp);})
                                     .attr("fill", colors(asnumList.indexOf(asnum.asnum)));
@@ -429,6 +374,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .datum(data)
                                 .attr("class", "line public-graph public-graph-" + asnum.asnum)
                                 .attr("d", line)
+                                .attr("isvisible", "false")
                                 .attr("clip-path", "url(#clip)")
                                 .attr("fill", "none")//,function(){return colors(i);})
                                 .attr("stroke", colors(asnumList.indexOf(asnum.asnum)))
@@ -443,10 +389,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 ee.timestamp = new Date(ee.timestamp);
                                 focus.append("circle").datum(ee)
                                     .attr("class", "point user-graph user-graph-" + e.asnum)
+                                    .attr("isvisible", "true")
                                     .attr("cx", function (d) {return x(d.timestamp)})
                                     .attr("cy", function (d) {return y(d.speed)})
                                     .attr("clip-path", "url(#clip)")
-                                    .attr("isvisible", "true")
                                     .attr("ds", function (d) {return d.speed;})
                                     .attr("ts", function (d) {return formatTime(d.timestamp);})
                                     .attr("r", circleSize)
@@ -456,20 +402,13 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .datum(e.downloads)
                                 .attr("class", "line user-graph user-graph-" + e.asnum)
                                 .attr("d", line)
+                                .attr("isvisible", "true")
                                 .attr("clip-path", "url(#clip)")
                                 .attr("fill", "none")
                                 .attr("stroke", colors(asnumList.indexOf(e.asnum)));
-
                         });
 
-                        focus.append("g")
-                            .attr("class", "x axis")
-                            .attr("transform", "translate(0," + height + ")")
-                            .call(xAxis);
-
-                        focus.append("g")
-                            .attr("class", "y axis")
-                            .call(yAxis);
+                        updateTooltipListener();
 
                         context.append("path")
                             .datum(rowDownloadList)
@@ -492,14 +431,16 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         d3.selectAll("path.domain").style("shape-rendering", "geometricPrecision");
 
                         $('.public-graph').hide();
+                    }
 
-                        $('.pane').mousemove(function (e) {
-                            var pane = $('.pane');
+                    function updateTooltipListener(){
+                        var pane = $('.pane');
+                        pane.mousemove(function (e) {
                             //var offset = pane.offset();
                             var offset = $(this).parent().offset();
                             var x = e.pageX - parseInt(offset.left) - margin.left, y = e.pageY - parseInt(offset.top) - margin.top;//e.pageX, y = e.pageY;//parseInt(offset.left), y = parseInt(offset.top);//e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
 
-                            console.log("x: " + x + ", y: " + y);
+                            //console.log("x: " + x + ", y: " + y);
                             var elements = $('.point').filter("[isvisible='true']").map(function () {
                                 var $this = $(this);
                                 var cx = parseInt($this.attr("cx"));
@@ -529,42 +470,50 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .style("top", (e.pageY - 28) + "px");
                         });
                     }
-
                     function updateGraph(newDownloadList, type, asnum){
-                        asnumList = scope.publicDownloadList.map(function(d){return d.asnum;});
-                        var isVisible = $('#asnum-'+newAsnum.asnum).attr("isvisible");
+                        console.log("ASNUM LIST " + JSON.stringify(asnumList));
+                        //asnumList = scope.publicDownloadList.map(function(d){return d.asnum;});
+                        var isVisible = $('.line.' + type + "-graph-" + asnum).attr("isvisible");
 
+                        if(isVisible === undefined) isVisible = false;
+
+                        console.log("isVisible " + isVisible);
                         //togliere linea dell/asnum
                         var element =  focus.selectAll("." + type + "-graph-" + asnum);
                         console.log(element);
                         element.remove();
 
-                        //disegnare nuovo asnum path
-
-                        focus.append("circle").datum(newDownloadList)
-                            .attr("class", "point " + type + "-graph-" + asnum)
-                            .attr("cx", function (d) {return x(d.timestamp)})
-                            .attr("cy", function (d) {return y(d.download_speed)})
-                            .attr("clip-path", "url(#clip)")
-                            .attr("r", circleSize)
-                            .attr("isvisible", isVisible)
-                            .attr("ds", function (d) {return d.download_speed;})
-                            .attr("ts", function (d) {return formatTime(d.timestamp);})
-                            .attr("fill", colors(asnumList.indexOf(asnum) % colors.length));
-
+                        newDownloadList.forEach(function(e){
+                            e.timestamp = new Date(e.timestamp);
+                            focus.append("circle").datum(e)
+                                .attr("class", "point " + type + "-graph " + type + "-graph-" + asnum)
+                                .attr("cx", function (d) {return x(d.timestamp)})
+                                .attr("cy", function (d) {return y(d.speed)})
+                                .attr("clip-path", "url(#clip)")
+                                .attr("r", circleSize)
+                                .attr("isvisible", isVisible)
+                                .attr("ds", function (d) {return d.speed;})
+                                .attr("ts", function (d) {return formatTime(d.timestamp);})
+                                .attr("fill", colors(asnumList.indexOf(asnum)));
+                        });
                         var newLine = focus.append("path")
                             .datum(newDownloadList)
-                            .attr("class", "line " + type + "-graph-" + asnum)
+                            .attr("class", "line " + type + "-graph " + type + "-graph-" + asnum)
+                            .attr("isvisible", isVisible)
                             .attr("d", line)
                             .attr("clip-path", "url(#clip)")
                             .attr("fill", "none")
-                            .attr("stroke", colors(asnumList.indexOf(asnum) % colors.length));
+                            .attr("stroke", colors(asnumList.indexOf(asnum)));
 
                         if(type === "public")
                             newLine.style("stroke-dasharray", ("3, 3"));
 
-                        if(isVisible == "false")
+                        if(isVisible === "false"){
                             $("." + type + "-graph-" + asnum).hide();
+                            console.log("NASCONDO");
+                        }
+
+                        updateTooltipListener();
 
                     }
                     scope.$watch('trigger.arrived', function (newVal) {
@@ -577,36 +526,45 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             );
                         }
                     });
-                    scope.$watch('trigger.newSpeedDataUser', function (asnum) {
-                        if (asnum !== undefined) {
+                    scope.$watch('trigger.newSpeedDataUser', function (newVal) {
+
+                        var asnum = scope.trigger.userAsnum;
+                        if (newVal !== undefined) {
                             console.log("arrivato data su websocket user");
                             var newUserDownload = [], i;
-                            for(i = 0; i<scope.userDownloadList; i++){
+                            for(i = 0; i<scope.userDownloadList.length; i++){
                                 if(scope.userDownloadList[i].asnum === asnum){
-                                    newUserDownload = scope.userDownloadList[i].values; break;
+                                    newUserDownload = scope.userDownloadList[i].downloads;
+                                    break;
                                 }
                             }
-                            updateGraph(
-                                newUserDownload,
-                                'user',
-                                asnum
-                            );
+                            if(newUserDownload.length!= 0)
+                                updateGraph(
+                                    newUserDownload,
+                                    'user',
+                                    asnum
+                                );
                         }
                     });
-                    scope.$watch('trigger.newSpeedDataPublic', function (asnum) {
-                        if (asnum !== undefined) {
-                            console.log("arrivato data su websocket public");
+                    scope.$watch('trigger.newSpeedDataPublic', function (newVal) {
+                        var asnum = scope.trigger.publicAsnum;
+                        if (newVal !== undefined) {
+                            console.log("arrivato data su websocket public asnum:" + asnum);
                             var newPublicDownload = [];
-                            for(var i = 0; i<scope.publicDownloadList; i++){
+                            for(var i = 0; i<scope.publicDownloadList.length; i++){
                                 if(scope.publicDownloadList[i].asnum === asnum){
-                                    newPublicDownload = scope.publicDownloadList[i].values; break;
+                                    newPublicDownload = scope.publicDownloadList[i].downloads;
+                                    break;
                                 }
                             }
-                            updateGraph(
-                                newPublicDownload,
-                                'public',
-                                asnum
-                            );
+                            console.log("newPublicDownload: " + JSON.stringify(newPublicDownload));
+                            console.log("scope.publicDownloadList: " + JSON.stringify(scope.publicDownloadList));
+                            if(newPublicDownload.length!= 0)
+                                updateGraph(
+                                    newPublicDownload,
+                                    'public',
+                                    asnum
+                                );
                         }
                     });
 

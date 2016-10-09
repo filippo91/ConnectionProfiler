@@ -13,6 +13,11 @@ div.tooltip {
     pointer-events: none;
 }
 
+div.tooltip-large{
+    height: 40px;
+    width: 120px;
+}
+
 body {
     margin-left:25px;
 }

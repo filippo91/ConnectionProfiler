@@ -9,52 +9,44 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
   });
 }])
 
-.controller('domainsBySize', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory',function($route, $routeParams, $scope, domainsDownloadFactory) {
+.controller('domainsBySize', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope ) {
         $("#timeManager").show();
         $("#" + $routeParams.view + "Btn").addClass("active");
 
-        $scope.trigger = {arrived:false, newAccess: undefined};
-        //setTimeout(myf, 2000);
+        $scope.trigger = {arrived:false, newData: undefined};
         
         $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
 
-        /*
-        function myf() {
-            $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
-            console.log($scope.domainSizeList);
-            $scope.$apply(function(){$scope.trigger.arrived = true;});
-        }
-        $scope.changeView = function(ele){
-            var currentParam = $routeParams;
-            switch(ele) {
-                case 'weekBtnDBS': currentParam.view = "week";  break;
-                case 'monthBtnDBS': currentParam.view = "month";    break;
-                case 'monthsBtnDBS': currentParam.view = "months";    break;
-            }
-            $route.updateParams(currentParam);
-
+        /**
+         * Web Socket
+         * @type {null}
+         */
+        var privateSubscription = null;
+        var socket = null;
+        $scope.connectPrivate = function () {
+            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    if($rootScope.isRelevant(download)) {
+                        domainsDownloadFactory.updateDomainSizeList($scope.domainSizeList, download);
+                        console.log("domainList: " + JSON.stringify($scope.domainSizeList));
+                        $scope.$apply(function () {
+                            $scope.trigger.newData = $scope.trigger.newData !== true;
+                        });
+                    }
+                });
+            });
         };
-        $scope.forward = function(){
-            var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            console.log(curDate.format("YYYY MM DD"));
-            switch($routeParams.view){
-                case "week":   curDate.add(7,"days");  break;
-                case "month":   curDate.add(1,"months"); break;
-                case "months": curDate.add(3, "months"); break;
+        $scope.disconnectPrivate = function(){
+            if(privateSubscription != null){
+                privateSubscription.unsubscribe();
+                privateSubscription = null;
             }
-            $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
         };
-        $scope.back = function(){
-            var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            console.log(curDate.format("YYYY MM DD"));
-            switch($routeParams.view){
-                case "week":   curDate.subtract(7,"days");  break;
-                case "month":   curDate.subtract(1,"months"); break;
-                case "months": curDate.subtract(3, "months"); break;
-            }
-            $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
-        }
-        */
+        $scope.$on('$destroy',$scope.disconnectPrivate);
 }])
 
     .directive('usagePie',function(d3Service){
@@ -199,7 +191,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             drawPie(true);
                         }
                     });
-                    scope.$watch('trigger.newSize',function(newVal){
+                    scope.$watch('trigger.newData',function(newVal){
                         if(newVal !== undefined) {
                             console.log("disegno pie!");
                             drawPie(false);

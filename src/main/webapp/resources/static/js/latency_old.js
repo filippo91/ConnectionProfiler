@@ -17,6 +17,31 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
         $scope.latencyData = latencyFactory.getLatencyData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
 
+        $scope.showAllAsnum = function(){
+            var ele = $('#showAll');
+            if(ele.hasClass('active')){
+                $(".asnumButton").removeClass("active");
+                $(".bar").fadeTo(500, 0);
+                ele.removeClass("active");
+                ele.text("Show All")
+            }else {
+                $(".asnumButton").addClass("active");
+                $(".bar").fadeTo(500, 1);
+                ele.addClass("active");
+                ele.text("Hide All");
+            }
+        };
+        $scope.showAsnum = function(asnum){
+            var ele = $("#button-"+asnum);
+            if(ele.hasClass("active")){ //hide
+                ele.removeClass("active");
+                $(".bar-" + asnum).fadeTo(500, 0);
+            }else{ //show
+                ele.addClass("active");
+                $(".bar-" + asnum).fadeTo(500, 1);
+            }
+        };
+
         /**
          * Web Socket
          */
@@ -68,11 +93,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
                     if(values[i].asnum === ret[j].asnum){
-                        ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords, asnum : values[i].asnum}); break;
+                        ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords}); break;
                     }
                 }
                 if(j === ret.length)
-                    ret.push({asnum : values[i].asnum, values : [{bin : values[i].bin, nRecords : values[i].nRecords, asnum : values[i].asnum}]});
+                    ret.push({asnum : values[i].asnum, values : [{bin : values[i].bin, nRecords : values[i].nRecords}]});
             }
             console.log(JSON.stringify(ret));
             return ret;
@@ -137,12 +162,12 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         .attr("class", "tooltip tooltip-large")
                         .style("opacity", 0);
 
+
+
                     svg.selectAll(".loading").remove();
 
                     var values = scope.latencyData;
                     var values_arr = latencyFactory.splitByAsnum(values);
-                    var asnumList = values_arr.map(function(d){ return d.asnum});
-
                     if(values === undefined || values.length === 0){
                         svg.append('defs')
                             .append('pattern')
@@ -174,8 +199,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                     console.log("max x : " + maxValueX);
 
-                    var x0 = d3.scale.linear().domain([0, maxValueX]).rangeRoundBands([0, width], .1);
-                    var x1 = d3.scale.ordinal().domain(asnumList).rangeRoundBands([0, x0.rangeBand()]);
+                    var x = d3.scale.linear().domain([0, maxValueX]).range([0, width]);
                     var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
                     var ris = [];for(var i = 0; i <= maxBin; ris.push(i++ * $routeParams.bin_width)); ris.push(maxValueX);
@@ -184,24 +208,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var yAxis = d3.svg.axis().scale(y).orient("left");
 
                     var bar = [];
-
-                    var bins = svg.selectAll(".bin")
-                        .data(values_arr)
-                        .enter().append("g")
-                        .attr("class", "bin")
-                        .attr("transform", function(d) { return "translate(" + parseInt(x0(d.bin * $routeParams.bin_width)+1) + ",0)"; });
-
-                    bins.selectAll("rect")
-                        .data(function(d) { return d.values; })
-                        .enter().append("rect")
-                        .attr("width", x1.rangeBand())
-                        .attr("x", function(d) { return x1(d.asnum); })
-                        .attr("y", function(d) { return y(d.nRecords); })
-                        .attr("height", function(d) { return height - y(d.nRecords); })
-                        .style("fill", function(d,i) { return color(i); });
-
-
-                    /*
                     values_arr.forEach(function(ele, i){
                         console.log("ora disegno : " + ele.asnum);
                         bar[ele.asnum]  = svg.selectAll(".bar-"+ele.asnum)
@@ -250,7 +256,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                                     .style("opacity", 0);
                             });
                     });
-                    */
 
                     svg.append("g")
                         .attr("class", "x axis")

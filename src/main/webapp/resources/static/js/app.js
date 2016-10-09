@@ -64,15 +64,15 @@ angular.module('myApp', [
 	};
 	
 	self.connectPrivate = function () {
-		var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-		 var stompClient = Stomp.over(socket);
-	    stompClient.connect({}, function (frame) {
-	        console.log('Connected: ' + frame);
-	        privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (download) {
-	        	console.log(JSON.parse(download.body));
-	        });
-	    });
-	};
+            var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (download) {
+                    console.log(JSON.parse(download.body));
+                });
+            });
+        };
 	
 	self.send = function(){
 		stompClient.send("/app/hello", {}, "ciao");
@@ -141,7 +141,28 @@ angular.module('myApp', [
               }
               $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
           };
+      $rootScope.isRelevant = function (download) {
+          var time = moment(download.timestamp);
+          var curDate_end = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
 
+          var curDate_start = moment(curDate_end);
+
+          switch ($routeParams.view) {
+              case "week":
+                  curDate_start.subtract(7, "days");
+                  break;
+              case "month":
+                  curDate_start.subtract(1, "months");
+                  break;
+              case "months":
+                  curDate_start.subtract(3, "months");
+                  break;
+          }
+          console.log(time.format('YYYY MM DD') +  " è prima di " + curDate_end.format('YYYY MM DD') + " dopo " + curDate_start.format('YYYY MM DD'));
+          var ret = (time.isBefore(curDate_end) && curDate_start.isBefore(time));
+          console.log(ret);
+          return ret;
+      };
               self.currentDate = moment();
 
           ////////////////

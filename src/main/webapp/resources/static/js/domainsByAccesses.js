@@ -9,73 +9,54 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
       });
     }])
 
-    .controller('domainsByAccesses', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', function($route, $routeParams, $scope, domainsDownloadFactory) {
+    .controller('domainsByAccesses', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope) {
 
         $("#timeManager").show();
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
 
-        $scope.trigger = {arrived:false, newAccess : undefined};
+        $scope.trigger = {arrived:false};
         $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
-        var stompClient = null;
-        $scope.connect = function(){
-            var socket = new SockJS('/connectionProfiler/connection-profiler-websocket');
-            stompClient = Stomp.over(socket);
+
+        /**
+         * Web Socket
+         * @type {null}
+         */
+        var subscription = null;
+        var socket = null;
+        $scope.realTimeIsConnected = true;
+
+        connect();
+
+        $scope.realTime = function(){
+            $scope.realTimeIsConnected ? disconnect() : connect();
+
+            console.log( "is conn: "+$scope.realTimeIsConnected );
+        };
+        function connect() {
+            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+            var stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/downloads', function (download) {
-                    console.log("download: " + download);
-                    domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
-                    console.log("dopo update:");
-                    console.log("domainList: " + JSON.stringify(domainList));
-                    $scope.trigger.newAccess = true;
+                $scope.$apply(function(){$scope.realTimeIsConnected = true;});
+                subscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    if($rootScope.isRelevant(download)) {
+                        domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
+                        console.log("domainList: " + JSON.stringify($scope.domainList));
+                        $scope.$apply(function () {
+                            $scope.trigger.newAccess = $scope.trigger.newAccess !== true;
+                        });
+                    }
                 });
             });
-        };
-       $scope.$on('$destroy',function(){
-           if (stompClient != null) {
-               stompClient.disconnect();
-           }
-       });
-
-        /*
-        setTimeout(myf, 500);
-        function myf() {
-            console.log("faccio");
-            $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
-            $scope.$apply(function(){$scope.trigger.arrived = true;});
         }
-
-        $scope.changeView = function(ele){
-            var currentParam = $routeParams;
-            switch(ele) {
-                case 'weekBtnDBA': currentParam.view = "week";  break;
-                case 'monthBtnDBA': currentParam.view = "month";    break;
-                case 'monthsBtnDBA': currentParam.view = "months";    break;
+        function disconnect(){
+            if(subscription != null){
+                subscription.unsubscribe();
+                subscription = null;
             }
-            $route.updateParams(currentParam);
-
-        };
-        $scope.forward = function(){
-            var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            console.log(curDate.format("YYYY MM DD"));
-            switch($routeParams.view){
-                case "week":   curDate.add(7,"days");  break;
-                case "month":   curDate.add(1,"months"); break;
-                case "months": curDate.add(3, "months"); break;
-            }
-            $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
-        };
-        $scope.back = function(){
-            var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            console.log(curDate.format("YYYY MM DD"));
-            switch($routeParams.view){
-                case "week":   curDate.subtract(7,"days");  break;
-                case "month":   curDate.subtract(1,"months"); break;
-                case "months": curDate.subtract(3, "months"); break;
-            }
-            $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
+            $scope.realTimeIsConnected = false;
         }
-        */
+        $scope.$on('$destroy', $scope.disconnect);
     }])
 
     .factory('domainsDownloadFactory',['$resource', function($resource){
@@ -89,14 +70,6 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                 trigger.arrived = true;
             });
         };
-        /*
-        factory.getDomainsAccessData = function(year, month, day, view, trigger){
-            var data = [{nRecords:10,server_domain:'google.it'},
-                {nRecords:13,server_domain:'gmail.it'},
-                {nRecords:2,server_domain:'hotmail.it'}];
-            return data;
-        };
-        */
         factory.getDomainsSizeData = function(year, month, day, view, trigger){
             return $resource(pieSizeUri).query({year : year, month : month, day : day, view : view}, function (domainList) {
                 console.log("getDomainsSizeData: " + JSON.stringify(domainList));
@@ -106,23 +79,23 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
         factory.updateDomainAccessList = function(domainList,download){
             var i;
             for(i=0;i<domainList.length;i++){
-                if(domainList[i].asnum === download.asnum && domainList[i].domain === download.domain){
-                    domainList[i].nRecords++; break;
+                if(domainList[i].server_domain === download.server_domain){
+                    domainList[i].nRecords++;break;
                 }
             }
             if(i === domainList.length)
-                domainList.push({asnum:download.asnum, domain: download.domain, nRecords: 1});
+                domainList.push({server_domain: download.server_domain, nRecords: 1});
             console.log("domainList: " + JSON.stringify(domainList));
         };
         factory.updateDomainSizeList = function(domainSizeList,download){
             var i;
             for(i=0;i<domainSizeList.length;i++){
-                if(domainSizeList[i].asnum === download.asnum && domainSizeList[i].domain === download.domain){
+                if(domainSizeList[i].server_domain === download.server_domain){
                     domainSizeList[i].size += download.size; break;
                 }
             }
             if(i === domainSizeList.length)
-                domainSizeList.push({asnum:download.asnum, domain: download.domain, size: download.size});
+                domainSizeList.push({server_domain: download.server_domain, size: download.size});
             console.log("updateDomainSizeList: " + JSON.stringify(domainSizeList));
         };
         return factory;

@@ -10,17 +10,49 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
   });
 }])
 
-.controller('speedTable', ['$route', '$routeParams', 'speedTable_downloadManager', '$rootScope', function($route, $routeParams, downloadManager, $rootScope) {
+.controller('speedTable', ['$route', '$routeParams', 'speedTable_downloadManager', '$rootScope', '$scope', function($route, $routeParams, downloadManager, $rootScope, $scope) {
         $("#timeManager").hide();
-        this.downloadList = downloadManager.getDownloads($routeParams.page,$routeParams.size);
-        this.succDownload = function() {
+
+        $scope.downloadList = downloadManager.getDownloads($routeParams.page,$routeParams.size);
+        $scope.nRecords = $routeParams.page * $routeParams.size;
+        $scope.succDownload = function() {
             $route.updateParams({page: parseInt($routeParams.page) + 1, size: $routeParams.size});
         };
-        this.prevDownload = function() {
+        $scope.prevDownload = function() {
             if(parseInt($routeParams.page) > 0)
                 $route.updateParams({page: parseInt($routeParams.page) - 1, size: $routeParams.size});
         };
 
+        var privateSubscription = null;
+        var socket = null;
+
+        $scope.connectPrivate = function () {
+            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    $scope.downloadList.push(download);//{timestamp : download.timestamp, download_speed : download.download_speed});
+                    console.log("pushato");
+                    $scope.downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                    $scope.$apply();
+                });
+            });
+        };
+
+        $scope.disconnectPrivate = function(){
+            if(privateSubscription != null){
+                privateSubscription.unsubscribe();
+                privateSubscription = null;
+            }
+        };
+        $scope.$on('$destroy',function(){
+            console.log(privateSubscription);
+            if (privateSubscription != null) {
+                privateSubscription.unsubscribe();
+            }
+        });
 
         function websocketCallback(scope){
             var download;
@@ -45,6 +77,7 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
             return $resource(serverURI).query({page: page, size: size}, function (downloadList) {
                 //console.log("arrivate:"+ JSON.stringify(downloadList));
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                console.log(JSON.stringify(downloadList));
             });
         };
         return factory;

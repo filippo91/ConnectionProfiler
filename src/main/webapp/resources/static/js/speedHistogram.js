@@ -9,7 +9,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
   });
 }])
 
-.controller('speedHistogram',['$route', '$routeParams', 'speedFactory', '$scope', function($route, $routeParams, speedFactory, $scope) {
+.controller('speedHistogram',['$route', '$routeParams', 'speedFactory', '$scope', '$rootScope', function($route, $routeParams, speedFactory, $scope, $rootScope) {
 
         $scope.trigger = {arrived: false, count : 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined};
 
@@ -43,96 +43,69 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 $(".bar-" + aType + "-" + asnum).fadeTo(500, 1);
             }
         };
-        function websocketCallbackUser(){
-            var userDownload;
-            $scope.speedDataUser = speedFactory.updateSpeedData($scope.speedDataUser,userDownload);
-            $scope.trigger.newSpeedDataUser = true;
-        }
-        function websocketCallbackPublic(){
-            var publicDownload;
-            $scope.speedDataPublic = speedFactory.updateSpeedData($scope.speedDataPublic,publicDownload);
-            $scope.trigger.newSpeedDataPublic = true;
-        }
+
+
+        /**
+         * Web Socket, 2 topics public and private
+         */
+        var privateSubscription = null;
+        var publicSubscription = null;
+        var socket = null;
+        $scope.connect = function () {
+            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    if($rootScope.isRelevant(download)) {
+                        speedFactory.updateSpeedData($scope.speedDataUser,download, $routeParams.bin_width);
+                        $scope.$apply(function () {
+                            $scope.trigger.newSpeedDataUser = $scope.trigger.newSpeedDataUser !== true;
+                        });
+                    }
+                });
+                publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
+                    var download =JSON.parse(packet.body).payload;
+                    if($rootScope.isRelevant(download)) {
+                        speedFactory.updateSpeedData($scope.speedDataPublic,download, $routeParams.bin_width);
+                        $scope.$apply(function () {
+                            $scope.trigger.newSpeedDataPublic = $scope.trigger.newSpeedDataPublic !== true;
+                        });
+                    }
+                });
+            });
+        };
+        $scope.disconnect = function(){
+            if(privateSubscription != null){
+                privateSubscription.unsubscribe();
+                privateSubscription = null;
+            }
+            if(publicSubscription != null){
+                publicSubscription.unsubscribe();
+                publicSubscription = null;
+            }
+        };
+        $scope.$on('$destroy', $scope.disconnect);
 }])
     .factory('speedFactory',['$resource', function($resource){
         var userUri = "http://localhost:8080/connectionProfiler/speedHistogram/:year/:month/:day/:view/:bin_width";
         var publicUri = "http://localhost:8080/connectionProfiler/publicSpeedHistogram/:year/:month/:day/:view/:bin_width";
         var factory = {};
         factory.getSpeedDataUser = function(year, month, day, view, bin_width, trigger){
-         var data =  $resource(userUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width},function (domainList) {
-                         console.log("speedHistogram: " + JSON.stringify(domainList));
-                         trigger.count ++;
-                         if(trigger.count == 2) trigger.arrived = true;
-         });
-         return data;
+              return $resource(userUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width},function (domainList) {
+                             console.log("speedHistogram: " + JSON.stringify(domainList));
+                             trigger.count ++;
+                             if(trigger.count == 2) trigger.arrived = true;
+             });
          };
         factory.getSpeedDataPublic = function(year, month, day, view, bin_width, trigger){
-            var data =  $resource(publicUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width},function (domainList) {
+           return  $resource(publicUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width},function (domainList) {
                 console.log("publicSpeedHistogram: " + JSON.stringify(domainList));
                 trigger.count ++;
                 if(trigger.count == 2) trigger.arrived = true;
             });
-            return data;
         };
-        /*
-        factory.getSpeedDataUser = function(){
-            return [{asnum: "alice", bin : 0, nRecords : 1 },
-                {asnum: "alice", bin : 1, nRecords : 11 },
-                {asnum: "alice", bin : 2, nRecords : 12 },
-                {asnum: "alice", bin : 3, nRecords : 14 },
-                {asnum: "alice", bin : 4, nRecords : 15 },
-                {asnum: "alice", bin : 5, nRecords : 16 },
-                {asnum: "alice", bin : 7, nRecords : 14 },
-                {asnum: "alice", bin : 8, nRecords : 13 },
-                {asnum: "alice", bin : 9, nRecords : 12 },
-                {asnum: "fastweb", bin : 0, nRecords : 4 },
-                {asnum: "fastweb", bin : 1, nRecords : 3 },
-                {asnum: "fastweb", bin : 2, nRecords : 14 },
-                {asnum: "fastweb", bin : 3, nRecords : 1 },
-                {asnum: "fastweb", bin : 4, nRecords : 24 },
-                {asnum: "fastweb", bin : 5, nRecords : 17 },
-                {asnum: "fastweb", bin : 7, nRecords : 11 },
-                {asnum: "fastweb", bin : 8, nRecords : 1 },
-                {asnum: "fastweb", bin : 9, nRecords : 2 },
-                {asnum: "megaWeb", bin : 0, nRecords : 6 },
-                {asnum: "megaWeb", bin : 2, nRecords : 4 },
-                {asnum: "megaWeb", bin : 3, nRecords : 10 },
-                {asnum: "megaWeb", bin : 4, nRecords : 5 },
-                {asnum: "megaWeb", bin : 5, nRecords : 7 },
-                {asnum: "megaWeb", bin : 6, nRecords : 8 },
-                {asnum: "megaWeb", bin : 8, nRecords : 1 },
-                {asnum: "megaWeb", bin : 9, nRecords : 1 }
-            ];
-        };
-        factory.getSpeedDataPublic = function(){
-            return [{asnum: "alice", bin : 0, nRecords : 1 },
-                {asnum: "alice", bin : 1, nRecords : 11 },
-                {asnum: "alice", bin : 2, nRecords : 12 },
-                {asnum: "alice", bin : 3, nRecords : 14 },
-                {asnum: "alice", bin : 4, nRecords : 15 },
-                {asnum: "alice", bin : 5, nRecords : 16 },
-                {asnum: "alice", bin : 7, nRecords : 14 },
-                {asnum: "alice", bin : 8, nRecords : 13 },
-                {asnum: "alice", bin : 9, nRecords : 12 },
-                {asnum: "fastweb", bin : 0, nRecords : 4 },
-                {asnum: "fastweb", bin : 1, nRecords : 3 },
-                {asnum: "fastweb", bin : 2, nRecords : 14 },
-                {asnum: "fastweb", bin : 3, nRecords : 1 },
-                {asnum: "fastweb", bin : 4, nRecords : 24 },
-                {asnum: "fastweb", bin : 5, nRecords : 17 },
-                {asnum: "fastweb", bin : 7, nRecords : 11 },
-                {asnum: "fastweb", bin : 8, nRecords : 1 },
-                {asnum: "fastweb", bin : 9, nRecords : 2 },
-                {asnum: "megaWeb", bin : 0, nRecords : 6 },
-                {asnum: "megaWeb", bin : 2, nRecords : 4 },
-                {asnum: "megaWeb", bin : 3, nRecords : 10 },
-                {asnum: "megaWeb", bin : 4, nRecords : 5 },
-                {asnum: "megaWeb", bin : 5, nRecords : 7 },
-                {asnum: "megaWeb", bin : 6, nRecords : 8 },
-                {asnum: "megaWeb", bin : 8, nRecords : 1 },
-                {asnum: "megaWeb", bin : 9, nRecords : 1 }
-            ];
-        }; */
         factory.splitByAsnum = function(values){
             var ret = [];
             for(var i = 0;i<values.length; i++){
@@ -146,8 +119,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             }
             return ret;
         };
-        factory.updateSpeedData = function(speedList, download){
-            var index = download.speed / ($routeParams.bin_width * 1000000);
+        factory.updateSpeedData = function(speedList, download, bin_width){
+            var index = parseInt(download.download_speed / (bin_width * 1000000));
             var i;
             for( i = 0; i<speedList.length; i++){
                 if(speedList[i].asnum === download.asnum && speedList[i].bin === index){
@@ -188,7 +161,15 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         .attr("width", 64)
                         .attr("height", 64);
 
-                    var drawHistogram = function(){
+                    var drawHistogram = function(animation){
+
+                        $(element[0]).empty();
+
+                        svg = d3.select(element[0]).append("svg")
+                            .attr("width", width + margin.left + margin.right)
+                            .attr("height", height + margin.top + margin.bottom)
+                            .append("g")
+                            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
                         svg.selectAll(".loading").remove();
 
@@ -218,17 +199,27 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                                 .attr("class", "bar bar-"+classType+" bar-"+classType+"-"+ele.asnum)
                                 .attr("transform", function(d) { return "translate(" + parseInt(x(d.bin * $routeParams.bin_width)+1) + "," + y(d.nRecords) + ")"; });
 
-                            bar[ele.asnum].append("rect")
-                                .attr("x", 1)
-                                .attr("width", x($routeParams.bin_width) - 2)
-                                .attr("height", 0)
-                                .attr("y", function(d){ return height - y(d.nRecords);})
-                                .attr("fill", color(i%10))
-                                .attr("opacity", function(){ var ret =0.9 - (dim) / 10; if(ret < 0.4) return 0.4; return ret;})
-                                .transition()
-                                .duration(500)
-                                .attr("height", function(d) { return height - y(d.nRecords); })
-                                .attr("y", 0);
+                            if(animation) {
+                                bar[ele.asnum].append("rect")
+                                    .attr("x", 1)
+                                    .attr("width", x($routeParams.bin_width) - 2)
+                                    .attr("height", 0)
+                                    .attr("y", function (d) {return height - y(d.nRecords);})
+                                    .attr("fill", color(i % 10))
+                                    .attr("opacity", function () {var ret = 0.9 - (dim) / 10;if (ret < 0.4) return 0.4;return ret;})
+                                    .transition()
+                                    .duration(500)
+                                    .attr("height", function (d) {return height - y(d.nRecords);})
+                                    .attr("y", 0);
+                            }else{
+                                bar[ele.asnum].append("rect")
+                                    .attr("x", 1)
+                                    .attr("width", x($routeParams.bin_width) - 2)
+                                    .attr("fill", color(i % 10))
+                                    .attr("opacity", function () {var ret = 0.9 - (dim) / 10;if (ret < 0.4) return 0.4;return ret;})
+                                    .attr("height", function (d) {return height - y(d.nRecords);})
+                                    .attr("y", 0);
+                            }
 
                             bar[ele.asnum].append("text")
                                 .attr("dy", ".75em")
@@ -255,19 +246,54 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                     scope.$watch('trigger.arrived',function(newVal){
                         if(newVal === true){
                             console.log("disegno");
-                            drawHistogram();
+                            drawHistogram(true);
                             $(".bar-public").hide();
                         }
                     });
 
                     scope.$watch('trigger.newSpeedDataUser',function(asnum){
                         if(asnum !== undefined) {
-                            updateHistogram();
+                            drawHistogram(false);
+                            $('.user-asnumButton').each(function(){
+                                var ele = $(this);
+                                var isactive = ele.hasClass("active");
+                                var asnum =  $("#" + ele.attr("id")).text();
+                                if(!isactive){
+                                    $(".bar-user-" + asnum).hide();
+                                }
+                            });
+
+                            $('.public-asnumButton').each(function(){
+                                var ele = $(this);
+                                var isactive = ele.hasClass("active");
+                                var asnum =  $("#" + ele.attr("id")).text();
+                                if(!isactive) {
+                                    console.log("nascondo asnum fsda" + asnum);
+                                    $(".bar-public-" + asnum).hide();
+                                }
+                            });
                         }
                     });
                     scope.$watch('trigger.newSpeedDataPublic',function(asnum){
                         if(asnum !== undefined) {
-                            updateHistogram();
+                            drawHistogram(false);
+                            $('.user-asnumButton').each(function(){
+                                var ele = $(this);
+                                var isactive = ele.hasClass("active");
+                                var asnum =  $("#" + ele.attr("id")).text();
+                                if(!isactive){
+                                    $(".bar-user-" + asnum).hide();
+                                }
+                            });
+                            $('.public-asnumButton').each(function(){
+                                var ele = $(this);
+                                var isactive = ele.hasClass("active");
+                                var asnum =  $("#" + ele.attr("id")).text();
+                                if(!isactive) {
+                                    console.log("nascondo asnum fsda" + asnum);
+                                    $(".bar-public-" + asnum).hide();
+                                }
+                            });
                         }
                     });
                 });

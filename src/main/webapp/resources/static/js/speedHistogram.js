@@ -46,6 +46,16 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         };*/
 
 
+        $scope.switchView = function(type){
+            var btn = $('#button-view-' + type), elements = $('.bin-' + type);
+            if(btn.hasClass("active")){// is visible
+                btn.removeClass("active");
+                elements.fadeOut();
+            }else{
+                btn.addClass("active");
+                elements.fadeIn();
+            }
+        };
         /**
          * Web Socket callbacks
          */
@@ -175,8 +185,10 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 d3Service.d3().then(function(d3){
 
                     var margin = {top: 10, right: 30, bottom: 30, left: 30},
-                        width = 960 - margin.left - margin.right,
-                        height = 500 - margin.top - margin.bottom;
+                        real_width = 960, real_height = 500,
+                        width = real_width - margin.left - margin.right,
+                        height = real_height - margin.top - margin.bottom,
+                        radius = Math.min(width, height) / 2;
 
                     var color = d3.scale.category10();
 
@@ -216,6 +228,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         var valuesUser = speedFactory.splitByBin(scope.speedDataUser);
                         var valuesPublic = speedFactory.splitByBin(scope.speedDataPublic);
                         var asnumList = getAsnumListFilter(scope.speedDataUser);
+                        var binWidth = $routeParams.bin_width;
+
+                        console.log("asnumList " + asnumList);
 
                         if((valuesUser === undefined || valuesUser.length === 0) && (valuesPublic === undefined || valuesPublic.length === 0)){
                             svg.attr("transform", "translate(" + real_width / 2 + "," + real_height / 2 + ")");
@@ -246,13 +261,13 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             return;
                         }
 
-                        var maxBin = d3.max(valuesUser.concat(valuesPublic),function(e){return d3.max(e.values,function(ee){return ee.bin;});}),
+                        var maxBin = d3.max(valuesUser.concat(valuesPublic),function(e){return e.bin;}),
                            // maxValueX = (maxBin + 1) * $routeParams.bin_width,
                             maxValueY = d3.max(valuesUser.concat(valuesPublic),function(e){return d3.max(e.values,function(ee){return ee.nRecords;});});
 
                         //console.log(maxValueX);
-                        console.log(maxValueY);
-                        //var x = d3.scale.linear().domain([0, maxValueX]).range([0, width]);
+                        console.log("maxvalue y: " + maxValueY);
+
                         var binList = [];
                         for(var i = 0; i <= maxBin; i++)    binList.push(i);
                         console.log("binList : " + binList);
@@ -262,7 +277,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
                         //var ris = [];for(var i = 0; i <= maxBin; ris.push(i++ * $routeParams.bin_width)); ris.push(maxValueX);
-                        var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){return (d + 1) * binWidth + "ms";});//.tickValues(ris);
+                        var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){
+                            return (d + 1) * binWidth + " Mbps";
+                            });//.tickValues(ris);
                         var yAxis = d3.svg.axis().scale(y).orient("left");
 
                         /*
@@ -312,13 +329,102 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         */
 
-                        function drawBars(values, type){
+                        var bins = [], bar = [], rect = [],text = [];
 
+                        function drawBars(values, type){
+                            bins[type] = svg.selectAll(".bin-" + type)
+                                .data(values)
+                                .enter().append("g")
+                                .attr("class", "bin bin-" + type)
+                                .attr("transform", function(d) {return "translate(" + x0(d.bin) + ",0)"; });
+
+                            bar[type] = bins[type].selectAll("bar-" + type)
+                                .data(function(d) { return d.values; })
+                                .enter().append("g")
+                                .attr("class", "bar bar-" + type);
+
+                            rect[type] = bar[type].append("rect")
+                                .attr("class", "rect rect-" + type)
+                                .attr("width", x1.rangeBand())
+                                .attr("x", function(d) { return x1(d.asnum); })
+                                .style("fill", function(d) { return color(d.asnum); })
+                                .attr("opacity",.5);
+
+                            if(animation){
+                                rect[type].attr("height", 0)
+                                    .attr("y", height)
+                                    .transition()
+                                    .duration(500)
+                                    .attr("y", function(d) { return y(d.nRecords); })
+                                    .attr("height", function(d) { return height - y(d.nRecords); });
+                            }else{
+                                rect[type].attr("y", function(d) { return y(d.nRecords); })
+                                    .attr("height", function(d) { return height - y(d.nRecords); });
+                            }
+
+                            text[type] = bar[type].append("text")
+                                .attr("dy", ".75em")
+                                .attr("x", function(d) { return x1(d.asnum) + x1.rangeBand() / 2; })
+                                .attr("text-anchor", "middle")
+                                .style("fill","white")
+                                .text(function(d) { return d.nRecords; });
+
+                            if(animation){
+                                text[type].attr("height", 0)
+                                    .attr("y", height)
+                                    .transition()
+                                    .duration(500)
+                                    .attr("y", function(d) { return y(d.nRecords) + 10; })
+                                    .attr("height", function(d) { return height - y(d.nRecords); });
+                            }else{
+                                text[type].attr("y", function(d) { return y(d.nRecords) + 10; })
+                                    .attr("height", function(d) { return height - y(d.nRecords); });
+                            }
+
+                            var tmp = $(".bar");
+                            var offset = tmp.offset();
+                            tmp.mousemove(function(e){
+                                var isvisible = $('#button-view-' + type).hasClass("active");
+                                console.log("is visible " + isvisible);
+                                //if(!isvisible) return;
+                                var x = e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
+                                tmp.css('cursor', 'pointer');
+                                div.transition()
+                                    .duration(200)
+                                    .style("opacity", .9);
+                                div.html("<i>Asnum: </i><b>" + d3.select(this).data()[0].asnum + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
+                                    .style("left", (x) + "px")
+                                    .style("top", (y - 28)  + "px");
+                            })
+                                .mouseleave(function(){
+                                    div.transition()
+                                        .duration(500)
+                                        .style("opacity", 0);
+                                });
                         }
+
                         drawBars(valuesUser, 'user');
                         drawBars(valuesPublic, 'public');
 
+                        var legend = svg.selectAll(".legend")
+                            .data(asnumList.slice().reverse())
+                            .enter().append("g")
+                            .attr("class", "legend")
+                            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
+                        legend.append("rect")
+                            .attr("x", width - 18)
+                            .attr("width", 18)
+                            .attr("opacity",.5)
+                            .attr("height", 18)
+                            .style("fill", color);
+
+                        legend.append("text")
+                            .attr("x", width - 24)
+                            .attr("y", 9)
+                            .attr("dy", ".35em")
+                            .style("text-anchor", "end")
+                            .text(function(d) { return d; });
                         svg.append("g")
                             .attr("class", "x axis")
                             .attr("transform", "translate(0," + height + ")")
@@ -331,55 +437,30 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                     scope.$watch('trigger.arrived',function(newVal){
                         if(newVal === true){
-                            console.log("disegno");
                             drawHistogram(true);
-                            $(".bar-public").hide();
+                            $(".bin-public").hide();
                         }
                     });
 
                     scope.$watch('trigger.newSpeedDataUser',function(asnum){
                         if(asnum !== undefined) {
                             drawHistogram(false);
-                            $('.user-asnumButton').each(function(){
-                                var ele = $(this);
-                                var isactive = ele.hasClass("active");
-                                var asnum =  $("#" + ele.attr("id")).text();
-                                if(!isactive){
-                                    $(".bar-user-" + asnum).hide();
-                                }
-                            });
 
-                            $('.public-asnumButton').each(function(){
-                                var ele = $(this);
-                                var isactive = ele.hasClass("active");
-                                var asnum =  $("#" + ele.attr("id")).text();
-                                if(!isactive) {
-                                    console.log("nascondo asnum fsda" + asnum);
-                                    $(".bar-public-" + asnum).hide();
-                                }
-                            });
+                            if(!$('#button-view-public').hasClass("active"))
+                                $(".bin-public").hide();
+                            if(!$('#button-view-user').hasClass("active"))
+                                $(".bin-user").hide();
+
                         }
                     });
                     scope.$watch('trigger.newSpeedDataPublic',function(asnum){
                         if(asnum !== undefined) {
                             drawHistogram(false);
-                            $('.user-asnumButton').each(function(){
-                                var ele = $(this);
-                                var isactive = ele.hasClass("active");
-                                var asnum =  $("#" + ele.attr("id")).text();
-                                if(!isactive){
-                                    $(".bar-user-" + asnum).hide();
-                                }
-                            });
-                            $('.public-asnumButton').each(function(){
-                                var ele = $(this);
-                                var isactive = ele.hasClass("active");
-                                var asnum =  $("#" + ele.attr("id")).text();
-                                if(!isactive) {
-                                    console.log("nascondo asnum fsda" + asnum);
-                                    $(".bar-public-" + asnum).hide();
-                                }
-                            });
+
+                            if(!$('#button-view-public').hasClass("active"))
+                                $(".bin-public").hide();
+                            if(!$('#button-view-user').hasClass("active"))
+                                $(".bin-user").hide();
                         }
                     });
                 });

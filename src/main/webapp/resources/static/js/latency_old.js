@@ -83,13 +83,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
             var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width}, function(latencyData){
             	trigger.arrived = true;
-                console.log(JSON.stringify(latencyData)); 
             });
             return data;
         };
         factory.splitByAsnum = function(values){
             var ret = [];
-            console.log("values: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
                     if(values[i].asnum === ret[j].asnum){
@@ -99,12 +97,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                 if(j === ret.length)
                     ret.push({asnum : values[i].asnum, values : [{bin : values[i].bin, nRecords : values[i].nRecords}]});
             }
-            console.log(JSON.stringify(ret));
             return ret;
         };
         factory.updateLatencyData = function(latencyData,download, bin_width){
-
-            console.log("latencyData: " + JSON.stringify(latencyData));
             var index = parseInt(download.connect_time / bin_width);
             var i;
             for(i = 0; i < latencyData.length; i++){
@@ -114,7 +109,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             }
             if(i === latencyData.length)
                 latencyData.push({asnum : download.asnum, bin : index, nRecords : 1});
-            console.log("latencyData: " + JSON.stringify(latencyData));
         };
         return factory;
     }])

@@ -22,38 +22,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         /**
          * Web Socket callbacks
          */
-            /*
-        var privateSubscription = null;
-        var socket = null;
-        $scope.connectPrivate = function () {
-            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
-                    var download =JSON.parse(packet.body).payload;
-                    if($rootScope.isRelevant(download)) {
-                        latencyFactory.updateLatencyData($scope.latencyData, download, $routeParams.bin_width);
-                        $scope.$apply(function () {
-                            $scope.trigger.newData = $scope.trigger.newData !== true;
-                        });
-                    }
-                });
-            });
-        };
-        $scope.disconnectPrivate = function(){
-            if(privateSubscription != null){
-                privateSubscription.unsubscribe();
-                privateSubscription = null;
-            }
-        };
-        $scope.$on('$destroy', function () {
-            console.log(privateSubscription);
-            if (privateSubscription != null) {
-                privateSubscription.unsubscribe();
-            }
-        });
-        */
         $rootScope.websocketCallbackUser = function (download) {
             if($rootScope.isRelevant(download)) {
                 latencyFactory.updateLatencyData($scope.latencyData, download, $routeParams.bin_width);
@@ -70,11 +38,10 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         var requestURL = "http://localhost:8080/connectionProfiler/latencyHistogram/:year/:month/:day/:view/:bin_width";
         var factory = {};
         factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
-            var data =  $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width}, function(latencyData){
+            return $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width}, function(latencyData){
             	trigger.arrived = true;
                 console.log(JSON.stringify(latencyData)); 
             });
-            return data;
         };
         factory.splitByAsnum = function(values){
             var ret = [];
@@ -151,7 +118,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     .attr("width", 64)
                     .attr("height", 64);
 
-
                 var drawHistogram = function(animation){
 
                     $(element[0]).empty();
@@ -174,7 +140,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var asnumList = getAsnumListFilter(values);
                     var binWidth = $routeParams.bin_width;
 
-                    console.log("asnumList: " + asnumList);
                     if(values === undefined || values.length === 0){
                         svg.attr("transform", "translate(" + real_width / 2 + "," + real_height / 2 + ")");
                         svg.append('defs')
@@ -207,18 +172,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                     var binList = [];
                     for(var i = 0; i <= maxBin; i++)    binList.push(i);
-                    console.log("binList : " + binList);
 
                     var x0 = d3.scale.ordinal().domain(binList).rangeRoundBands([0, width], .2);
                     var x1 = d3.scale.ordinal().domain(asnumList).rangeRoundBands([0, x0.rangeBand()],.1);
                     var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
-                    values_arr.forEach(function(d){
-                        console.log("X0: " + d.bin + " -> " + x0(d.bin));
-                    });
-                    asnumList.forEach(function(d){
-                        console.log("X1: " + x0.rangeBand() + ", " + x1(d));
-                    });
                     var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){return (d + 1) * binWidth + "ms";});//.tickValues(ris);
                     var yAxis = d3.svg.axis().scale(y).orient("left");
 
@@ -321,14 +279,12 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                 scope.$watch('trigger.arrived',function(newVal){
                     if(newVal === true){
-                        console.log("ci entro");
                         drawHistogram(true);
                     }
                 });
 
                 scope.$watch('trigger.newData',function(asnum){
                     if(asnum !== undefined) {
-                        console.log("disegno lat histo!");
                         drawHistogram(false);
                     }
                 });
@@ -338,15 +294,12 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 })
     .filter('getAsnumList',function(){
         return function(input){
-            console.log("sdafdsafsdafasd");
             var  ret = [];
             if(input === undefined || input.length === 0) return ret;
             input.forEach(function(download){
                 if(ret.indexOf(download.asnum) === -1)
                     ret[ret.length] = (download.asnum);
             });
-            console.log("split");
-            console.log(JSON.stringify(ret));
             return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
         };
     });

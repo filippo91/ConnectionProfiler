@@ -191,22 +191,18 @@ angular.module('myApp', [
           var stompClient = Stomp.over(socket);
           stompClient.connect({}, function (frame) {
               console.log("connetto");
-              if($rootScope.websocketCallbackUser !== undefined){
-                  $rootScope.$apply(function(){$rootScope.socketConnected = true;});
-                  $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function(packet) {
-                      var download =JSON.parse(packet.body).payload;
-                      console.log("CHIAMO CALLBACK USER");
-                      $rootScope.websocketCallbackUser(download);
-                  });
-              }
-              if($rootScope.websocketCallbackPublic !== undefined){
-                  $rootScope.$apply(function(){$rootScope.socketConnected = true;});
-                  $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
-                      var download =JSON.parse(packet.body).payload;
-                      console.log("CHIAMO CALLBACK PUBLIC");
-                      $rootScope.websocketCallbackPublic(download);
-                  });
-              }
+              $rootScope.$apply(function(){$rootScope.socketConnected = true;});
+              $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function(packet) {
+                  var download =JSON.parse(packet.body).payload;
+                  console.log("CHIAMO CALLBACK USER");
+                  if($rootScope.websocketCallbackUser !== undefined) $rootScope.websocketCallbackUser(download);
+              });
+              $rootScope.$apply(function(){$rootScope.socketConnected = true;});
+              $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
+                  var download =JSON.parse(packet.body).payload;
+                  console.log("CHIAMO CALLBACK PUBLIC");
+                  if($rootScope.websocketCallbackPublic !== undefined) $rootScope.websocketCallbackPublic(download);
+              });
           });
       }
       function disconnect(){

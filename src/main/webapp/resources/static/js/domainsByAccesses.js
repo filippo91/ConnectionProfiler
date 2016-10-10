@@ -22,44 +22,6 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
         /**
          * Web Socket callbacks
          */
-            /*
-        var subscription = null;
-        var socket = null;
-        $scope.realTimeIsConnected = true;
-
-        connect();
-
-        $scope.realTime = function(){
-            $scope.realTimeIsConnected ? disconnect() : connect();
-
-            console.log( "is conn: "+$scope.realTimeIsConnected );
-        };
-        function connect() {
-            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                $scope.$apply(function(){$scope.realTimeIsConnected = true;});
-                subscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
-                    var download =JSON.parse(packet.body).payload;
-                    if($rootScope.isRelevant(download)) {
-                        domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
-                        console.log("domainList: " + JSON.stringify($scope.domainList));
-                        $scope.$apply(function () {
-                            $scope.trigger.newAccess = $scope.trigger.newAccess !== true;
-                        });
-                    }
-                });
-            });
-        }
-        function disconnect(){
-            if(subscription != null){
-                subscription.unsubscribe();
-                subscription = null;
-            }
-            $scope.realTimeIsConnected = false;
-        }
-        $scope.$on('$destroy', $scope.disconnect);
-        */
         $rootScope.websocketCallbackUser = function (download) {
             if($rootScope.isRelevant(download)) {
                 domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
@@ -126,26 +88,20 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                         radius = Math.min(width, height) / 2;
 
                     var color = d3.scale.category20();
-                    //.range(["#98abc5","#ff8c00"]);
 
                     var arc = d3.svg.arc()
                         .outerRadius(radius - 10)
                         .innerRadius(120);
-/*
-                    var labelArc = d3.svg.arc()
-                        .outerRadius(radius * 0.7)
-                        .innerRadius(radius * 0.7);
-*/
+
                     var pie = d3.layout.pie()
                         .sort(null)
                         .value(function(d) { return d.nRecords; });
 
-                    //console.log(pie);
-
-                    var svg = d3.select(element[0]).append("svg")
+                    var svg_content = d3.select(element[0]).append("svg")
                         .attr("width", width)
-                        .attr("height", height)
-                        .append("g")
+                        .attr("height", height);
+
+                    var svg = svg_content.append("g")
                         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
                     // Define the div for the tooltip
@@ -198,8 +154,6 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                             return;
                         }
 
-
-
                         var g = svg.selectAll(".arc")
                             .data(pie(data))
                             .enter().append("g")
@@ -215,15 +169,27 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                                 .duration(750)
                                 .attrTween("d", tweenPie);
                         }
-/*
-                        g.append("text")
-                            .attr("transform", function(d) {return "translate(" + labelArc.centroid(d) + ")"; })
+
+                        var legend = svg_content.selectAll(".legend")
+                            .data(data.map(function(d){return d.server_domain;}).reverse())
+                            .enter().append("g")
+                            .attr("class", "legend")
+                            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+                        legend.append("rect")
+                            .attr("x", width - 18)
+                            .attr("width", 18)
+                            .attr("opacity",.7)
+                            .attr("height", 18)
+                            .style("fill", color);
+
+                        legend.append("text")
+                            .attr("x", width - 24)
+                            .attr("y", 9)
                             .attr("dy", ".35em")
-                            .style("font-family", "sans-serif")
-                            .style("font-size", "12px")
-                            //.style("fill", "white")
-                            .text(function(d) { return d.data.server_domain; });
-*/
+                            .style("text-anchor", "end")
+                            .text(function(d) { return d; });
+
                         //Tooltip
                         var pane = $('.arc');
                         var offset = pane.offset();
@@ -242,7 +208,8 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                                 .duration(500)
                                 .style("opacity", 0);});
                     };
-                    //Animation
+
+                    //Animation: growing circles
                     function tweenPie(finish) {
                         var start = {
                             startAngle: 0,

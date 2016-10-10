@@ -1,27 +1,13 @@
-
-<!--button ng-click="connect()" class="btn btn-danger">Connect</button-->
     <div class="btn-group row " id="btnDivHist">
         <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-               Public Asnums <span class="caret"></span>
+            <button type="button" class="btn btn-default active" ng-click="switchView('user')" id="button-view-user">
+                User providers
             </button>
-            <ul class="dropdown-menu">
-                <li><a class="btn btn-default" id="public-showAll" ng-click="showAllAsnum('public');"  isvisible="false">Show All</a></li>
-                <li isVisible="false" ng-repeat="ele in (speedDataPublic | getAsnumList)" id="general-hist-asnum-{{ele}}">
-                    <a class="btn btn-default public-asnumButton" id="public-button-{{ele}}" ng-click="showAsnum(ele, 'public')">{{ele}}</a>
-                </li>
-            </ul>
         </div>
         <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                User Asnums <span class="caret"></span>
+            <button type="button" class="btn btn-default" ng-click="switchView('public')" id="button-view-public">
+               Public providers
             </button>
-            <ul class="dropdown-menu">
-                <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsnum('user');">Hide All</a></li>
-                <li isvisible="false" ng-repeat="ele in (speedDataUser | getAsnumList)" id="asnum-{{ele}}">
-                    <a class="btn btn-default user-asnumButton active" id="user-button-{{ele}}" ng-click="showAsnum(ele, 'user')">{{ele}}</a>
-                </li>
-            </ul>
         </div>
     </div>
     <speed-histogram class="row"></speed-histogram>

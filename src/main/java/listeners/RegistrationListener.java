@@ -1,5 +1,9 @@
 package listeners;
 
+import java.io.StringWriter;
+
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,19 +14,20 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import models.User;
-import services.UserService;
 
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 	Logger log = LoggerFactory.getLogger(RegistrationListener.class);
-	
+
 	private final static String EMAIL_SUBJECT = "Confirm your email address";
 	private final static String EMAIL_FROM = "aiProjectTeam@polito.it";
+
+	@Autowired
+	JavaMailSender mailSender;
 	
-	@Autowired JavaMailSender mailSender;
-	
-	@Autowired UserService userService;
-	
+	@Autowired
+	VelocityEngine velocityEngine;
+
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
 		this.requestConfirmation(event);
@@ -30,29 +35,28 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
 	private void requestConfirmation(OnRegistrationCompleteEvent event) {
 		User user = event.getUser();
-		String url = event.getAppUrl() + "newUser/confirmRegistration";
+		String url = event.getAppUrl() + "confirmRegistration.html";
 		String token = event.getToken();
 		String recipientAddress = user.getEmail();
-		
+
 		SimpleMailMessage email = new SimpleMailMessage();
 		email.setTo(recipientAddress);
 		email.setSubject(EMAIL_SUBJECT);
-		email.setText("Dear " + user.getUsername() + ", "
-                + "thank you for registering into our service."
-				+ "In order to complete the registration process click"
-				+ "on the following link: " 
-                + url + " "
-                + "and copy and paste the following code: "
-                + token
-                + "into the designated web page field. "
-                + "Enjoy!");
-		
 		email.setFrom(EMAIL_FROM);
+
+		VelocityContext velocityContext = new VelocityContext();
+		velocityContext.put("name", user.getUsername());
+		velocityContext.put("link", url);
+		velocityContext.put("token", token);
+		StringWriter stringWriter = new StringWriter();
+		velocityEngine.mergeTemplate("velocity/confirmRegistrationEmail.html", "UTF-8", velocityContext, stringWriter);
 		
-		try{
+		email.setText(stringWriter.toString());
+
+		try {
 			mailSender.send(email);
-		}catch(MailException me){
-			//contact the admin
+		} catch (MailException me) {
+			// contact the admin
 			log.error("Error while sending email to " + user.getUsername());
 			me.printStackTrace();
 		}

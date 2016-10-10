@@ -13,6 +13,8 @@ angular.module('myApp', [
   'myApp.domainsBySize'
 ])
 
+.constant("PUBLIC_PAGES", ['', '/', '/login', '/register', '/confirmRegistration'])
+
 .config(['$locationProvider', '$routeProvider', '$httpProvider', function($locationProvider, $routeProvider, $httpProvider) {
   $locationProvider.hashPrefix('!');
 /*
@@ -99,19 +101,24 @@ angular.module('myApp', [
 	
 })
 
-.controller('navigation',
-  function($rootScope, $http, $location, $route, $routeParams, $scope) {
+.controller('navigation',  function($rootScope, $http, $location, $route, $routeParams, PUBLIC_PAGES, $scope) {
 
-      $("#timeManager").css("visibility","hidden");
-      $("#realtimediv").css("visibility","hidden");
+
+        $("#timeManager").css("visibility","hidden");
+        $("#realtimediv").css("visibility","hidden");
 
           var self = this;
           $rootScope.user = {};
+          self.speedTableParams = {};
+          self.speedTableParams.page = 0;
+          self.speedTableParams.pageSize = 10;
+          
           /////////////////
           
           $rootScope.rowUserDownloadList =[];
           $rootScope.rowPublicDownloadList =[];
-
+          $rootScope.enableChangeView = false;
+          
           /**
            * Functions for controlling time
            */
@@ -261,6 +268,25 @@ angular.module('myApp', [
               $location.path("/");
             });
           }
+          
+          //////////////////////////
+          $rootScope.$on('$routeChangeStart', function (event, next, prev) {
+        	  	console.info($location.url(), PUBLIC_PAGES);
+        	  	if(PUBLIC_PAGES.indexOf($location.url()) >= 0){
+        	  		$rootScope.enableChangeView = false;
+        	  	}else{
+        	  		$rootScope.enableChangeView = true;
+        	  	}
+        	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf($location.url()) < 0) {
+        	    	event.preventDefault();
+        	        $rootScope.$evalAsync(function() {
+        	        	$location.path("/login");
+        	        	$rootScope.enableChangeView = false;
+        	        });
+        	    	
+        	    }
+
+        	});
 
         })
 

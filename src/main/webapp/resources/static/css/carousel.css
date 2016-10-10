@@ -1,0 +1,151 @@
+body, html {
+	height: 100%;
+	width: 100%;
+}
+
+header {
+	min-height: auto;
+	height: 700px;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	background-size: cover;
+	-o-background-size: cover;
+	background-position: center;
+	background-image: url(../img/slide1.jpg) !important;
+	color: #fff
+}
+
+header, header .header-content {
+	position: relative;
+	width: 100%;
+	text-align: center;
+}
+
+header .header-content {
+	padding: 100px 15px
+}
+
+header .header-content .header-content-inner h1 {
+	font-weight: 700;
+	text-transform: uppercase;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: 30px
+}
+
+header .header-content .header-content-inner hr {
+	margin: 30px auto
+}
+
+header .header-content .header-content-inner p {
+	font-weight: 300;
+	color: rgba(255, 255, 255, .7);
+	font-size: 16px;
+	margin-bottom: 50px
+}
+
+@media ( min-width : 768px) {
+	header {
+		min-height: 100%
+	}
+	header .header-content {
+		position: absolute;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		-ms-transform: translateY(-50%);
+		transform: translateY(-50%);
+		padding: 0 50px
+	}
+	header .header-content .header-content-inner {
+		max-width: 1000px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	header .header-content .header-content-inner h1 {
+		font-size: 50px
+	}
+	header .header-content .header-content-inner p {
+		font-size: 18px;
+		max-width: 80%;
+		margin-left: auto;
+		margin-right: auto
+	}
+}
+
+nav.navbar {
+	padding: 20px 0px;
+	transition: padding .3s;
+	margin-bottom: 0px;
+}
+
+nav.navbar.little-navbar {
+	padding: 0px 0px;
+}
+
+.navbar-inverse .navbar-nav>.active>a, .navbar-inverse .navbar-nav>.open>a
+	{
+	background-image: none;
+	box-shadow: none;
+}
+
+.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:focus,
+	.navbar-inverse .navbar-nav>.open>a:hover {
+	background-color: transparent;
+}
+
+.navbar-inverse {
+	background-image: none;
+}
+
+.navbar-nav>li>.dropdown-menu {
+	background-color: #222;
+	color: #FFFFFF;
+	box-shadow: none;
+	border-color: transparent;
+}
+
+.dropdown-menu>li>a {
+	color: #9d9d9d;
+}
+
+.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+	background-image: none;
+	color: #FFFFFF;
+	background-color: transparent;
+}
+
+#navbar a {
+	color: #9d9d9d;
+}
+
+#navbar a:focus, #navbar a:hover {
+	background-image: none;
+	color: #FFFFFF;
+	background-color: transparent;
+	text-decoration: none;
+}
+
+footer {
+	background-color: #ffffff;
+}
+
+footer>div>p {
+	margin: 10px 0px;
+}
+
+.mycontainer {
+	padding-right: 0px;
+	padding-left: 0px;
+	margin-right: 0;
+	margin-left: 0;
+	width: inherit;
+}
+/*
+Teacher: Adriano
+- Selectors
+  * Siblings
+      p + p {
+      }
+  * due puntini
+    p:nth
+*/

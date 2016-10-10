@@ -1,9 +1,14 @@
 package configurations.root;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.VelocityException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +22,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.ui.velocity.VelocityEngineFactory;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
@@ -84,6 +90,14 @@ public class ConnectionProfilerAppConfig {
 	        return javaMailSender;
 	    }
 
-	      
+	  @Bean
+	    public VelocityEngine velocityEngine() throws VelocityException, IOException{
+	        VelocityEngineFactory factory = new VelocityEngineFactory();
+	        Properties props = new Properties();
+	        props.put("resource.loader", "class");
+	        props.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+	        factory.setVelocityProperties(props);
+	        return factory.createVelocityEngine();      
+	    }
 	  
 }

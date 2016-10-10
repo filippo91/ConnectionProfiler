@@ -313,7 +313,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         */
 
                         function drawBars(values, type){
-                            
+
                         }
                         drawBars(valuesUser, 'user');
                         drawBars(valuesPublic, 'public');

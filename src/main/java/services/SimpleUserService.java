@@ -55,7 +55,7 @@ public class SimpleUserService implements UserService {
 		 * to the user in order to verify his account through the 
 		 * verification token just created.
 		 */
-		String appUrl = "http://localhost:8080/connectionProfiler/";
+		String appUrl = "http://localhost:8080/connectionProfiler/index.html#!/confirmRegistration";
 		
 		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl, token));
 	}

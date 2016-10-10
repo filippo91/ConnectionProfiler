@@ -4,6 +4,16 @@ public class BinLatencyDownload {
 	private Integer asnum;
 	private Integer bin;
 	private Integer nRecords;
+	private String asname;
+	
+	
+	
+	public String getAsname() {
+		return asname;
+	}
+	public void setAsname(String asname) {
+		this.asname = asname;
+	}
 	public Integer getAsnum() {
 		return asnum;
 	}

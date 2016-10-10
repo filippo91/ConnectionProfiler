@@ -40,9 +40,25 @@ public class User {
     private String role;
     
     public User() {
-    	id = (int)(Math.random()*1000);
 	}
     
+	public User(String username, String email, String password) {
+		super();
+		this.username = username;
+		this.email = email;
+		this.password = password;
+	}
+    
+	public User(String username, String email, String password, Integer id) {
+		super();
+		this.username = username;
+		this.email = email;
+		this.password = password;
+		this.id = id;
+	}
+
+
+
 	public String getUsername() {
 		return username;
 	}

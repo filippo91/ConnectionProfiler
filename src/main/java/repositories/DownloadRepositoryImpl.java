@@ -37,10 +37,14 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				
-				project("asnum", "download_speed", "timestamp").and("timestamp").extractDayOfMonth().as("day"),
-				group("asnum", "day").avg("download_speed").as("speed").min("timestamp").as("timestamp").count().as("count"),
-				project("asnum", "speed", "count", "timestamp")
+				project("asnum", "asname", "download_speed", "timestamp")
+					.and("timestamp").extractDayOfMonth().as("day"),
+				group("asnum", "day")
+					.avg("download_speed").as("speed")
+					.min("timestamp").as("timestamp")
+					.count().as("count")
+					.first("asname").as("asname"),
+				project("asnum", "speed", "count", "timestamp", "asname")
 			);
 		
 		AggregationResults<AvgDaySpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", AvgDaySpeedDownload.class);
@@ -57,10 +61,14 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 		Aggregation agg = newAggregation(
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				
-				project("asnum", "download_speed", "timestamp").and("timestamp").extractDayOfMonth().as("day"),//.and("timestamp").extractDayOfMonth().as("day"),
-				group("asnum", "day").avg("download_speed").as("speed").min("timestamp").as("timestamp").count().as("count"),
-				project("asnum", "speed", "count", "timestamp")
+				project("asnum", "asname", "download_speed", "timestamp")
+					.and("timestamp").extractDayOfMonth().as("day"),
+				group("asnum", "day")
+					.avg("download_speed").as("speed")
+					.min("timestamp").as("timestamp")
+					.count().as("count")
+					.first("asname").as("asname"),
+				project("asnum", "asname", "speed", "count", "timestamp")
 			);
 		
 		AggregationResults<AvgDaySpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", AvgDaySpeedDownload.class);
@@ -76,11 +84,14 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-		
-				project("asnum").and("download_speed").divide(bin_width).as("binFloat"),
-				project("asnum").andExpression("binFloat - binFloat % 1").as("bin"),
-				group("asnum", "bin").count().as("nRecords"),
-				project("nRecords", "asnum", "bin")
+				project("asnum").and("download_speed")
+					.divide(bin_width).as("binFloat"),
+				project("asnum", "asname")
+					.andExpression("binFloat - binFloat % 1").as("bin"),
+				group("asnum", "bin")
+					.count().as("nRecords")
+					.first("asname").as("asname"),
+				project("nRecords", "asnum", "asname", "bin")
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
@@ -97,10 +108,14 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 		
-				project("asnum").and("download_speed").divide(bin_width).as("binFloat"),
-				project("asnum").andExpression("binFloat - binFloat % 1").as("bin"),
-				group("asnum", "bin").count().as("nRecords"),
-				project("nRecords", "asnum", "bin")
+				project("asnum")
+					.and("download_speed").divide(bin_width).as("binFloat"),
+				project("asnum", "asname")
+					.andExpression("binFloat - binFloat % 1").as("bin"),
+				group("asnum", "bin")
+					.count().as("nRecords")
+					.first("asname").as("asname"),
+				project("nRecords", "asnum", "asname", "bin")
 			);
 		
 		AggregationResults<BinSpeedDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinSpeedDownload.class);
@@ -117,10 +132,14 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				project("asnum").and("connect_time").divide(bin_width).as("binFloat"),
-				project("asnum").andExpression("binFloat - binFloat % 1").as("bin"),
-				group("asnum", "bin").count().as("nRecords"),
-				project("asnum", "bin", "nRecords")
+				project("asnum")
+					.and("connect_time").divide(bin_width).as("binFloat"),
+				project("asnum", "asname")
+					.andExpression("binFloat - binFloat % 1").as("bin"),
+				group("asnum", "bin")
+					.count().as("nRecords")
+					.first("asname").as("asname"),
+				project("asnum", "asname", "bin", "nRecords")
 			);
 		
 		AggregationResults<BinLatencyDownload> results = mongoTemplate.aggregate(agg, "DOWNLOADS", BinLatencyDownload.class);

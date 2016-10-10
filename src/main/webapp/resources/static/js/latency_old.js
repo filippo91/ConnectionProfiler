@@ -126,8 +126,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             d3Service.d3().then(function(d3){
 
                 var margin = {top: 10, right: 30, bottom: 30, left: 30},
-                    width = 960 - margin.left - margin.right,
-                    height = 500 - margin.top - margin.bottom,
+                    real_width = 960, real_height = 500,
+                    width = real_width - margin.left - margin.right,
+                    height = real_height - margin.top - margin.bottom,
                     radius = Math.min(width, height) / 2;
 
                 var color = d3.scale.category10();
@@ -152,8 +153,8 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     $(element[0]).empty();
 
                     svg = d3.select(element[0]).append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
+                        .attr("width", real_width)
+                        .attr("height", real_height)
                         .append("g")
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 

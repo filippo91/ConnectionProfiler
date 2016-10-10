@@ -11,7 +11,8 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
 }])
 
 .controller('speedTable', ['$route', '$routeParams', 'speedTable_downloadManager', '$rootScope', '$scope', function($route, $routeParams, downloadManager, $rootScope, $scope) {
-        $("#timeManager").hide();
+        $("#timeManager").css('visibility', 'hidden');
+        $("#realtimediv").css('visibility', 'visible');
 
         $scope.downloadList = downloadManager.getDownloads($routeParams.page,$routeParams.size);
         $scope.nRecords = $routeParams.page * $routeParams.size;
@@ -22,7 +23,17 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
             if(parseInt($routeParams.page) > 0)
                 $route.updateParams({page: parseInt($routeParams.page) - 1, size: $routeParams.size});
         };
-
+        /**
+         * Web Socket callbacks
+         */
+        $rootScope.websocketCallbackUser = function (download) {
+            $scope.downloadList.push(download);//{timestamp : download.timestamp, download_speed : download.download_speed});
+            console.log("pushato");
+            $scope.downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+            $scope.$apply();
+        };
+        $rootScope.websocketCallbackPublic = function(download){};
+/*
         var privateSubscription = null;
         var socket = null;
 
@@ -59,16 +70,7 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
             scope.downloadList.push({timestamp : download.timestamp, download_speed : download.download_speed});
             downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
         }
-        /*
-        console.log($rootScope.stompClient);
-        this.connect = function connect() {
-            $rootScope.stompClient.connect($rootScope.socket, function (frame) {
-                console.log('Connected: ' + frame);
-                $rootScope.stompClient.subscribe('/topic/downloads', function (download) {
-                   console.log(download.body);
-                });
-            });
-        }*/
+        */
 }])
 .factory('speedTable_downloadManager', ['$resource', function($resource) {
         var serverURI = "http://localhost:8080/connectionProfiler/speedTable/:page/:size";

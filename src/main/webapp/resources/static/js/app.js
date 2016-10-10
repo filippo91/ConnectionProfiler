@@ -50,7 +50,10 @@ angular.module('myApp', [
   
   var publicSubscription = null;
   var privateSubscription = null;
-  
+
+        $("#timeManager").css("visibility","hidden");
+        $("#realtimediv").css("visibility","hidden");
+
   self.msg = "default message";
   self.connectPublic = function () {
 	  var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
@@ -97,7 +100,10 @@ angular.module('myApp', [
 })
 
 .controller('navigation',
-  function($rootScope, $http, $location, $route, $routeParams) {
+  function($rootScope, $http, $location, $route, $routeParams, $scope) {
+
+      $("#timeManager").css("visibility","hidden");
+      $("#realtimediv").css("visibility","hidden");
 
           var self = this;
           $rootScope.user = {};
@@ -166,6 +172,49 @@ angular.module('myApp', [
               self.currentDate = moment();
 
           ////////////////
+      $rootScope.socketConnected = true;
+      connect();
+      $rootScope.realtime = function(){
+          console.log("ascasfdsadfsdafsdaf");
+          $rootScope.socketConnected ? disconnect() : connect();
+          console.log( "is conn: "+$rootScope.socketConnected );
+      };
+      function connect(){
+          var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+          var stompClient = Stomp.over(socket);
+          stompClient.connect({}, function (frame) {
+              console.log("connetto");
+              if($rootScope.websocketCallbackUser !== undefined){
+                  $rootScope.$apply(function(){$rootScope.socketConnected = true;});
+                  $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function(packet) {
+                      var download =JSON.parse(packet.body).payload;
+                      console.log("CHIAMO CALLBACK USER");
+                      $rootScope.websocketCallbackUser(download);
+                  });
+              }
+              if($rootScope.websocketCallbackPublic !== undefined){
+                  $rootScope.$apply(function(){$rootScope.socketConnected = true;});
+                  $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
+                      var download =JSON.parse(packet.body).payload;
+                      console.log("CHIAMO CALLBACK PUBLIC");
+                      $rootScope.websocketCallbackPublic(download);
+                  });
+              }
+          });
+      }
+      function disconnect(){
+          if($rootScope.privateSubscription != null){
+              $rootScope.privateSubscription.unsubscribe();
+              $rootScope.privateSubscription = null;
+          }
+          if($rootScope.publicSubscription != null){
+              $rootScope.publicSubscription.unsubscribe();
+              $rootScope.publicSubscription = null;
+          }
+          $rootScope.socketConnected = false;
+      }
+
+      ////////////////////////
           
           var authenticate = function(credentials, callback) {
 
@@ -259,4 +308,15 @@ angular.module('myApp', [
 		                
 		        };
 		    }
-);
+)
+    .filter('getAsnumList',function(){
+        return function(input){
+            var  ret = [];
+            if(input.length === 0) return ret;
+            input.forEach(function(download){
+                if(ret.indexOf(download.asnum) === -1)
+                    ret[ret.length] = (download.asnum);
+            });
+            return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
+        };
+    });;

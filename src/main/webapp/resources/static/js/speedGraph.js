@@ -11,7 +11,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
     .controller('speedGraph', ['$route', '$routeParams', '$scope', 'speedGraph_downloadManager', '$rootScope', function($route, $routeParams, $scope, downloadManager,$rootScope) {
 
         $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined};
-        $("#timeManager").show();
+        $("#timeManager").css("visibility","visible")
+        $("#realtimediv").css('visibility', 'visible');
 
         function updateRootScopeCallback(data, t){
             if(t) {
@@ -26,8 +27,25 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
 
         /**
-         * Web Socket, 2 topics public and private
+         * Web Socket callbacks
          */
+        $rootScope.websocketCallbackUser = function (download) {
+            downloadManager.updateDownloads($rootScope.rowUserDownloadList, download);
+            $scope.userDownloadList = downloadManager.splitByAsnum($rootScope.rowUserDownloadList);
+            $scope.$apply(function () {
+                $scope.trigger.userAsnum = download.asnum;
+                $scope.trigger.newSpeedDataUser = $scope.trigger.newSpeedDataUser !== true;
+            });
+        };
+        $rootScope.websocketCallbackPublic = function(download){
+            downloadManager.updateDownloads($rootScope.rowPublicDownloadList, download);
+            $scope.publicDownloadList = downloadManager.splitByAsnum($rootScope.rowPublicDownloadList);
+            $scope.$apply(function () {
+                $scope.trigger.publicAsnum = download.asnum;
+                $scope.trigger.newSpeedDataPublic = $scope.trigger.newSpeedDataPublic !== true;
+            });
+        };
+            /*
         var privateSubscription = null;
         var publicSubscription = null;
         var socket = null;
@@ -71,7 +89,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             }
         };
         $scope.$on('$destroy', $scope.disconnect);
-
+*/
 
         $scope.showAllAsnum = function(aType){
             var ele = $('#'+aType+'-showAll'), graphEle = $("." + aType + "-graph");

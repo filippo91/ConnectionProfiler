@@ -10,7 +10,9 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 }])
 
 .controller('domainsBySize', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope ) {
-        $("#timeManager").show();
+
+        $("#timeManager").css('visibility', 'visible');
+        $("#realtimediv").css('visibility', 'visible');
         $("#" + $routeParams.view + "Btn").addClass("active");
 
         $scope.trigger = {arrived:false, newData: undefined};
@@ -18,9 +20,19 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
         $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
 
         /**
-         * Web Socket
-         * @type {null}
+         * Web Socket callbacks
          */
+        $rootScope.websocketCallbackUser = function (download) {
+            if($rootScope.isRelevant(download)) {
+                domainsDownloadFactory.updateDomainSizeList($scope.domainSizeList, download);
+                console.log("domainList: " + JSON.stringify($scope.domainSizeList));
+                $scope.$apply(function () {
+                    $scope.trigger.newData = $scope.trigger.newData !== true;
+                });
+            }
+        };
+        $rootScope.websocketCallbackPublic = function(download){};
+          /*
         var privateSubscription = null;
         var socket = null;
         $scope.connectPrivate = function () {
@@ -47,6 +59,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
             }
         };
         $scope.$on('$destroy',$scope.disconnectPrivate);
+        */
 }])
 
     .directive('usagePie',function(d3Service){
@@ -64,12 +77,12 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                     var arc = d3.svg.arc()
                         .outerRadius(radius - 10)
-                        .innerRadius(0);
-
+                        .innerRadius(120);
+/*
                     var labelArc = d3.svg.arc()
                         .outerRadius(radius * 0.7)
                         .innerRadius(radius * 0.7);
-
+*/
                     var pie = d3.layout.pie()
                         .sort(null)
                         .value(function(d) { return d.size; });
@@ -84,7 +97,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                     // Define the div for the tooltip
                     var div = d3.select(element[0]).append("div")
-                        .attr("class", "tooltip")
+                        .attr("class", "tooltip tooltip-large")
                         .style("opacity", 0);
 
                     //loading icon
@@ -141,14 +154,15 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                         var path  = g.append("path")
                             .attr("d", arc)
-                            .style("fill", function(d) { return color(d.data.server_domain); });
+                            .style("fill", function(d) { return color(d.data.server_domain); })
+                            .attr("opacity",.7);
 
                         if(animation) {
                             path.transition()
                                 .duration(750)
                                 .attrTween("d", tweenPie);
                         }
-
+/*
                         g.append("text")
                             .attr("transform", function(d) {return "translate(" + labelArc.centroid(d) + ")"; })
                             .attr("dy", ".35em")
@@ -156,7 +170,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             .style("font-size", "12px")
                             //.style("fill", "white")
                             .text(function(d) { return d.data.server_domain; });
-
+*/
                         //Tooltip
                         var pane = $('.arc');
                         var offset = pane.offset();
@@ -166,7 +180,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             div.transition()
                                 .duration(200)
                                 .style("opacity", .9);
-                            div.html("<i>Size</i><br/><b>" + d3.select(this).data()[0].value + "</b>")
+                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br><i>Size: </i><b>" + d3.select(this).data()[0].value + "</b>")
                                 .style("left", (x) + "px")
                                 .style("top", (y - 28)  + "px");
                         });

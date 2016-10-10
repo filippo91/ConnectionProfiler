@@ -8,17 +8,6 @@
     <button type="button" class="btn btn-default" ng-click="forward()"> > </button>
 </div-->
 
-<button ng-click="connectPrivate()" class="btn btn-danger">Connect</button>
-<br>
-<div class="btn-group row">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Asnums <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-        <li ><a class="btn btn-default active" id="showAll" ng-click="showAllAsnum();">Hide All</a></li>
-        <li isvisible="false" ng-repeat="ele in (latencyData | getAsnumList)" id="asnum-{{ele}}">
-            <a class="btn btn-default asnumButton active" id="button-{{ele}}" ng-click="showAsnum(ele)">{{ele}}</a>
-        </li>
-    </ul>
-</div>
+<!--button ng-click="connectPrivate()" class="btn btn-danger"><span id="icon" class="glyphicon glyphicon-align-left" aria-hidden="true"></span>Connect</button>
+<br-->
 <latency-histogram id = "latency-histogram" class="graph row"></latency-histogram>

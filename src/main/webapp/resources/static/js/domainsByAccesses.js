@@ -11,16 +11,18 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
     .controller('domainsByAccesses', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope) {
 
-        $("#timeManager").show();
+        $("#timeManager").css('visibility', 'visible');
+        $("#realtimediv").css('visibility', 'visible');
         $("#" + $routeParams.view + "BtnDBA").addClass("active");
 
         $scope.trigger = {arrived:false};
         $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
 
+
         /**
-         * Web Socket
-         * @type {null}
+         * Web Socket callbacks
          */
+            /*
         var subscription = null;
         var socket = null;
         $scope.realTimeIsConnected = true;
@@ -57,6 +59,18 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
             $scope.realTimeIsConnected = false;
         }
         $scope.$on('$destroy', $scope.disconnect);
+        */
+        $rootScope.websocketCallbackUser = function (download) {
+            if($rootScope.isRelevant(download)) {
+                domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
+                console.log("domainList: " + JSON.stringify($scope.domainList));
+                $scope.$apply(function () {
+                    $scope.trigger.newAccess = $scope.trigger.newAccess !== true;
+                });
+            }
+        };
+        $rootScope.websocketCallbackPublic = function(){};
+
     }])
 
     .factory('domainsDownloadFactory',['$resource', function($resource){
@@ -116,12 +130,12 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
                     var arc = d3.svg.arc()
                         .outerRadius(radius - 10)
-                        .innerRadius(0);
-
+                        .innerRadius(120);
+/*
                     var labelArc = d3.svg.arc()
                         .outerRadius(radius * 0.7)
                         .innerRadius(radius * 0.7);
-
+*/
                     var pie = d3.layout.pie()
                         .sort(null)
                         .value(function(d) { return d.nRecords; });
@@ -136,7 +150,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
                     // Define the div for the tooltip
                     var div = d3.select(element[0]).append("div")
-                        .attr("class", "tooltip")
+                        .attr("class", "tooltip tooltip-large")
                         .style("opacity", 0);
 
                     //loading icon
@@ -147,7 +161,6 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                         .attr("y", -32)
                         .attr("width", 64)
                         .attr("height", 64);
-
 
                     var drawPie = function(animation){
                         svg.selectAll(".arc").remove();
@@ -194,13 +207,15 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
                         var path  = g.append("path")
                             .attr("d", arc)
-                            .style("fill", function(d) { return color(d.data.server_domain); });
+                            .style("fill", function(d) { return color(d.data.server_domain); })
+                            .attr("opacity",.7);
+
                         if(animation) {
                             path.transition()
                                 .duration(750)
                                 .attrTween("d", tweenPie);
                         }
-
+/*
                         g.append("text")
                             .attr("transform", function(d) {return "translate(" + labelArc.centroid(d) + ")"; })
                             .attr("dy", ".35em")
@@ -208,7 +223,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                             .style("font-size", "12px")
                             //.style("fill", "white")
                             .text(function(d) { return d.data.server_domain; });
-
+*/
                         //Tooltip
                         var pane = $('.arc');
                         var offset = pane.offset();
@@ -218,14 +233,14 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                             div.transition()
                                 .duration(200)
                                 .style("opacity", .9);
-                            div.html("<i>Accesses</i><br/><b>" + d3.select(this).data()[0].value + "</b>")
+                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br><i>Accesses: </i><b>" + d3.select(this).data()[0].value + "</b>")
                                 .style("left", (x) + "px")
                                 .style("top", (y - 28)  + "px");
                         });
                         pane.mouseleave(function(){
                             div.transition()
-                            .duration(500)
-                            .style("opacity", 0);});
+                                .duration(500)
+                                .style("opacity", 0);});
                     };
                     //Animation
                     function tweenPie(finish) {

@@ -7,6 +7,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,16 +18,18 @@ import models.User;
 
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
-	Logger log = LoggerFactory.getLogger(RegistrationListener.class);
+	private Logger log = LoggerFactory.getLogger(RegistrationListener.class);
 
-	private final static String EMAIL_SUBJECT = "Confirm your email address";
-	private final static String EMAIL_FROM = "aiProjectTeam@polito.it";
-
-	@Autowired
-	JavaMailSender mailSender;
+	@Value("${confirmation.email.subject}")
+	private static String EMAIL_SUBJECT;
+	@Value("${confirmation.email.from}")
+	private static String EMAIL_FROM;
+	@Value("${confirmation.page}")
+	private static String CONFIRMATION_PAGE;
 	
-	@Autowired
-	VelocityEngine velocityEngine;
+	@Autowired private JavaMailSender mailSender;
+	
+	@Autowired private VelocityEngine velocityEngine;
 
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
@@ -35,7 +38,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
 	private void requestConfirmation(OnRegistrationCompleteEvent event) {
 		User user = event.getUser();
-		String url = event.getAppUrl() + "confirmRegistration.html";
+		String url = event.getAppUrl() + CONFIRMATION_PAGE;
 		String token = event.getToken();
 		String recipientAddress = user.getEmail();
 
@@ -60,6 +63,11 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 			log.error("Error while sending email to " + user.getUsername());
 			me.printStackTrace();
 		}
+	}
+
+	public String getSubject() {
+		// TODO Auto-generated method stub
+		return EMAIL_SUBJECT;
 	}
 
 }

@@ -1,8 +1,8 @@
 package services;
 
-import java.util.List;
-import java.util.UUID;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,70 +11,79 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import exceptions.TokenExpiredException;
-import exceptions.TokenNotFoundException;
+import exceptions.TokenNotValidException;
 import listeners.OnRegistrationCompleteEvent;
 import models.User;
 import models.VerificationToken;
 import repositories.UserRepository;
-import repositories.VerificationTokenRepository;
 
 @Service
 public class SimpleUserService implements UserService {
 	private static final Logger log = LoggerFactory.getLogger(SimpleUserService.class);
 	
-	private static final int VERIFICATION_TOKEN_EXPIRATION = 60 * 24; //in minutes
+	private static final String APP_URL = "http://localhost:8080/connectionProfiler/index.html#!/confirmRegistration";
 	
-	@Autowired UserRepository userRepository;
-	@Autowired VerificationTokenRepository tokenRepository;
-	@Autowired ApplicationEventPublisher eventPublisher;
+	@Autowired private UserRepository userRepository;
+	@Autowired private TokenService tokenService;
+	@Autowired private ApplicationEventPublisher eventPublisher;
 	
 	@Override
-	public void register(User user) {
+	public void register(User user, Date registrationDate) {
 		log.info("Try to register a new user with the following information: " + user);
 		
 		/*
 		 * Fill the spring related fields for a user object and 
 		 * save it in the repository.
 		 */
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		String password = encoder.encode(user.getPassword());
-		user.setPassword(password);
+		user.setPassword(getEncrypted(user.getPassword()));
 		user.setEnabled(false);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         user.setRole("ROLE_USER");
+        user.setId(createUserId(user));
 		userRepository.save(user);
 		
 		// create and save a verification token for this user
-		String token = UUID.randomUUID().toString();
-		createAndPersistVerificationToken(user, token);
+		String token = tokenService.createToken(user, registrationDate);
 		
 		/* set up an event that causes the system to send an email
 		 * to the user in order to verify his account through the 
 		 * verification token just created.
-		 */
-		String appUrl = "http://localhost:8080/connectionProfiler/index.html#!/confirmRegistration";
+		 */		
+		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, APP_URL, token));
+	}
+
+	private String getEncrypted(String password) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String encryptedPassword = encoder.encode(password);
+		return encryptedPassword;
+	}
+
+	private Integer createUserId(User user) {
+		Integer id = null;
+		User foundUser = user;
 		
-		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, appUrl, token));
+		assertNotNull(foundUser);
+		
+		int collisionsCounter = 0;
+		while(foundUser != null){
+			id = user.hashCode() + collisionsCounter;
+			foundUser = userRepository.findById(id);
+			collisionsCounter++;
+		}
+		
+		assertNotNull(id);
+		
+		return id;
 	}
 
 	@Override
-	public void confirmRegistration(String token) {
-		VerificationToken verificationToken = tokenRepository.findByToken(token);
+	public void confirmRegistration(String token, Date confirmationDate) {
+		VerificationToken verificationToken = tokenService.findByToken(token);
 		
-		System.out.println(verificationToken);
-		if(verificationToken == null){
-			//the token doesn't exist: bad user
-			//TODO: throw meaningful exception
-			throw new TokenNotFoundException();
-		}
-		
-		if(verificationToken.isExpired()){
-			//the token has already expired: bad user
-			//TODO: throw meaningful exception
-			throw new TokenExpiredException();
+		if(!tokenService.isValid(token, confirmationDate)){
+			throw new TokenNotValidException();
 		}
 		
 		/*
@@ -85,11 +94,6 @@ public class SimpleUserService implements UserService {
 		user.setEnabled(true);
 		userRepository.save(user);
 	}
-
-    private void createAndPersistVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user, VERIFICATION_TOKEN_EXPIRATION);
-        tokenRepository.save(myToken);
-    }
 
 	@Override
 	public User getCurrentUser() {

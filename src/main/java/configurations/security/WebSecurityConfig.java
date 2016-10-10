@@ -40,7 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 		
 			.authorizeRequests()
-				.antMatchers("/connection-profiler-websocket/**", "/img/**", "/index.html", "/newUser/**", "/css/**", "/js/**", "/fonts/**", "/partials/public/**").permitAll()
+				.antMatchers("/connection-profiler-websocket/**", 
+						"/img/**", "/index.html", "/newUser/**", 
+						"/css/**", "/js/**", "/fonts/**", "/partials/public/**").permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.httpBasic()

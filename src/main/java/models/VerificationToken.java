@@ -2,6 +2,7 @@ package models;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -17,34 +18,33 @@ public class VerificationToken {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     
-    
+    @Column(unique=true)
     private String token;
    
     @OneToOne(targetEntity = User.class)
     @JoinColumn(nullable = false, name = "username")
     private User user;
      
-    private Date expiryDate;
+    private Date creationDate;
+	private Date expirationDate;
+	
     private boolean verified;
+
+
     
     public VerificationToken() {
         super();
     }
     
-    public VerificationToken(String token, User user, int expiration) {
+    public VerificationToken(String token, User user, Date creationDate, Date expirationDate) {
         super();
         this.token = token;
         this.user = user;
-        this.expiryDate = calculateExpiryDate(expiration);
+        this.creationDate = creationDate;
+        this.expirationDate = expirationDate;
         this.verified = false;
     }
-     
-    private Date calculateExpiryDate(int expiryTimeInMinutes) {
-    	DateTime now = DateTime.now();
-    	DateTime expiryDate = now.plusMinutes(expiryTimeInMinutes);
-    	
-        return new Date(expiryDate.getMillis());
-    }
+    
 	public Long getId() {
 		return id;
 	}
@@ -63,12 +63,8 @@ public class VerificationToken {
 	public void setUser(User user) {
 		this.user = user;
 	}
-	public Date getExpiryDate() {
-		return expiryDate;
-	}
-	public void setExpiryDate(Date expiryDate) {
-		this.expiryDate = expiryDate;
-	}
+
+	
 	public boolean isVerified() {
 		return verified;
 	}
@@ -76,16 +72,30 @@ public class VerificationToken {
 		this.verified = verified;
 	}
 	
-	public boolean isExpired(){
-		DateTime now = DateTime.now();
-		return now.isAfter(expiryDate.getTime());
+	public Date getCreationDate() {
+		return creationDate;
 	}
 
-	@Override
-	public String toString() {
-		return "VerificationToken [id=" + id + ", token=" + token + ", user=" + user + ", expiryDate=" + expiryDate
-				+ ", verified=" + verified + "]";
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getExpirationDate() {
+		return expirationDate;
+	}
+
+	public void setExpirationDate(Date expirationDate) {
+		this.expirationDate = expirationDate;
+	}
+
+	public boolean isExpired(Date date) {
+		DateTime verificationDate = new DateTime(date);
+		return verificationDate.isAfter(expirationDate.getTime());
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "VerificationToken [id=" + id + ", token=" + token + ", user=" + user + ", creationDate=" + creationDate
+				+ ", expirationDate=" + expirationDate + ", verified=" + verified + "]";
+	}
 }

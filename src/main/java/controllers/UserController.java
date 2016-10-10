@@ -2,9 +2,11 @@ package controllers;
 
 import java.security.InvalidParameterException;
 import java.security.Principal;
+import java.util.Date;
 
 import javax.validation.Valid;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-//import listeners.OnRegistrationCompleteEvent;
 import models.User;
 import services.UserService;
 
@@ -44,7 +45,7 @@ public class UserController {
 		}
 
 		try{
-			userService.register(user);
+			userService.register(user, DateTime.now().toDate());
 		}catch(DataIntegrityViolationException ex){
 			log.info("Impossible to save the user into the DB");
 			throw ex;
@@ -56,7 +57,7 @@ public class UserController {
 
 	@PostMapping(value = "/newUser/confirmRegistration")
 	public void confirmRegistration(@RequestBody String token) {
-		userService.confirmRegistration(token);
+		userService.confirmRegistration(token, new Date());
 	}
 
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409

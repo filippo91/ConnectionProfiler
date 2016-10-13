@@ -84,7 +84,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				project("asnum").and("download_speed")
+				project("asnum", "asname").and("download_speed")
 					.divide(bin_width).as("binFloat"),
 				project("asnum", "asname")
 					.andExpression("binFloat - binFloat % 1").as("bin"),
@@ -108,7 +108,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
 		
-				project("asnum")
+				project("asnum", "asname")
 					.and("download_speed").divide(bin_width).as("binFloat"),
 				project("asnum", "asname")
 					.andExpression("binFloat - binFloat % 1").as("bin"),
@@ -132,7 +132,7 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 				match(Criteria.where("uuid").is(uuid)),
 				match(Criteria.where("timestamp").gte(start)),
 				match(Criteria.where("timestamp").lt(end)),
-				project("asnum")
+				project("asnum", "asname")
 					.and("connect_time").divide(bin_width).as("binFloat"),
 				project("asnum", "asname")
 					.andExpression("binFloat - binFloat % 1").as("bin"),

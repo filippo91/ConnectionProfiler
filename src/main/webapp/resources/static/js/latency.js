@@ -43,17 +43,17 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                 console.log(JSON.stringify(latencyData)); 
             });
         };
-        factory.splitByAsnum = function(values){
+        factory.splitByAsname = function(values){
             var ret = [];
             console.log("values: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].asnum === ret[j].asnum){
-                        ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords, asnum : values[i].asnum}); break;
+                    if(values[i].asname === ret[j].asname){
+                        ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }
                 if(j === ret.length)
-                    ret.push({asnum : values[i].asnum, values : [{bin : values[i].bin, nRecords : values[i].nRecords, asnum : values[i].asnum}]});
+                    ret.push({asname : values[i].asname, values : [{bin : values[i].bin, nRecords : values[i].nRecords, asname : values[i].asname}]});
             }
             console.log(JSON.stringify(ret));
             return ret;
@@ -64,11 +64,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
                     if(values[i].bin === ret[j].bin){
-                        ret[j].values.push({nRecords : values[i].nRecords, asnum : values[i].asnum}); break;
+                        ret[j].values.push({nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }
                 if(j === ret.length)
-                    ret.push({bin : values[i].bin, values : [{nRecords : values[i].nRecords, asnum : values[i].asnum}]});
+                    ret.push({bin : values[i].bin, values : [{nRecords : values[i].nRecords, asname : values[i].asname}]});
             }
             console.log(JSON.stringify(ret));
             return ret;
@@ -79,18 +79,18 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             var index = parseInt(download.connect_time / bin_width);
             var i;
             for(i = 0; i < latencyData.length; i++){
-                if(latencyData[i].asnum === download.asnum && latencyData[i].bin === index){
+                if(latencyData[i].asname === download.asname && latencyData[i].bin === index){
                     latencyData[i].nRecords++; console.log("ciaone!!!");break;
                 }
             }
             if(i === latencyData.length)
-                latencyData.push({asnum : download.asnum, bin : index, nRecords : 1});
+                latencyData.push({asname : download.asname, bin : index, nRecords : 1});
             console.log("latencyData: " + JSON.stringify(latencyData));
         };
         return factory;
     }])
 
-.directive('latencyHistogram',function($route, $routeParams,d3Service,latencyFactory, getAsnumListFilter){
+.directive('latencyHistogram',function($route, $routeParams,d3Service,latencyFactory, getAsnameListFilter){
     return {
         restrict: 'E',
         link: function(scope,element){
@@ -137,7 +137,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                     var values = scope.latencyData;
                     var values_arr = latencyFactory.splitByBin(values);
-                    var asnumList = getAsnumListFilter(values);
+                    var asnameList = getAsnameListFilter(values);
                     var binWidth = $routeParams.bin_width;
 
                     if(values === undefined || values.length === 0){
@@ -174,7 +174,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     for(var i = 0; i <= maxBin; i++)    binList.push(i);
 
                     var x0 = d3.scale.ordinal().domain(binList).rangeRoundBands([0, width], .2);
-                    var x1 = d3.scale.ordinal().domain(asnumList).rangeRoundBands([0, x0.rangeBand()],.1);
+                    var x1 = d3.scale.ordinal().domain(asnameList).rangeRoundBands([0, x0.rangeBand()],.1);
                     var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
                     var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){return (d + 1) * binWidth + "ms";});//.tickValues(ris);
@@ -195,8 +195,8 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var rect = bar.append("rect")
                         .attr("class", "rect")
                         .attr("width", x1.rangeBand())
-                        .attr("x", function(d) { return x1(d.asnum); })
-                        .style("fill", function(d) { return color(d.asnum); })
+                        .attr("x", function(d) { return x1(d.asname); })
+                        .style("fill", function(d) { return color(d.asname); })
                         .attr("opacity",.7);
 
                     if(animation){
@@ -213,7 +213,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                     var text = bar.append("text")
                         .attr("dy", ".75em")
-                        .attr("x", function(d) { return x1(d.asnum) + x1.rangeBand() / 2; })
+                        .attr("x", function(d) { return x1(d.asname) + x1.rangeBand() / 2; })
                         .attr("text-anchor", "middle")
                         .style("fill","white")
                         .text(function(d) { return d.nRecords; });
@@ -230,7 +230,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                             .attr("height", function(d) { return height - y(d.nRecords); });
                     }
                     var legend = svg.selectAll(".legend")
-                        .data(asnumList.slice().reverse())
+                        .data(asnameList.slice().reverse())
                         .enter().append("g")
                         .attr("class", "legend")
                         .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -257,7 +257,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
-                        div.html("<i>Asnum: </i><b>" + d3.select(this).data()[0].asnum + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
+                        div.html("<i>Provider: </i><b>" + d3.select(this).data()[0].asname + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
                             .style("left", (x) + "px")
                             .style("top", (y - 28)  + "px");
                     })
@@ -283,23 +283,13 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     }
                 });
 
-                scope.$watch('trigger.newData',function(asnum){
-                    if(asnum !== undefined) {
+                scope.$watch('trigger.newData',function(asname){
+                    if(asname !== undefined) {
                         drawHistogram(false);
+                        console.log("disegno new Data");
                     }
                 });
             });
         }
     }
-})
-    .filter('getAsnumList',function(){
-        return function(input){
-            var  ret = [];
-            if(input === undefined || input.length === 0) return ret;
-            input.forEach(function(download){
-                if(ret.indexOf(download.asnum) === -1)
-                    ret[ret.length] = (download.asnum);
-            });
-            return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
-        };
-    });
+});

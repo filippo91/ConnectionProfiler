@@ -20,28 +20,28 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         $scope.speedDataUser = speedFactory.getSpeedDataUser($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
         $scope.speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
 /*
-        $scope.showAllAsnum = function(aType){
+        $scope.showAllAsname = function(aType){
             var ele = $('#'+aType+'-showAll');
             if(ele.hasClass('active')){
-                $("."+aType+"-asnumButton").removeClass("active");
+                $("."+aType+"-asnameButton").removeClass("active");
                 $(".bar-" + aType).fadeTo(500, 0);
                 ele.removeClass("active");
                 ele.text("Show All")
             }else {
-                $("."+aType+"-asnumButton").addClass("active");
+                $("."+aType+"-asnameButton").addClass("active");
                 $(".bar-" + aType).fadeTo(500, 1);
                 ele.addClass("active");
                 ele.text("Hide All");
             }
         };
-        $scope.showAsnum = function(asnum,aType){
-            var ele = $("#"+aType+"-button-"+asnum);
+        $scope.showAsname = function(asname,aType){
+            var ele = $("#"+aType+"-button-"+asname);
             if(ele.hasClass("active")){ //hide
                 ele.removeClass("active");
-                $(".bar-" + aType + "-" + asnum).fadeTo(500, 0);
+                $(".bar-" + aType + "-" + asname).fadeTo(500, 0);
             }else{ //show
                 ele.addClass("active");
-                $(".bar-" + aType + "-" + asnum).fadeTo(500, 1);
+                $(".bar-" + aType + "-" + asname).fadeTo(500, 1);
             }
         };*/
 
@@ -135,16 +135,16 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 if(trigger.count == 2) trigger.arrived = true;
             });
         };
-        factory.splitByAsnum = function(values){
+        factory.splitByAsname = function(values){
             var ret = [];
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].asnum === ret[j].asnum){
+                    if(values[i].asname === ret[j].asname){
                         ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords}); break;
                     }
                 }
                 if(j === ret.length)
-                    ret.push({asnum : values[i].asnum, values : [{bin : values[i].bin, nRecords : values[i].nRecords}]});
+                    ret.push({asname : values[i].asname, values : [{bin : values[i].bin, nRecords : values[i].nRecords}]});
             }
             return ret;
         };
@@ -154,11 +154,11 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
                     if(values[i].bin === ret[j].bin){
-                        ret[j].values.push({nRecords : values[i].nRecords, asnum : values[i].asnum}); break;
+                        ret[j].values.push({nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }
                 if(j === ret.length)
-                    ret.push({bin : values[i].bin, values : [{nRecords : values[i].nRecords, asnum : values[i].asnum}]});
+                    ret.push({bin : values[i].bin, values : [{nRecords : values[i].nRecords, asname : values[i].asname}]});
             }
             console.log(JSON.stringify(ret));
             return ret;
@@ -167,18 +167,18 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             var index = parseInt(download.download_speed / (bin_width * 1000000));
             var i;
             for( i = 0; i<speedList.length; i++){
-                if(speedList[i].asnum === download.asnum && speedList[i].bin === index){
+                if(speedList[i].asname === download.asname && speedList[i].bin === index){
                     speedList[i].nRecords++; break;
                 }
             }
             if(i === speedList.length)
-                speedList.push({asnum : download.asnum, bin : index, nRecords : 1});
+                speedList.push({asname : download.asname, bin : index, nRecords : 1});
             console.log("userSpeedData: " + JSON.stringify(speedList));
 
         };
         return factory;
     }])
-.directive('speedHistogram',function($route, $routeParams,d3Service,speedFactory,getAsnumListFilter){
+.directive('speedHistogram',function($route, $routeParams,d3Service,speedFactory,getAsnameListFilter){
         return {
             restrict: 'E',
             link: function(scope,element){
@@ -227,10 +227,11 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         var valuesUser = speedFactory.splitByBin(scope.speedDataUser);
                         var valuesPublic = speedFactory.splitByBin(scope.speedDataPublic);
-                        var asnumList = getAsnumListFilter(scope.speedDataUser);
+                        var asnameList = getAsnameListFilter(scope.speedDataPublic);
+                        console.log(asnameList);
                         var binWidth = $routeParams.bin_width;
 
-                        console.log("asnumList " + asnumList);
+                        console.log("asnameList " + asnameList);
 
                         if((valuesUser === undefined || valuesUser.length === 0) && (valuesPublic === undefined || valuesPublic.length === 0)){
                             svg.attr("transform", "translate(" + real_width / 2 + "," + real_height / 2 + ")");
@@ -273,7 +274,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         console.log("binList : " + binList);
 
                         var x0 = d3.scale.ordinal().domain(binList).rangeRoundBands([0, width], .2);
-                        var x1 = d3.scale.ordinal().domain(asnumList).rangeRoundBands([0, x0.rangeBand()],.1);
+                        var x1 = d3.scale.ordinal().domain(asnameList).rangeRoundBands([0, x0.rangeBand()],.1);
                         var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
                         //var ris = [];for(var i = 0; i <= maxBin; ris.push(i++ * $routeParams.bin_width)); ris.push(maxValueX);
@@ -287,14 +288,14 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         var userBar = [], publicBar = [];
 
                         function drawBar(bar,ele,i, classType){
-                            bar[ele.asnum]  = svg.selectAll(".bar-"+classType+"-"+ele.asnum)
+                            bar[ele.asname]  = svg.selectAll(".bar-"+classType+"-"+ele.asname)
                                 .data(ele.values)
                                 .enter().append("g")
-                                .attr("class", "bar bar-"+classType+" bar-"+classType+"-"+ele.asnum)
+                                .attr("class", "bar bar-"+classType+" bar-"+classType+"-"+ele.asname)
                                 .attr("transform", function(d) { return "translate(" + parseInt(x(d.bin * $routeParams.bin_width)+1) + "," + y(d.nRecords) + ")"; });
 
                             if(animation) {
-                                bar[ele.asnum].append("rect")
+                                bar[ele.asname].append("rect")
                                     .attr("x", 1)
                                     .attr("width", x($routeParams.bin_width) - 2)
                                     .attr("height", 0)
@@ -306,7 +307,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                                     .attr("height", function (d) {return height - y(d.nRecords);})
                                     .attr("y", 0);
                             }else{
-                                bar[ele.asnum].append("rect")
+                                bar[ele.asname].append("rect")
                                     .attr("x", 1)
                                     .attr("width", x($routeParams.bin_width) - 2)
                                     .attr("fill", color(i % 10))
@@ -315,7 +316,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                                     .attr("y", 0);
                             }
 
-                            bar[ele.asnum].append("text")
+                            bar[ele.asname].append("text")
                                 .attr("dy", ".75em")
                                 .attr("y", function(d){ if(d.nRecords===0) return -15; else return 6;})
                                 .attr("x", x($routeParams.bin_width) / 2 - 1)
@@ -346,8 +347,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             rect[type] = bar[type].append("rect")
                                 .attr("class", "rect rect-" + type)
                                 .attr("width", x1.rangeBand())
-                                .attr("x", function(d) { return x1(d.asnum); })
-                                .style("fill", function(d) { return color(d.asnum); })
+                                .attr("x", function(d) { return x1(d.asname); })
+                                .style("fill", function(d) { return color(d.asname); })
                                 .attr("opacity",.5);
 
                             if(animation){
@@ -364,7 +365,12 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                             text[type] = bar[type].append("text")
                                 .attr("dy", ".75em")
-                                .attr("x", function(d) { return x1(d.asnum) + x1.rangeBand() / 2; })
+                                .attr("x", function(d) {
+                                    console.log("....> " + JSON.stringify(d));
+                                    console.log("....> " + JSON.stringify(x1(d.asname)));
+                                    console.log("....> " + JSON.stringify(x1.rangeBand()));
+                                    return parseInt(x1(d.asname) + x1.rangeBand()) / 2;
+                                })
                                 .attr("text-anchor", "middle")
                                 .style("fill","white")
                                 .text(function(d) { return d.nRecords; });
@@ -385,14 +391,13 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             var offset = tmp.offset();
                             tmp.mousemove(function(e){
                                 var isvisible = $('#button-view-' + type).hasClass("active");
-                                console.log("is visible " + isvisible);
                                 //if(!isvisible) return;
                                 var x = e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
                                 tmp.css('cursor', 'pointer');
                                 div.transition()
                                     .duration(200)
                                     .style("opacity", .9);
-                                div.html("<i>Asnum: </i><b>" + d3.select(this).data()[0].asnum + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
+                                div.html("<i>Asname: </i><b>" + d3.select(this).data()[0].asname + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
                                     .style("left", (x) + "px")
                                     .style("top", (y - 28)  + "px");
                             })
@@ -407,7 +412,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         drawBars(valuesPublic, 'public');
 
                         var legend = svg.selectAll(".legend")
-                            .data(asnumList.slice().reverse())
+                            .data(asnameList.slice().reverse())
                             .enter().append("g")
                             .attr("class", "legend")
                             .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -442,8 +447,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         }
                     });
 
-                    scope.$watch('trigger.newSpeedDataUser',function(asnum){
-                        if(asnum !== undefined) {
+                    scope.$watch('trigger.newSpeedDataUser',function(asname){
+                        if(asname !== undefined) {
                             drawHistogram(false);
 
                             if(!$('#button-view-public').hasClass("active"))
@@ -453,8 +458,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         }
                     });
-                    scope.$watch('trigger.newSpeedDataPublic',function(asnum){
-                        if(asnum !== undefined) {
+                    scope.$watch('trigger.newSpeedDataPublic',function(asname){
+                        if(asname !== undefined) {
                             drawHistogram(false);
 
                             if(!$('#button-view-public').hasClass("active"))

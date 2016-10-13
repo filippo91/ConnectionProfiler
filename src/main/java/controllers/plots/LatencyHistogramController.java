@@ -15,14 +15,15 @@ import org.springframework.web.bind.annotation.RestController;
 import models.BinLatencyDownload;
 import models.User;
 import services.DownloadService;
-import services.DownloadService.View;
+import services.PlotsService;
+import services.PlotsService.View;
 
 @RestController
 @CrossOrigin
 public class LatencyHistogramController {
 private static final Logger log = LoggerFactory.getLogger(LatencyHistogramController.class);
 	
-	@Autowired DownloadService downloadService;
+	@Autowired PlotsService plotsService;
 	
 	@GetMapping("/latencyHistogram/{year}/{month}/{day}/{view}/{bin_width}")
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(
@@ -35,6 +36,6 @@ private static final Logger log = LoggerFactory.getLogger(LatencyHistogramContro
 		
 		int uuid = user.getId();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
-		return downloadService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
+		return plotsService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
 	}
 }

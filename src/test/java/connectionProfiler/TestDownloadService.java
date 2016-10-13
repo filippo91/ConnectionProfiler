@@ -12,7 +12,8 @@ import configurations.mvc.ConnectionProfilerAppInitializer;
 import configurations.root.ConnectionProfilerAppConfig;
 import models.BinSpeedDownload;
 import services.DownloadService;
-import services.DownloadService.View;
+import services.PlotsService;
+import services.PlotsService.View;
 
 @WebAppConfiguration
 @ContextConfiguration(classes=ConnectionProfilerAppConfig.class)
@@ -20,11 +21,11 @@ import services.DownloadService.View;
 public class TestDownloadService {
 	private static final int ONE_MBIT = 1000000;
 	
-	@Autowired DownloadService downloadService;
+	@Autowired PlotsService plotsService;
 	
 	@Test
 	public void speedDownloadQuery(){
-		Collection<BinSpeedDownload> list = downloadService.getBinSpeedDownloads(2016, 9, 5, View.months, ONE_MBIT/3);
+		Collection<BinSpeedDownload> list = plotsService.getBinSpeedDownloads(2016, 9, 5, View.months, ONE_MBIT/3);
 		System.out.println(list);
 	}
 }

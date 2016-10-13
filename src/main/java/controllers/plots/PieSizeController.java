@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import models.SizeDownload;
 import models.User;
-import services.DownloadService;
-import services.DownloadService.View;
+import services.PlotsService;
+import services.PlotsService.View;
 
 @RestController
 @CrossOrigin
 public class PieSizeController {
 	private static final Logger log = LoggerFactory.getLogger(PieSizeController.class);
 	
-	@Autowired DownloadService downloadService;
+	@Autowired PlotsService plotsService;
 	
 	@GetMapping("/pieSize/{year}/{month}/{day}/{view}")
 	public Collection<SizeDownload> getDomainSizeDownload(
@@ -35,6 +35,6 @@ public class PieSizeController {
 		int uuid = user.getId();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		log.debug("getDomainSizeDownload for " + uuid);
-		return downloadService.getDomainSizeDownload(uuid, year, month, day, view);
+		return plotsService.getDomainSizeDownload(uuid, year, month, day, view);
 	}
 }

@@ -18,16 +18,16 @@ import models.VerificationToken;
 import repositories.VerificationTokenRepository;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SimpleTokenServiceTest {
+public class TokenServiceImplTest {
 	@Mock VerificationTokenRepository tokenRepository;
 	
 	@InjectMocks
-	private SimpleTokenService tokenService;
+	private TokenServiceImpl tokenService;
 	
 	Date creationDate = new Date(10);
-	Date expirationDate = new Date(10+SimpleTokenService.VERIFICATION_TOKEN_DURATION);
-	Date verificationDateValid = new Date(10+SimpleTokenService.VERIFICATION_TOKEN_DURATION-1);
-	Date verificationDateTooLate = new Date(10+SimpleTokenService.VERIFICATION_TOKEN_DURATION+1);
+	Date expirationDate = new Date(10+TokenServiceImpl.VERIFICATION_TOKEN_DURATION);
+	Date verificationDateValid = new Date(10+TokenServiceImpl.VERIFICATION_TOKEN_DURATION-1);
+	Date verificationDateTooLate = new Date(10+TokenServiceImpl.VERIFICATION_TOKEN_DURATION+1);
 	VerificationToken token = new VerificationToken("token", new User(), creationDate, expirationDate);
 	
 	@Test

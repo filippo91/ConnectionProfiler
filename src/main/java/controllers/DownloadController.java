@@ -66,6 +66,7 @@ public class DownloadController {
 			download.setUuid(user.getId());
 			downloadService.saveDownload(download);
 		}
+		
 		//TODO: Talk with Fra to check if the client supports an array of downloads
 		messagingTemplate.convertAndSend("/topic/downloads", new GenericMessage<Set<Download>>(downloads));
 		messagingTemplate.convertAndSendToUser(user.getUsername(), "/downloads", new GenericMessage<Set<Download>>(downloads));

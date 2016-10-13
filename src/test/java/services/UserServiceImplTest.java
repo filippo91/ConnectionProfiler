@@ -17,14 +17,14 @@ import models.User;
 import repositories.UserRepository;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SimpleUserServiceTest {
+public class UserServiceImplTest {
 	
 	@Mock UserRepository userRepository;
-	@Mock SimpleTokenService tokenService;
+	@Mock TokenServiceImpl tokenService;
 	@Mock ApplicationEventPublisher eventPublisher;
 	
 	@InjectMocks
-	private SimpleUserService userService;	
+	private UserServiceImpl userService;	
 	
 	private Date registrationDate = new Date(10);
 	private User user = new User("Pippo", "pippo@gmail.com", "password", 1);

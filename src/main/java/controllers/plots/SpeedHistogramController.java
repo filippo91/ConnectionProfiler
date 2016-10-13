@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import models.BinSpeedDownload;
 import models.User;
-import services.DownloadService;
-import services.DownloadService.View;
+import services.PlotsService;
+import services.PlotsService.View;
 
 @RestController
 @CrossOrigin
@@ -23,7 +23,7 @@ public class SpeedHistogramController {
 	private static final Logger log = LoggerFactory.getLogger(SpeedHistogramController.class);
 	private static final int ONE_MBIT = 1000000;
 	
-	@Autowired DownloadService downloadService;
+	@Autowired PlotsService plotsService;
 	
 	@GetMapping("/speedHistogram/{year}/{month}/{day}/{view}/{width}")
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(
@@ -39,7 +39,7 @@ public class SpeedHistogramController {
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		width *= ONE_MBIT;
 		log.info("after date is converted");
-		return downloadService.getBinSpeedDownloads(uuid, year, month, day, view, width);
+		return plotsService.getBinSpeedDownloads(uuid, year, month, day, view, width);
 	}
 	
 	@GetMapping("/publicSpeedHistogram/{year}/{month}/{day}/{view}/{width}")
@@ -52,6 +52,6 @@ public class SpeedHistogramController {
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		width *= ONE_MBIT;
 		
-		return downloadService.getBinSpeedDownloads(year, month, day, view, width);
+		return plotsService.getBinSpeedDownloads(year, month, day, view, width);
 	}
 }

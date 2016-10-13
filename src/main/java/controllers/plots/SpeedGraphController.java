@@ -12,18 +12,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import controllers.DownloadController;
 import models.AvgDaySpeedDownload;
 import models.User;
-import services.DownloadService;
-import services.DownloadService.View;
+import services.PlotsService;
+import services.PlotsService.View;
 
 @CrossOrigin
 @RestController
 public class SpeedGraphController {
 	private static final Logger log = LoggerFactory.getLogger(SpeedGraphController.class);
 	
-	@Autowired private DownloadService downloadService;
+	@Autowired PlotsService plotsService;
 	
 	/*
 	 * @RequestMapping(method=GET) = @GetMapping
@@ -41,7 +40,7 @@ public class SpeedGraphController {
 		//User user = userService.getCurrentUser();
 		int uuid = user.getId();
 		
-		return downloadService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
+		return plotsService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}
 	
 	@GetMapping("/publicSpeedGraph/{year}/{month}/{day}/{view}")
@@ -53,7 +52,7 @@ public class SpeedGraphController {
 		
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		
-		return downloadService.getAvgDayDownloadsSpeed(year, month, day, view);
+		return plotsService.getAvgDayDownloadsSpeed(year, month, day, view);
 	}
 	
 }

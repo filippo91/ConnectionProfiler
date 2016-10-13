@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import models.FrequencyAccess;
 import models.User;
-import services.DownloadService;
-import services.DownloadService.View;
+import services.PlotsService;
+import services.PlotsService.View;
 
 @RestController
 @CrossOrigin
 public class PieAccessesController {
 	private static final Logger log = LoggerFactory.getLogger(PieAccessesController.class);
 	
-	@Autowired DownloadService downloadService;
+	@Autowired PlotsService plotsService;
 	
 	@GetMapping("/pieAccesses/{year}/{month}/{day}/{view}")
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(
@@ -33,6 +33,6 @@ public class PieAccessesController {
 			@AuthenticationPrincipal User user){
 		int uuid = user.getId();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
-		return downloadService.getDomainFrequencyAccess(uuid, year, month, day, view);
+		return plotsService.getDomainFrequencyAccess(uuid, year, month, day, view);
 	}
 }

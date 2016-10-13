@@ -197,12 +197,14 @@ angular.module('myApp', [
           stompClient.connect({}, function (frame) {
               console.log("connetto");
               $rootScope.$apply(function(){$rootScope.socketConnected = true;});
-              $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function(packet) {
-                  var download =JSON.parse(packet.body).payload;
-                  console.log("CHIAMO CALLBACK USER");
-                  if($rootScope.websocketCallbackUser !== undefined) $rootScope.websocketCallbackUser(download);
-              });
-              $rootScope.$apply(function(){$rootScope.socketConnected = true;});
+              //
+              if($rootScope.user.authenticated) {
+                  $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
+                      var download = JSON.parse(packet.body).payload;
+                      console.log("CHIAMO CALLBACK USER");
+                      if ($rootScope.websocketCallbackUser !== undefined) $rootScope.websocketCallbackUser(download);
+                  });
+              }
               $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
                   var download =JSON.parse(packet.body).payload;
                   console.log("CHIAMO CALLBACK PUBLIC");
@@ -256,6 +258,7 @@ angular.module('myApp', [
             authenticate(self.credentials, function() {
               if ($rootScope.authenticated) {
                 $location.path("/");
+
                 self.error = false;
               } else {
                 $location.path("/login");
@@ -336,13 +339,13 @@ angular.module('myApp', [
 		        };
 		    }
 )
-    .filter('getAsnumList',function(){
+    .filter('getAsnameList',function(){
         return function(input){
             var  ret = [];
             if(input.length === 0) return ret;
             input.forEach(function(download){
-                if(ret.indexOf(download.asnum) === -1)
-                    ret[ret.length] = (download.asnum);
+                if(ret.indexOf(download.asname) === -1)
+                    ret[ret.length] = (download.asname);
             });
             return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
         };

@@ -1,11 +1,18 @@
 package models;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 /**
@@ -17,7 +24,12 @@ import org.hibernate.validator.constraints.Email;
  *
  */
 @Entity(name="users")
-public class User {
+public class User implements UserDetails {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5004792185908475274L;
+
 	@Id
 	@Size(min=3, max=20)
 	private  String username;
@@ -129,5 +141,13 @@ public class User {
 
 	public String getEmail() {
 		return email;
+	}
+	
+	public Collection<? extends GrantedAuthority> getAuthorities() {		
+        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        
+        authorities.add(new SimpleGrantedAuthority(role));
+        
+        return authorities;
 	}
 }

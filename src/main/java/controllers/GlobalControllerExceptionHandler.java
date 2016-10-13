@@ -18,4 +18,10 @@ public class GlobalControllerExceptionHandler {
 		log.error("Binding Result contains errors.");
 		//nothing to do
 	}
+	
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
+	@ExceptionHandler(IllegalArgumentException.class)
+	public void duplicateInformationForNewUser() {
+		// Nothing to do
+	}
 }

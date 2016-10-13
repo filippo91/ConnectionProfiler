@@ -1,9 +1,8 @@
-
-<!--button ng-click="connectPrivate()" class="btn btn-danger">Connect</button>
-<button ng-click="disconnectPrivate()" class="btn btn-danger">Disconnect</button-->
+<div class="container">
 <button class="btn btn-default" ng-click="prevDownload()">-</button>
 <button class="btn btn-default" ng-click="succDownload()">+</button>
 <table class="table table-striped graph" style="position: relative; top: 40px;" id="download-table">
     <tr><th>#</th><th>Date</th><th>Donwload Speed</th></tr>
     <tr ng-repeat="ele in downloadList"><th>{{$index + 1 + nRecords}}</th><td>{{ele.timestamp | date:'dd-MM-yyyy'}}</td><td>{{ele.download_speed }}</td></tr>
 </table>
+</div>

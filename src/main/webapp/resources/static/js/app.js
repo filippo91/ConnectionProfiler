@@ -119,6 +119,8 @@ angular.module('myApp', [
           $rootScope.rowPublicDownloadList =[];
           $rootScope.enableChangeView = false;
           
+          $rootScope.currentDate = moment();
+          
           /**
            * Functions for controlling time
            */
@@ -135,24 +137,27 @@ angular.module('myApp', [
 
           };
           $rootScope.forward = function(){
-              var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-              console.log(curDate.format("YYYY MM DD"));
+        	  $rootScope.currentDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
               switch($routeParams.view){
-                  case "week":   curDate.add(7,"days");  break;
-                  case "month":   curDate.add(1,"months"); break;
-                  case "months": curDate.add(3, "months"); break;
+                  case "week":   $rootScope.currentDate.add(7,"days");  break;
+                  case "month":   $rootScope.currentDate.add(1,"months"); break;
+                  case "months": $rootScope.currentDate.add(3, "months"); break;
               }
-              $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
+              $route.updateParams({year : $rootScope.currentDate.year(), month : $rootScope.currentDate.month(), day : $rootScope.currentDate.date(), view : $routeParams.view});
           };
           $rootScope.back = function(){
-              var curDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-              console.log(curDate.format("YYYY MM DD"));
+        	  $rootScope.currentDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
               switch($routeParams.view){
-                  case "week":   curDate.subtract(7,"days");  break;
-                  case "month":   curDate.subtract(1,"months"); break;
-                  case "months": curDate.subtract(3, "months"); break;
+                  case "week":   $rootScope.currentDate.subtract(7,"days");  break;
+                  case "month":   $rootScope.currentDate.subtract(1,"months"); break;
+                  case "months": $rootScope.currentDate.subtract(3, "months"); break;
               }
-              $route.updateParams({year : curDate.year(), month : curDate.month(), day : curDate.date(), view : $routeParams.view});
+              $route.updateParams({year : $rootScope.currentDate.year(), month : $rootScope.currentDate.month(), day : $rootScope.currentDate.date(), view : $routeParams.view});
+          };
+          $rootScope.today = function(){
+        	  $rootScope.currentDate = moment();
+              console.log($rootScope.currentDate.format("YYYY MM DD"));
+              $route.updateParams({year : $rootScope.currentDate.year(), month : $rootScope.currentDate.month(), day : $rootScope.currentDate.date(), view : $routeParams.view});
           };
       $rootScope.isRelevant = function (download) {
           var time = moment(download.timestamp);
@@ -176,7 +181,7 @@ angular.module('myApp', [
           console.log(ret);
           return ret;
       };
-              self.currentDate = moment();
+      
 
           ////////////////
       $rootScope.socketConnected = true;

@@ -3,7 +3,7 @@
 angular.module('myApp.speedGraph', ['ngRoute'])
     .config(['$routeProvider', function($routeProvider) {
       $routeProvider.when('/speedGraph/:year/:month/:day/:view', {
-        templateUrl: 'partials/restricted/speedGraph.html',
+        templateUrl: 'partials/public/speedGraph.html',
         controller: 'speedGraph',
         controllerAs: 'controller'
       });

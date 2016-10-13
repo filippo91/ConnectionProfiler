@@ -4,7 +4,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/speedHistogram/:year/:month/:day/:view/:bin_width', {
-    templateUrl: 'partials/restricted/speedHistogram.html',
+    templateUrl: 'partials/public/speedHistogram.html',
     controller: 'speedHistogram'
   });
 }])

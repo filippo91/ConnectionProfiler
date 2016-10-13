@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,8 @@ public class SpeedGraphController {
 		return plotsService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}
 	
-	@GetMapping("/publicSpeedGraph/{year}/{month}/{day}/{view}")
+	@PreAuthorize("permitAll()")
+	@GetMapping("/publics/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getPublicDownloadsSpeed(
 			@PathVariable int year, 
 			@PathVariable int month, 

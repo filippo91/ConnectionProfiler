@@ -36,7 +36,7 @@ public class UserController {
 		return user;
 	}
 
-	@PostMapping("/newUser")
+	@PostMapping("/publics/newUser")
 	//@ResponseStatus(value = HttpStatus.CREATED)
 	public void register(@RequestBody @Valid User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -55,7 +55,7 @@ public class UserController {
 		log.info("New user details: " + user);
 	}
 
-	@PostMapping(value = "/newUser/confirmRegistration")
+	@PostMapping(value = "/publics/newUser/confirmRegistration")
 	public void confirmRegistration(@RequestBody String token) {
 		userService.confirmRegistration(token, new Date());
 	}

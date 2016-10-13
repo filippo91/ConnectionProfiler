@@ -119,7 +119,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 }])
     .factory('speedFactory',['$resource', function($resource){
         var userUri = "http://localhost:8080/connectionProfiler/speedHistogram/:year/:month/:day/:view/:bin_width";
-        var publicUri = "http://localhost:8080/connectionProfiler/publicSpeedHistogram/:year/:month/:day/:view/:bin_width";
+        var publicUri = "http://localhost:8080/connectionProfiler/publics/speedHistogram/:year/:month/:day/:view/:bin_width";
         var factory = {};
         factory.getSpeedDataUser = function(year, month, day, view, bin_width, trigger){
               return $resource(userUri).query({year : year, month : month, day : day, view : view, bin_width : bin_width},function (domainList) {

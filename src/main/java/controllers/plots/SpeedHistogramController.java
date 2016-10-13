@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +43,8 @@ public class SpeedHistogramController {
 		return plotsService.getBinSpeedDownloads(uuid, year, month, day, view, width);
 	}
 	
-	@GetMapping("/publicSpeedHistogram/{year}/{month}/{day}/{view}/{width}")
+	@PreAuthorize("permitAll()")
+	@GetMapping("/publics/speedHistogram/{year}/{month}/{day}/{view}/{width}")
 	public Collection<BinSpeedDownload> getPublicBinSpeedDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 

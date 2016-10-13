@@ -13,7 +13,7 @@ angular.module('myApp', [
   'myApp.domainsBySize'
 ])
 
-.constant("PUBLIC_PAGES", ['', '/', '/login', '/register', '/confirmRegistration'])
+.constant("PUBLIC_PAGES", ['', 'login', 'register', 'confirmRegistration', 'speedGraph', 'speedHistogram'])
 
 .config(['$locationProvider', '$routeProvider', '$httpProvider', function($locationProvider, $routeProvider, $httpProvider) {
   $locationProvider.hashPrefix('!');
@@ -113,7 +113,7 @@ angular.module('myApp', [
           self.speedTableParams.page = 0;
           self.speedTableParams.pageSize = 10;
           
-          /////////////////
+          // ///////////////
           
           $rootScope.rowUserDownloadList =[];
           $rootScope.rowPublicDownloadList =[];
@@ -122,8 +122,8 @@ angular.module('myApp', [
           $rootScope.currentDate = moment();
           
           /**
-           * Functions for controlling time
-           */
+			 * Functions for controlling time
+			 */
           $rootScope.changeView = function(ele){
               $(".view").removeClass("active");
               var currentParam = $routeParams;
@@ -183,7 +183,7 @@ angular.module('myApp', [
       };
       
 
-          ////////////////
+          // //////////////
       $rootScope.socketConnected = true;
       connect();
       $rootScope.realtime = function(){
@@ -224,7 +224,7 @@ angular.module('myApp', [
           $rootScope.socketConnected = false;
       }
 
-      ////////////////////////
+      // //////////////////////
           
           var authenticate = function(credentials, callback) {
 
@@ -273,15 +273,25 @@ angular.module('myApp', [
             });
           }
           
-          //////////////////////////
+          // ////////////////////////
           $rootScope.$on('$routeChangeStart', function (event, next, prev) {
-        	  	console.info($location.url(), PUBLIC_PAGES);
-        	  	if(PUBLIC_PAGES.indexOf($location.url()) >= 0){
+        	  var pagePrefix = null;
+        	  var thisPageUrl = $location.url();
+        	  var thisPageUrlSplitted = thisPageUrl.split('/');
+        	  
+        	  if(thisPageUrlSplitted.length > 1){
+        		  pagePrefix = thisPageUrlSplitted[1];
+        	  }else{
+        		  pagePrefix = thisPageUrlSplitted[0];
+        	  }
+        	  
+        	  	console.info(pagePrefix, PUBLIC_PAGES);
+        	  	if(PUBLIC_PAGES.indexOf(pagePrefix) >= 0){
         	  		$rootScope.enableChangeView = false;
         	  	}else{
         	  		$rootScope.enableChangeView = true;
         	  	}
-        	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf($location.url()) < 0) {
+        	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf(pagePrefix) < 0) {
         	    	event.preventDefault();
         	        $rootScope.$evalAsync(function() {
         	        	$location.path("/login");
@@ -302,7 +312,7 @@ angular.module('myApp', [
 		self.user.password = "";
 		var createUser = function(user) { 
 			console.log(self.user);
-			$http.post('http://localhost:8080/connectionProfiler/newUser', user).then(function () {
+			$http.post('http://localhost:8080/connectionProfiler/publics/newUser', user).then(function () {
 				                        $location.path('/login');
 				                    }, function(){
 					$location.path('/');
@@ -323,7 +333,7 @@ angular.module('myApp', [
 		var self = this;
 		self.token = "";
 		var sendToken = function(token) { 
-			$http.post('http://localhost:8080/connectionProfiler/newUser/confirmRegistration', token).then(function () {
+			$http.post('http://localhost:8080/connectionProfiler/publics/newUser/confirmRegistration', token).then(function () {
 				                        $location.path('/login');
 				                    }, function(){
 					$location.path('/');

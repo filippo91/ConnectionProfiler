@@ -27,9 +27,7 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
          * Web Socket callbacks
          */
         $rootScope.websocketCallbackUser = function (download) {
-            $scope.downloadList.push(download);//{timestamp : download.timestamp, download_speed : download.download_speed});
-            console.log("pushato");
-            $scope.downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+            $scope.downloadList.push(download);
             $scope.$apply();
         };
         $rootScope.websocketCallbackPublic = function(download){};
@@ -78,7 +76,7 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
         factory.getDownloads = function (page,size) {
             return $resource(serverURI).query({page: page, size: size}, function (downloadList) {
                 //console.log("arrivate:"+ JSON.stringify(downloadList));
-                downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                //downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
                 console.log(JSON.stringify(downloadList));
             });
         };

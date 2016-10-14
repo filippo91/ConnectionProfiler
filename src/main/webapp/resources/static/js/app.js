@@ -135,10 +135,9 @@ angular.module('myApp', [
       
 
           // //////////////
-      $rootScope.socketConnected = true;
-      connect();
+      $rootScope.socketConnected = false;
+      //connect();
       $rootScope.realtime = function(){
-          console.log("ascasfdsadfsdafsdaf");
           $rootScope.socketConnected ? disconnect() : connect();
           console.log( "is conn: "+$rootScope.socketConnected );
       };
@@ -147,17 +146,22 @@ angular.module('myApp', [
           var stompClient = Stomp.over(socket);
           stompClient.connect({}, function (frame) {
               $rootScope.$apply(function(){$rootScope.socketConnected = true;});
-              //
-              if($rootScope.user.authenticated) {
+
+              if($rootScope.authenticated) {
                   $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
                       var download = JSON.parse(packet.body).payload;
-                      if ($rootScope.websocketCallbackUser !== undefined) $rootScope.websocketCallbackUser(download);
+                      if ($rootScope.websocketCallbackUser !== undefined) {
+                          console.log("CHIAMO CALLBACK USER");
+                          $rootScope.websocketCallbackUser(download);
+                      }
                   });
               }
               $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
                   var download =JSON.parse(packet.body).payload;
-                  console.log("CHIAMO CALLBACK PUBLIC");
-                  if($rootScope.websocketCallbackPublic !== undefined) $rootScope.websocketCallbackPublic(download);
+                  if($rootScope.websocketCallbackPublic !== undefined){
+                      console.log("CHIAMO CALLBACK PUBLIC");
+                      $rootScope.websocketCallbackPublic(download);
+                  }
               });
           });
       }
@@ -198,7 +202,7 @@ angular.module('myApp', [
               callback && callback();
             });
 
-          }
+          };
 
           authenticate();
           self.credentials = {};
@@ -207,7 +211,6 @@ angular.module('myApp', [
             authenticate(self.credentials, function() {
               if ($rootScope.authenticated) {
                 $location.path("/");
-
                 self.error = false;
               } else {
                 $location.path("/login");
@@ -221,7 +224,7 @@ angular.module('myApp', [
                 disconnect();
               $location.path("/");
             });
-          }
+          };
           
           // ////////////////////////
           $rootScope.$on('$routeChangeStart', function (event, next, prev) {
@@ -266,7 +269,7 @@ angular.module('myApp', [
 				                        self.dataLoading = false;
 				                    }
 				                );
-		}
+		};
 		
 		self.register = function() {
 		       self.dataLoading = true;
@@ -288,7 +291,7 @@ angular.module('myApp', [
 				                        self.dataLoading = false;
 				                    }
 				                );
-		}
+		};
 		
 		self.confirmRegistration = function() {
 		       self.dataLoading = true;
@@ -307,4 +310,4 @@ angular.module('myApp', [
             });
             return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
         };
-    });;
+    });

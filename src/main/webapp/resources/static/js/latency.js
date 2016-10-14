@@ -95,7 +95,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         link: function(scope,element){
             d3Service.d3().then(function(d3){
 
-                var margin = {top: 10, right: 30, bottom: 30, left: 30},
+                var margin = {top: 10, right: 30, bottom: 60, left: 60},
                     real_width = 960, real_height = 500,
                     width = real_width - margin.left - margin.right,
                     height = real_height - margin.top - margin.bottom,
@@ -103,6 +103,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
                 var color = d3.scale.category10();
 
+                var f = d3.format(".1f");
                 var svg = d3.select(element[0]).append("svg")
                     .attr("width", real_width)
                     .attr("height", real_height)
@@ -122,8 +123,8 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     $(element[0]).empty();
 
                     svg = d3.select(element[0]).append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
+                        .attr("width", real_width)
+                        .attr("height", real_height)
                         .append("g")
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -135,7 +136,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     svg.selectAll(".loading").remove();
 
                     var values = scope.latencyData;
+                    var tot = d3.sum(values, function(d){ return d.nRecords;});
                     var values_arr = latencyFactory.splitByBin(values);
+
                     var asnameList = getAsnameListFilter(values);
                     var binWidth = $routeParams.bin_width;
 
@@ -176,7 +179,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var x1 = d3.scale.ordinal().domain(asnameList).rangeRoundBands([0, x0.rangeBand()],.1);
                     var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
-                    var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){return (d + 1) * binWidth + "ms";});//.tickValues(ris);
+                    var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){return (d + 1) * binWidth;});//.tickValues(ris);
                     var yAxis = d3.svg.axis().scale(y).orient("left");
 
 
@@ -209,7 +212,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         rect.attr("y", function(d) { return y(d.nRecords); })
                             .attr("height", function(d) { return height - y(d.nRecords); });
                     }
-
                     var text = bar.append("text")
                         .attr("dy", ".75em")
                         .attr("x", function(d) { return x1(d.asname) + x1.rangeBand() / 2; })
@@ -228,6 +230,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         text.attr("y", function(d) { return y(d.nRecords) + 10; })
                             .attr("height", function(d) { return height - y(d.nRecords); });
                     }
+
                     var legend = svg.selectAll(".legend")
                         .data(asnameList.slice().reverse())
                         .enter().append("g")
@@ -256,7 +259,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
-                        div.html("<i>Provider: </i><b>" + d3.select(this).data()[0].asname + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
+                        div.html("<i>Provider: </i><b>" + d3.select(this).data()[0].asname + "</b><br><i>n: </i><b>" +
+                            d3.select(this).data()[0].nRecords + " (" +
+                            f((d3.select(this).data()[0].nRecords / tot)*100) + "%)</b>")
                             .style("left", (x) + "px")
                             .style("top", (y - 28)  + "px");
                     })
@@ -269,11 +274,22 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     svg.append("g")
                         .attr("class", "x axis")
                         .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis);
+                        .call(xAxis)
+                        .append("text")
+                        .attr("x", width / 2)
+                        .attr("y", 30)
+                        .attr("dy", ".35em")
+                        .style("text-anchor", "end")
+                        .text("Latency in milliseconds [ms]");
 
                     svg.append("g")
                         .attr("class", "y axis")
-                        .call(yAxis);
+                        .call(yAxis)
+                        .append("text")
+                        .attr("dy", ".35em")
+                        .style("text-anchor", "end")
+                        .attr("transform", "translate(-40,"+(height/3)+")rotate(-90)")
+                        .text("Numbers of occurrences");
                 };
 
                 scope.$watch('trigger.arrived',function(newVal){

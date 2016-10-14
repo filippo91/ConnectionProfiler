@@ -67,15 +67,17 @@
 					<li><a
 						href="#!/latency/{{ currentDate.year() }}/{{ currentDate.month() }}/{{ currentDate.date() }}/months/200">Latency</a></li>
 				</ul>
-				<p class="navbar-text navbar-right" ng-show="!authenticated">
-					<a href="#!/login">login</a>
-				</li>
-				<p ng-show="authenticated" class="navbar-text navbar-right">
-					<a href="" ng-click="nav.logout()">logout</a>
-				</li>
-				<p ng-show="authenticated" class="navbar-text navbar-right">
-					Signed in as {{ user.name }}</a>
-				</p>
+				<ul class="nav navbar-nav navbar-right">
+				<li><a ng-show="!authenticated" href="#!/login"><span class="glyphicon glyphicon-log-in"> Login</a>
+					
+				<li>
+					<a ng-show="authenticated" class="dropdown-toggle" data-toggle="dropdown" href="" role="button" aria-haspopup="true" aria-expanded="false"> Hi {{ user.name }}! <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+					<li role="presentation"><a href="#!/userProfile" role="menuitem" tabindex="-1"><span class="glyphicon glyphicon-user"> profile</a>
+					<li role="presentation"><a href="" ng-click="nav.logout()" role="menuitem" tabindex="-1"><span class="glyphicon glyphicon-log-out"> logout</a>
+					
+					</ul>
+				</ul>
 			</div>
 			<!--/.nav-collapse -->
 		</div>
@@ -92,8 +94,7 @@
 			</div>
 
 			<div class="col-md-2">{{currentDate.valueOf() | date : 'MMM dd yyyy' }}</div>
-			<div id="timeManager" class="col-md-4 col-md-offset-2"
-				style="visibility: hidden;">
+			<div id="timeManager" class="col-md-4 col-md-offset-2">
 				<div class="btn-group" role="group">
 					<button id="weekBtn" type="button" class="btn btn-default view"
 						ng-click="changeView('weekBtn');">Week</button>
@@ -104,7 +105,7 @@
 				</div>
 
 			</div>
-			<div class="col-md-2" id="realtimediv" style="visibility: hidden;">
+			<div class="col-md-2" id="realtimediv">
 				<button ng-click="realtime();" class="btn"
 					ng-class="socketConnected ? 'btn-danger active' : 'btn-default'">
 					<span
@@ -165,5 +166,6 @@
 	<script src="js/speedHistogram.js"></script>
 	<script src="js/domainsBySize.js"></script>
 	<script src="js/domainsByAccesses.js"></script>
+	<script src="js/userProfile.js"></script>
 </body>
 </html>

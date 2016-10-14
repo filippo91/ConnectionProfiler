@@ -199,6 +199,11 @@
 
 	<build>
 		<finalName>connectionProfiler</finalName>
+		<resources>
+     	<resource>
+       		<directory>src/main/webapp/resources</directory>
+     	</resource>
+   </resources>
 	</build>
 
 

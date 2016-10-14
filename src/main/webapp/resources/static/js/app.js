@@ -10,7 +10,8 @@ angular.module('myApp', [
   'myApp.speedHistogram',
   'myApp.latency',
   'myApp.domainsByAccesses',
-  'myApp.domainsBySize'
+  'myApp.domainsBySize',
+  'myApp.userProfile'
 ])
 
 .constant("PUBLIC_PAGES", ['', 'login', 'register', 'confirmRegistration', 'speedGraph', 'speedHistogram'])

@@ -10,17 +10,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-
-import models.*;
+import models.AvgDaySpeedDownload;
+import models.BinLatencyDownload;
+import models.BinSpeedDownload;
+import models.Download;
+import models.FrequencyAccess;
+import models.SizeDownload;
 import repositories.DownloadRepository;
 
-
 @Service
-public class MyDownloadService implements DownloadService {
-	Logger log = Logger.getLogger(MyDownloadService.class);
+public class PlotsServiceImpl implements PlotsService{
+	Logger log = Logger.getLogger(PlotsServiceImpl.class);
 	
-	@Autowired
-	private DownloadRepository downloadRepository;
+	@Autowired DownloadRepository downloadRepository;
 	
 	@Override
 	public Collection<Download> getDownloadsSpeed(int uuid, int page, int pageSize) {
@@ -111,10 +113,7 @@ public class MyDownloadService implements DownloadService {
 	}
 
 
-	@Override
-	public Download saveDownload(Download download) {
-		return downloadRepository.save(download);
-	}
+
 	
 	private Date getEndDate(int year, int month, int day, View view) {
 		DateTime date;

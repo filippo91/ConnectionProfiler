@@ -3,8 +3,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import listeners.OnRegistrationCompleteEvent;
 import listeners.RegistrationListener;
@@ -16,6 +21,7 @@ import models.User;
  * @author philip
  *
  */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes=TestRegistrationListenerConfiguration.class)
 public class TestRegistrationListener {
@@ -23,6 +29,8 @@ public class TestRegistrationListener {
 	
 	private User user;
 			
+	@Value("${spring.application.name}")
+	private String appName;
 	@Before
 	public void setup(){
 		user = new User();
@@ -34,5 +42,10 @@ public class TestRegistrationListener {
 	public void sendEmail(){
 		OnRegistrationCompleteEvent event = new OnRegistrationCompleteEvent(user, "appURL", "randomToken");
 		registrationListener.onApplicationEvent(event);
+
+		System.out.println(registrationListener.getSubject());
+		System.out.println(appName);
 	}
+	
+	
 }

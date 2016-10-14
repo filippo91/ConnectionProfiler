@@ -18,8 +18,8 @@ import models.VerificationToken;
 import repositories.UserRepository;
 
 @Service
-public class SimpleUserService implements UserService {
-	private static final Logger log = LoggerFactory.getLogger(SimpleUserService.class);
+public class UserServiceImpl implements UserService {
+	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 	
 	private static final String APP_URL = "http://localhost:8080/connectionProfiler/index.html#!/confirmRegistration";
 	

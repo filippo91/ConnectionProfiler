@@ -7,21 +7,20 @@ import org.apache.velocity.exception.VelocityException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.ui.velocity.VelocityEngineFactory;
 
 @Configuration
 @ComponentScan(basePackages={"listeners"})
+@PropertySource("classpath:application.properties")
 public class TestRegistrationListenerConfiguration {
 	 @Bean
 	    public JavaMailSender javaMailService() {
 	        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-	        String host = "localhost";
-			javaMailSender.setHost(host);
-	        int port = 25; //smtp server port 
-			javaMailSender.setPort(port);
-	        
+
 	        return javaMailSender;
 	    }
 	  @Bean
@@ -33,4 +32,8 @@ public class TestRegistrationListenerConfiguration {
 	        factory.setVelocityProperties(props);
 	        return factory.createVelocityEngine();      
 	    }
+	  @Bean
+		public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+			return new PropertySourcesPlaceholderConfigurer();
+		}
 }

@@ -12,7 +12,7 @@ import models.VerificationToken;
 import repositories.VerificationTokenRepository;
 
 @Service
-public class SimpleTokenService implements TokenService {
+public class TokenServiceImpl implements TokenService {
 	@Autowired private VerificationTokenRepository tokenRepository;
 	
 	@Override

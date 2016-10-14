@@ -80,7 +80,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
     .factory('speedGraph_downloadManager', ['$resource', function($resource) {
             var serverURI_user = "http://localhost:8080/connectionProfiler/speedGraph/:year/:month/:day/:view",
-                serverURI_public = "http://localhost:8080/connectionProfiler/publicSpeedGraph/:year/:month/:day/:view";
+                serverURI_public = "http://localhost:8080/connectionProfiler/publics/speedGraph/:year/:month/:day/:view";
             var factory = {};
 
             factory.splitByAsname = function(downloadList){

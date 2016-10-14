@@ -309,15 +309,17 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         var valueList_x = valueList_x_pub.concat(valueList_x_user), maxList_y = maxList_y_pub.concat(maxList_y_user);
 
 */
-                        var valueList_x = [], maxY;
-                        
-                        userDownloadList.forEach(function (d, i) {
-                            maxList_y_pub[i] = d3.max(d.downloads.map(function (d) {return d.speed;}));
-                            valueList_x_pub = d.downloads.map(function (d) {return d.timestamp;});
+                        var valueList_x = [], maxList_y = [];
+
+                        publicDownloadList.forEach(function (d, i) {
+                            maxList_y[i] = d3.max(d.downloads.map(function (d) {return d.speed;}));
+                            console.log(d3.extent(d.downloads.map(function(v){return v.timestamp;})));
+                            valueList_x = valueList_x.concat(d3.extent(d.downloads.map(function(v){return v.timestamp;})));
                         });
 
-                        //console.log("x extend: " + d3.extent(valueList_x));
-                        //console.log("y max: " + d3.max(maxList_y));
+                        console.log("x extend: " + valueList_x + " " +d3.extent(valueList_x));
+                        console.log("y max: " + d3.max(maxList_y));
+
                         x.domain(d3.extent(valueList_x));
                         y.domain([0, d3.max(maxList_y) * 1.3]);
                         x2.domain(x.domain());
@@ -357,32 +359,42 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .style("stroke-dasharray", ("3, 3"));
                         });
 
-                        /**
-                         * Disegno grafico user
-                         * */
-                        userDownloadList.forEach(function (e) {
-                            e.downloads.forEach(function (ee) {
-                                ee.timestamp = new Date(ee.timestamp);
-                                focus.append("circle").datum(ee)
-                                    .attr("class", "point user-graph user-graph-" + e.asname)
+                        if($rootScope.authenticated) {
+                            /**
+                             * Disegno grafico user
+                             * */
+                            userDownloadList.forEach(function (e) {
+                                e.downloads.forEach(function (ee) {
+                                    ee.timestamp = new Date(ee.timestamp);
+                                    focus.append("circle").datum(ee)
+                                        .attr("class", "point user-graph user-graph-" + e.asname)
+                                        .attr("isvisible", "true")
+                                        .attr("cx", function (d) {
+                                            return x(d.timestamp)
+                                        })
+                                        .attr("cy", function (d) {
+                                            return y(d.speed)
+                                        })
+                                        .attr("clip-path", "url(#clip)")
+                                        .attr("ds", function (d) {
+                                            return d.speed;
+                                        })
+                                        .attr("ts", function (d) {
+                                            return formatTime(d.timestamp);
+                                        })
+                                        .attr("r", circleSize)
+                                        .attr("fill", colors(asnameList.indexOf(e.asname)));
+                                });
+                                focus.append("path")
+                                    .datum(e.downloads)
+                                    .attr("class", "line user-graph user-graph-" + e.asname)
+                                    .attr("d", line)
                                     .attr("isvisible", "true")
-                                    .attr("cx", function (d) {return x(d.timestamp)})
-                                    .attr("cy", function (d) {return y(d.speed)})
                                     .attr("clip-path", "url(#clip)")
-                                    .attr("ds", function (d) {return d.speed;})
-                                    .attr("ts", function (d) {return formatTime(d.timestamp);})
-                                    .attr("r", circleSize)
-                                    .attr("fill", colors(asnameList.indexOf(e.asname)));
+                                    .attr("fill", "none")
+                                    .attr("stroke", colors(asnameList.indexOf(e.asname)));
                             });
-                            focus.append("path")
-                                .datum(e.downloads)
-                                .attr("class", "line user-graph user-graph-" + e.asname)
-                                .attr("d", line)
-                                .attr("isvisible", "true")
-                                .attr("clip-path", "url(#clip)")
-                                .attr("fill", "none")
-                                .attr("stroke", colors(asnameList.indexOf(e.asname)));
-                        });
+                        }
 
                         updateTooltipListener();
 
@@ -406,7 +418,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         brush.extent([new Date(d3.min(valueList_x)), new Date(d3.max(valueList_x))]);
                         d3.selectAll("path.domain").style("shape-rendering", "geometricPrecision");
 
-                        $('.public-graph').hide();
+                        if($rootScope.authenticated)    $('.public-graph').hide();
                     }
 
                     function updateTooltipListener(){

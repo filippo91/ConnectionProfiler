@@ -355,7 +355,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                     scope.$watch('trigger.arrived',function(newVal){
                         if(newVal === true){
                             drawHistogram(true);
-                            $(".bin-public").hide();
+                            if($rootScope.authenticated)
+                                $(".bin-public").hide();
                         }
                     });
 

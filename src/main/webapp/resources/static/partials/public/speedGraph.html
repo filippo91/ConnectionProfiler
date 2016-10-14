@@ -1,17 +1,21 @@
 <div class="container">
         <div class="btn-group row" id="btnDiv">
             <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        ng-class="authenticated ? 'btn btn-default dropdown-toggle' : 'btn btn-default active dropdown-toggle'">
                     Public Asnames <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li ><a class="btn btn-default" id="public-showAll" ng-click="showAllAsname('public');">Show All</a></li>
+                    <li ><a id="public-showAll" ng-click="showAllAsname('public');"
+                            ng-class="authenticated ? 'btn btn-default' : 'btn btn-default active'">
+                        {{authenticated ? 'Show All' : 'Hide All'}}</a></li>
                     <li ng-repeat="ele in publicDownloadList" id="public-graph-asname-{{ele.asname}}">
-                        <a class="btn btn-default public-asnameButton" id="public-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'public')">{{ele.asname}}</a>
+                        <a ng-class="authenticated ? 'btn btn-default public-asnameButton' : 'btn btn-default active public-asnameButton'"
+                           id="public-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'public')">{{ele.asname}}</a>
                     </li>
                 </ul>
             </div>
-            <div class="btn-group">
+            <div class="btn-group" ng-if="authenticated">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     User Asnames <span class="caret"></span>
                 </button>

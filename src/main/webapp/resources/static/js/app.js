@@ -13,7 +13,7 @@ angular.module('myApp', [
   'myApp.domainsBySize'
 ])
 
-.constant("PUBLIC_PAGES", ['', '/', '/login', '/register', '/confirmRegistration'])
+.constant("PUBLIC_PAGES", ['', 'login', 'register', 'confirmRegistration', 'speedGraph', 'speedHistogram'])
 
 .config(['$locationProvider', '$routeProvider', '$httpProvider', function($locationProvider, $routeProvider, $httpProvider) {
   $locationProvider.hashPrefix('!');
@@ -48,56 +48,9 @@ angular.module('myApp', [
 }])
 
 .controller('home', function($rootScope, $http) {
-  var self = this;
-  
-  var publicSubscription = null;
-  var privateSubscription = null;
 
         $("#timeManager").css("visibility","hidden");
         $("#realtimediv").css("visibility","hidden");
-
-  self.msg = "default message";
-  self.connectPublic = function () {
-	  var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-	  var stompClient = Stomp.over(socket);
-	    stompClient.connect({}, function (frame) {
-	        console.log('Connected: ' + frame);
-	        publicSubscription = stompClient.subscribe('/topic/downloads', function (download) {
-	            console.log(JSON.parse(download.body));
-	        });
-	    });
-	};
-	
-	self.connectPrivate = function () {
-            var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (download) {
-                    console.log(JSON.parse(download.body));
-                });
-            });
-        };
-	
-	self.send = function(){
-		stompClient.send("/app/hello", {}, "ciao");
-				
-	};
-	
-	
-	self.disconnectPublic = function(){
-		if(publicSubscription != null){
-			publicSubscription.unsubscribe();
-			publicSubscription = null;
-		}
-	};
-	
-	self.disconnectPrivate = function(){
-		if(privateSubscription != null){
-			privateSubscription.unsubscribe();
-			privateSubscription = null;
-		}
-	};
 	
 })
 
@@ -195,13 +148,11 @@ angular.module('myApp', [
           var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
           var stompClient = Stomp.over(socket);
           stompClient.connect({}, function (frame) {
-              console.log("connetto");
               $rootScope.$apply(function(){$rootScope.socketConnected = true;});
               //
               if($rootScope.user.authenticated) {
                   $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
                       var download = JSON.parse(packet.body).payload;
-                      console.log("CHIAMO CALLBACK USER");
                       if ($rootScope.websocketCallbackUser !== undefined) $rootScope.websocketCallbackUser(download);
                   });
               }
@@ -269,19 +220,22 @@ angular.module('myApp', [
           self.logout = function() {
             $http.post('http://localhost:8080/connectionProfiler/logout', {}).finally(function() {
               $rootScope.authenticated = false;
+                disconnect();
               $location.path("/");
             });
           }
           
           //////////////////////////
           $rootScope.$on('$routeChangeStart', function (event, next, prev) {
-        	  	console.info($location.url(), PUBLIC_PAGES);
-        	  	if(PUBLIC_PAGES.indexOf($location.url()) >= 0){
+        	  	console.info($location.path(), PUBLIC_PAGES);
+              var thisPage = $location.path().split('/')[1];
+              console.info(thisPage);
+        	  	if(PUBLIC_PAGES.indexOf(thisPage) >= 0){
         	  		$rootScope.enableChangeView = false;
         	  	}else{
         	  		$rootScope.enableChangeView = true;
         	  	}
-        	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf($location.url()) < 0) {
+        	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf(thisPage) < 0) {
         	    	event.preventDefault();
         	        $rootScope.$evalAsync(function() {
         	        	$location.path("/login");

@@ -10,7 +10,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
     }])
     .controller('speedGraph', ['$route', '$routeParams', '$scope', 'speedGraph_downloadManager', '$rootScope', function($route, $routeParams, $scope, downloadManager,$rootScope) {
 
-        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined};
+        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
         $("#timeManager").css("visibility","visible");
         $("#realtimediv").css('visibility', 'visible');
 
@@ -23,7 +23,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 $scope.publicDownloadList = downloadManager.splitByAsname($rootScope.rowPublicDownloadList);
             }
         }
-        downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
+        if($rootScope.authenticated){
+            $scope.trigger.nData ++;
+            downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
+        }
         downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
 
         /**
@@ -45,51 +48,6 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 $scope.trigger.newSpeedDataPublic = $scope.trigger.newSpeedDataPublic !== true;
             });
         };
-            /*
-        var privateSubscription = null;
-        var publicSubscription = null;
-        var socket = null;
-        $scope.connect = function () {
-            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
-                    var download =JSON.parse(packet.body).payload;
-                    if(true){//$rootScope.isRelevant(download)) {
-                        downloadManager.updateDownloads($rootScope.rowUserDownloadList, download);
-                        $scope.userDownloadList = downloadManager.splitByAsname($rootScope.rowUserDownloadList);
-                        $scope.$apply(function () {
-                            $scope.trigger.userAsname = download.asname;
-                            $scope.trigger.newSpeedDataUser = $scope.trigger.newSpeedDataUser !== true;
-                        });
-                    }
-                });
-                publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
-                    var download =JSON.parse(packet.body).payload;
-                    if(true){//$rootScope.isRelevant(download)) {
-                        downloadManager.updateDownloads($rootScope.rowPublicDownloadList, download);
-                        $scope.publicDownloadList = downloadManager.splitByAsname($rootScope.rowPublicDownloadList);
-                        $scope.$apply(function () {
-                            $scope.trigger.publicAsname = download.asname;
-                            $scope.trigger.newSpeedDataPublic = $scope.trigger.newSpeedDataPublic !== true;
-                        });
-                    }
-                });
-            });
-        };
-        $scope.disconnect = function(){
-            if(privateSubscription != null){
-                privateSubscription.unsubscribe();
-                privateSubscription = null;
-            }
-            if(publicSubscription != null){
-                publicSubscription.unsubscribe();
-                publicSubscription = null;
-            }
-        };
-        $scope.$on('$destroy', $scope.disconnect);
-*/
 
         $scope.showAllAsname = function(aType){
             var ele = $('#'+aType+'-showAll'), graphEle = $("." + aType + "-graph");
@@ -147,14 +105,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
            return $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
                 callback(downloadList,true);
-                trigger.arrived = ++trigger.count === 2;
+                trigger.arrived = ++trigger.count === trigger.nData;
             });
         };
         factory.getPublicDownloads = function (year,month,day,view,trigger, callback){
             return $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
                 callback(downloadList,false);
-                trigger.arrived = ++trigger.count === 2;
+                trigger.arrived = ++trigger.count === trigger.nData;
             });
         };
         factory.updateDownloads = function(downloadList, download){
@@ -170,15 +128,6 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             }
             if(i === downloadList.length)
                 downloadList.push({asname : download.asname, count : 1,speed : download.download_speed, timestamp : download.timestamp})
-        };
-        factory.getDownloadListByAsname = function(asname,downloadList){
-            var ret = [], i;
-            for(i = 0; i < downloadList.length; i++){
-                if(downloadList[i].asname === asname){
-
-                }
-            }
-
         };
             return factory;
         }])
@@ -341,14 +290,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             $('#user-graph-button-' + asn).css('color', colors(i));
                         });
 
-                        //var userDownloadList = scope.userDownloadList;
-                        //var publicDownloadList = scope.publicDownloadList;
 
                         console.log("user: " + JSON.stringify(userDownloadList));
                         console.log("public: " + JSON.stringify(publicDownloadList));
 
+                        /*
                         //max user
                         var maxList_y_user = [], maxList_y_pub = [], valueList_x_user = [], valueList_x_pub = [];
+
                         publicDownloadList.forEach(function (d, i) {
                             maxList_y_user[i] = d3.max(d.downloads.map(function (d) {return d.speed;}));
                             valueList_x_user = d.downloads.map(function (d) {return d.timestamp;});
@@ -358,6 +307,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             valueList_x_pub = d.downloads.map(function (d) {return d.timestamp;});
                         });
                         var valueList_x = valueList_x_pub.concat(valueList_x_user), maxList_y = maxList_y_pub.concat(maxList_y_user);
+
+*/
+                        var valueList_x = [], maxY;
+                        
+                        userDownloadList.forEach(function (d, i) {
+                            maxList_y_pub[i] = d3.max(d.downloads.map(function (d) {return d.speed;}));
+                            valueList_x_pub = d.downloads.map(function (d) {return d.timestamp;});
+                        });
 
                         //console.log("x extend: " + d3.extent(valueList_x));
                         //console.log("y max: " + d3.max(maxList_y));

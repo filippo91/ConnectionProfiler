@@ -49,56 +49,9 @@ angular.module('myApp', [
 }])
 
 .controller('home', function($rootScope, $http) {
-  var self = this;
-  
-  var publicSubscription = null;
-  var privateSubscription = null;
 
         $("#timeManager").css("visibility","hidden");
         $("#realtimediv").css("visibility","hidden");
-
-  self.msg = "default message";
-  self.connectPublic = function () {
-	  var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-	  var stompClient = Stomp.over(socket);
-	    stompClient.connect({}, function (frame) {
-	        console.log('Connected: ' + frame);
-	        publicSubscription = stompClient.subscribe('/topic/downloads', function (download) {
-	            console.log(JSON.parse(download.body));
-	        });
-	    });
-	};
-	
-	self.connectPrivate = function () {
-            var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (download) {
-                    console.log(JSON.parse(download.body));
-                });
-            });
-        };
-	
-	self.send = function(){
-		stompClient.send("/app/hello", {}, "ciao");
-				
-	};
-	
-	
-	self.disconnectPublic = function(){
-		if(publicSubscription != null){
-			publicSubscription.unsubscribe();
-			publicSubscription = null;
-		}
-	};
-	
-	self.disconnectPrivate = function(){
-		if(privateSubscription != null){
-			privateSubscription.unsubscribe();
-			privateSubscription = null;
-		}
-	};
 	
 })
 
@@ -196,13 +149,11 @@ angular.module('myApp', [
           var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
           var stompClient = Stomp.over(socket);
           stompClient.connect({}, function (frame) {
-              console.log("connetto");
               $rootScope.$apply(function(){$rootScope.socketConnected = true;});
               //
               if($rootScope.user.authenticated) {
                   $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
                       var download = JSON.parse(packet.body).payload;
-                      console.log("CHIAMO CALLBACK USER");
                       if ($rootScope.websocketCallbackUser !== undefined) $rootScope.websocketCallbackUser(download);
                   });
               }
@@ -270,6 +221,7 @@ angular.module('myApp', [
           self.logout = function() {
             $http.post('http://localhost:8080/connectionProfiler/logout', {}).finally(function() {
               $rootScope.authenticated = false;
+                disconnect();
               $location.path("/");
             });
           }

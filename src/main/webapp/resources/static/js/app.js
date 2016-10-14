@@ -49,17 +49,14 @@ angular.module('myApp', [
 }])
 
 .controller('home', function($rootScope, $http) {
-
-        $("#timeManager").css("visibility","hidden");
-        $("#realtimediv").css("visibility","hidden");
+	$rootScope.enableChangeView = false;
 	
 })
 
 .controller('navigation',  function($rootScope, $http, $location, $route, $routeParams, PUBLIC_PAGES, $scope) {
 
 
-        $("#timeManager").css("visibility","hidden");
-        $("#realtimediv").css("visibility","hidden");
+	$rootScope.enableChangeView = false;
 
           var self = this;
           $rootScope.user = {};
@@ -239,16 +236,11 @@ angular.module('myApp', [
         	  }
         	  
         	  	console.info(pagePrefix, PUBLIC_PAGES);
-        	  	if(PUBLIC_PAGES.indexOf(pagePrefix) >= 0){
-        	  		$rootScope.enableChangeView = false;
-        	  	}else{
-        	  		$rootScope.enableChangeView = true;
-        	  	}
+        	  	
         	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf(pagePrefix) < 0) {
         	    	event.preventDefault();
         	        $rootScope.$evalAsync(function() {
         	        	$location.path("/login");
-        	        	$rootScope.enableChangeView = false;
         	        });
         	    	
         	    }
@@ -259,9 +251,11 @@ angular.module('myApp', [
 
 .controller('register',
 		function($rootScope, $http, $location) {
+	$rootScope.enableChangeView = false;
+	
 		        var self = this;
 		self.user = {};
-		self.user.username = "pippo";
+		self.user.username = "";
 		self.user.password = "";
 		var createUser = function(user) { 
 			console.log(self.user);
@@ -283,6 +277,7 @@ angular.module('myApp', [
 )
 .controller('confirmRegistration',
 		function($rootScope, $http, $location) {
+	$rootScope.enableChangeView = false;
 		var self = this;
 		self.token = "";
 		var sendToken = function(token) { 

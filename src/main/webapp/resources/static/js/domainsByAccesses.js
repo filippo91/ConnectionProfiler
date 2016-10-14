@@ -11,6 +11,9 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
     .controller('domainsByAccesses', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope) {
 
+    	
+    	$rootScope.enableChangeView = true;
+    	
         $scope.trigger = {arrived:false};
         $scope.domainList = domainsDownloadFactory.getDomainsAccessData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);
 

@@ -11,11 +11,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
 .controller('speedHistogram',['$route', '$routeParams', 'speedFactory', '$scope', '$rootScope', function($route, $routeParams, speedFactory, $scope, $rootScope) {
 
+	$rootScope.enableChangeView = true;
+	
         $scope.trigger = {arrived: false, count : 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
-
-        $("#" + $routeParams.view + "Btn").addClass("active");
-        $("#timeManager").css("visibility","visible");
-        $("#realtimediv").css('visibility', 'visible');
 
         console.log(" AUTH: " + $rootScope.authenticated);
         if($rootScope.authenticated) {

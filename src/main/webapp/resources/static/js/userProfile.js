@@ -10,7 +10,8 @@ angular.module('myApp.userProfile', ['ngRoute', 'ngResource'])
   });
 }])
 
-.controller('userProfile', ['quotesFactory', function(quotesFactory){
+.controller('userProfile', ['quotesFactory', '$rootScope', function(quotesFactory, $rootScope){
+	$rootScope.enableChangeView = false;
 	console.info("loading controller user profile");
 	var self = this;
 	self.test = "hi there!";

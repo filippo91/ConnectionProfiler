@@ -10,9 +10,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
     }])
     .controller('speedGraph', ['$route', '$routeParams', '$scope', 'speedGraph_downloadManager', '$rootScope', function($route, $routeParams, $scope, downloadManager,$rootScope) {
 
+    	$rootScope.enableChangeView = true;
+    	
         $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
-        $("#timeManager").css("visibility","visible");
-        $("#realtimediv").css('visibility', 'visible');
 
         function updateRootScopeCallback(data, t){
             if(t) {

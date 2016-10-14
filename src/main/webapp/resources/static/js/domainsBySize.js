@@ -11,10 +11,8 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
 .controller('domainsBySize', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope ) {
 
-        $("#timeManager").css('visibility', 'visible');
-        $("#realtimediv").css('visibility', 'visible');
-        $("#" + $routeParams.view + "Btn").addClass("active");
-
+	$rootScope.enableChangeView = true;
+	
         $scope.trigger = {arrived:false, newData: undefined};
         
         $scope.domainSizeList = domainsDownloadFactory.getDomainsSizeData($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger);

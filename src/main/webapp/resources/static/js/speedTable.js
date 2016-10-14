@@ -12,6 +12,8 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
 
 .controller('speedTable', ['$route', '$routeParams', 'speedTable_downloadManager', '$rootScope', '$scope', function($route, $routeParams, downloadManager, $rootScope, $scope) {
 
+	$rootScope.enableChangeView = false;
+	
         $scope.downloadList = downloadManager.getDownloads($routeParams.page,$routeParams.size);
         $scope.nRecords = $routeParams.page * $routeParams.size;
         $scope.succDownload = function() {

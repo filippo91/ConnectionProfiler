@@ -11,9 +11,8 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
 
     .controller('latency', ['$route', '$routeParams', 'latencyFactory', '$scope', '$rootScope', function($route, $routeParams, latencyFactory, $scope, $rootScope) {
 
-        $("#timeManager").css('visibility', 'visible');
-        $("#realtimediv").css('visibility', 'visible');
-
+    	$rootScope.enableChangeView = true;
+    	
         $scope.trigger = {arrived: false, newData : undefined};
         $scope.latencyData = [];
         $("#" + $routeParams.view + "BtnDBA").addClass("active");

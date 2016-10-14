@@ -13,9 +13,6 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
         $scope.trigger = {arrived: false, count : 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined};
 
-        $("#" + $routeParams.view + "Btn").addClass("active");
-        $("#timeManager").show();
-
         $scope.speedDataUser = speedFactory.getSpeedDataUser($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
         $scope.speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
 

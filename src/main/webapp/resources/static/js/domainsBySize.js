@@ -44,6 +44,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                     var color = d3.scale.category20();
 
+                    var f =  d3.format(".2s");
                     var arc = d3.svg.arc()
                         .outerRadius(radius - 10)
                         .innerRadius(120);
@@ -82,6 +83,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                         
                         var data =  scope.domainSizeList;
 
+                        var tot = d3.sum(data, function(d){return d.size;});
                         //no data found icon
                         if(data === undefined || data.length === 0){
                             svg.append('defs')
@@ -156,7 +158,8 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             div.transition()
                                 .duration(200)
                                 .style("opacity", .9);
-                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br><i>Size: </i><b>" + d3.select(this).data()[0].value + "</b>")
+                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br><i>Size: </i><b>" + f(d3.select(this).data()[0].value) +
+                                        " bit ("+ Number(((d3.select(this).data()[0].value / tot) * 100).toFixed(1)) + "%)</b>")
                                 .style("left", (x) + "px")
                                 .style("top", (y - 28)  + "px");
                         });

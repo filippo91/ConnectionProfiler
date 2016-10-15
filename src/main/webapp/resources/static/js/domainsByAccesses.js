@@ -125,6 +125,8 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                         svg.selectAll("path").remove();
                         
                         var data =  scope.domainList;
+                        var tot = d3.sum(data,function(d){return d.nRecords;});
+
                         if(data === undefined || data.length === 0){
                             svg.append('defs')
                                 .append('pattern')
@@ -198,7 +200,9 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                             div.transition()
                                 .duration(200)
                                 .style("opacity", .9);
-                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br><i>Accesses: </i><b>" + d3.select(this).data()[0].value + "</b>")
+                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br>" +
+                                "<i>Accesses: </i><b>" + d3.select(this).data()[0].value +
+                                " ("+ Number(((d3.select(this).data()[0].value / tot) * 100).toFixed(1)) + "%)</b>")
                                 .style("left", (x) + "px")
                                 .style("top", (y - 28)  + "px");
                         });

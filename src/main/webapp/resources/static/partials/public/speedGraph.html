@@ -1,31 +1,35 @@
-<div class="container">
-        <div class="btn-group row" id="btnDiv">
-            <div class="btn-group">
-                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="btn btn-default dropdown-toggle" >
-                    Public Asnames <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li ><a id="public-showAll" ng-click="showAllAsname('public');"
-                            ng-class="authenticated ? 'btn btn-default' : 'btn btn-default active'">
-                        {{authenticated ? 'Show All' : 'Hide All'}}</a></li>
-                    <li ng-repeat="ele in publicDownloadList" id="public-graph-asname-{{ele.asname}}">
-                        <a ng-class="authenticated ? 'btn btn-default public-asnameButton' : 'btn btn-default active public-asnameButton'"
-                           id="public-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'public')">{{ele.asname}}</a>
-                    </li>
-                </ul>
-            </div>
-            <div class="btn-group" ng-if="authenticated">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    User Asnames <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a></li>
-                    <li ng-repeat="ele in userDownloadList" id="user-graph-asname-{{ele.asname}}">
-                        <a class="btn btn-default active user-asnameButton" id="user-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'user')">{{ele.asname}}</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
+<div class="col-md-3 col-md-offset-1" >
+<uib-tabset active="activePill" >
+    <uib-tab index="0" heading="Info">
+    <div ng-controller="speedGraphPlotInfoController as ctrl">
+		<plot-info plot="ctrl.plotInfo"></plot-info>
+		</div>
+	</uib-tab>
+    <uib-tab index="1" heading="Your Providers">
+    	<div ng-controller="speedGraph" class="providers pre-scrollable">
+			<ul>
+	                    <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a></li>
+	                    <li ng-repeat="ele in userDownloadList" id="user-graph-asname-{{ele.asname}}">
+	                        <a class="btn btn-default active user-asnameButton" id="user-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'user')">{{ele.asname}}</a>
+	                    </li>
+	       </ul>
+       </div>
+    </uib-tab>
+    <uib-tab index="2" heading="Providers" >
+    	<div ng-controller="speedGraph" class="providers pre-scrollable">
+			<ul>
+	        	<li ><a id="public-showAll" ng-click="showAllAsname('public');"
+	                            ng-class="authenticated ? 'btn btn-default' : 'btn btn-default active'">
+	                        {{authenticated ? 'Show All' : 'Hide All'}}</a></li>
+	            <li ng-repeat="ele in publicDownloadList" id="public-graph-asname-{{ele.asname}}">
+	                        <a ng-class="authenticated ? 'btn btn-default public-asnameButton' : 'btn btn-default active public-asnameButton'"
+	                           id="public-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'public')">{{ele.asname}}</a>
+	                    </li>
+	    	</ul>
+    	</div>
+    </uib-tab>
+</uib-tabset>
+</div>
+<div class="col-md-8">
     <download-speed-temporal-graph class="row"></download-speed-temporal-graph>
 </div>

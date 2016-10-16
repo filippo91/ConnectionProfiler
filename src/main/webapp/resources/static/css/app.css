@@ -76,3 +76,16 @@ rect.pane {
 .btn-group.changeView {
 	padding: 0px;
 }
+
+.row { 
+	margin-top:10px; 
+}
+
+#change-view-bar div{
+	padding: 5px;
+}
+
+div.providers{
+	overflow-x: hidden;
+	min-height: 400px;
+}

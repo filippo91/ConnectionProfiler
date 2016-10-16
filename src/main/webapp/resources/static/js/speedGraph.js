@@ -190,7 +190,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
                     var margin = {top: 10, right: 10, bottom: 100, left: 50},
                         margin2 = {top: 430, right: 10, bottom: 20, left: 0},
-                        width = 960 - margin.left - margin.right,
+                        width = 700 - margin.left - margin.right,
                         height = 500 - margin.top - margin.bottom,
                         height2 = 500 - margin2.top - margin2.bottom;
 
@@ -577,4 +577,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 });
             }
         }
-    });
+    })
+    .controller('speedGraphPlotInfoController', ['plotsInfoService', function(plotsInfoService){
+	var self = this;
+	
+	self.plotInfo = plotsInfoService.getInfo('speedGraph');
+}]);

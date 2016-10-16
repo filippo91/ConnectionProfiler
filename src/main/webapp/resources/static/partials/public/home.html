@@ -7,13 +7,13 @@
             <p>Profile your Internet connection quality and check it out what provider offers the best service.
                It requires few clicks to get started! 
             </p>
-            <a href="#about" class="btn btn-primary btn-xl page-scroll">Find Out More</a>
+            <a href="https://github.com/filippo91/ConnectionProfiler" class="btn btn-primary btn-xl page-scroll" target="_blank">Source Code</a>
         </div>
     </div>
 </header>
 
 <!-- START THE FEATURETTES -->
-<div class="container">
+<div class="container" ng-controller="navigation as nav">
 <hr>
 
 <div class="container">
@@ -29,7 +29,7 @@
                     commodo.</p>
             </div>
             <div class="row">
-                <button class="btn btn-primary">See Graph 1</button>
+                <a class="btn btn-primary" href="#!/speedGraph/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Go to the graph!</a>
             </div>
         </div>
         <div class="col-md-5">
@@ -59,7 +59,7 @@
                     tellus ac cursus commodo.</p>
             </div>
             <div class="row">
-                <button class="btn btn-primary">See Graph 2</button>
+                <a href="#!/speedHistogram/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}/{{ nav.speedHistogramBin.width }}" class="btn btn-primary" > Check it out! </a>
             </div>
         </div>
 
@@ -67,4 +67,26 @@
 </div>
 
 <hr>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="row">
+                <h2>Install the proxy and get started! <span
+                        class="text-muted">Let's go.</span></h2>
+                <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis
+                    euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus,
+                    tellus ac cursus commodo.</p>
+            </div>
+            <div class="row">
+                <a href="" class="btn btn-primary">Proxy</a>
+            </div>
+        </div>
+		<div class="col-md-5">
+            <img src="img/slide4.jpg"
+                 alt="Generic placeholder image" height="200">
+        </div>
+    </div>
+</div>
+
 </div>

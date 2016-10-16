@@ -1,3 +1,10 @@
-<div class="container">
+<div class="col-md-3 col-md-offset-1" ng-controller="latencyPlotInfoController as ctrl">
+<uib-tabset active="activePill">
+    <uib-tab index="0" heading="Info">
+		<plot-info plot="ctrl.plotInfo"></plot-info>
+	</uib-tab>
+</uib-tabset>
+</div>
+<div class="col-md-8">
 <latency-histogram id = "latency-histogram" class="graph row"></latency-histogram>
 </div>

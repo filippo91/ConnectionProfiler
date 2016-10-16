@@ -1,3 +1,10 @@
-<div class="container">
+<div class="col-md-3 col-md-offset-1" ng-controller="accessPlotInfoController as ctrl">
+<uib-tabset active="activePill">
+    <uib-tab index="0" heading="Info">
+		<plot-info plot="ctrl.plotInfo"></plot-info>
+	</uib-tab>
+</uib-tabset>
+</div>
+<div class="col-md-8">
 <access-pie id = "access-pie1" class="graph"></access-pie>
 </div>

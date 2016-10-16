@@ -147,7 +147,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 d3Service.d3().then(function(d3){
 
                     var margin = {top: 10, right: 30, bottom: 30, left: 30},
-                        real_width = 960, real_height = 500,
+                        real_width = 700, real_height = 500,
                         width = real_width - margin.left - margin.right,
                         height = real_height - margin.top - margin.bottom,
                         radius = Math.min(width, height) / 2;

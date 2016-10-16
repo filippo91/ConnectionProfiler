@@ -82,7 +82,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
             link: function(scope,element){
                 d3Service.d3().then(function(d3){
 
-                    var width = 960,
+                    var width = 700,
                         height = 500,
                         radius = Math.min(width, height) / 2;
 

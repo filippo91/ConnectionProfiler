@@ -125,10 +125,10 @@
 						aria-hidden="true"></span> realtime
 				</button>
 			</div>
-			<div ng-if="nav.binSelector != null" class="col-md-3">
+			<div ng-if="nav.binSelector != null" class="col-md-3 col-md-offset-5">
 				<input id="btn-bin-minus" type="button" class="btn btn-default" value="-" ng-click="nav.changeBinSize($event)">
 				<input id="btn-bin-plus" type="button" class="btn btn-default" value="+" ng-click="nav.changeBinSize($event)">
-				<span> {{ nav.binSelector.width }} </span>
+				<span>Bin width: {{ nav.binSelector.width }}</span>
 			</div>
 		</div>
 		

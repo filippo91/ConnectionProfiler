@@ -1,37 +1,24 @@
-<div class="col-md-3 col-md-offset-1" ng-controller="speedHistogramPlotInfoController as ctrl">
-<uib-tabset active="activePill">
-    <uib-tab index="0" heading="Info">
-		<plot-info plot="ctrl.plotInfo"></plot-info>
-	</uib-tab>
-    <uib-tab index="1" heading="Your Providers">
-		<div class="checkbox">
-	      <label>
-	        <input type="checkbox"> Provider 1
-	      </label>
-	    </div>
-	    <div class="checkbox">
-	      <label>
-	        <input type="checkbox"> Provider 2
-	      </label>
-   	 	</div>
-    </uib-tab>
-    <uib-tab index="2" heading="Providers">
-		
-    </uib-tab>
-</uib-tabset>
+<div class="col-md-3 col-md-offset-1"
+	ng-controller="speedHistogramPlotInfoController as ctrl">
+	<uib-tabset active="activePill"> <uib-tab index="0"
+		heading="Info"> <plot-info plot="ctrl.plotInfo"></plot-info>
+	</uib-tab> <uib-tab index="1" heading="Providers">
+	<div class="btn-group row " id="btnDivHist"
+		ng-controller="speedHistogram">
+		<div class="btn-group" ng-if="authenticated">
+			<button type="button" class="btn btn-default active"
+				ng-click="switchView('user')" id="button-view-user">User
+				providers</button>
+		</div>
+		<div class="btn-group" ng-if="authenticated">
+			<button type="button" class="btn btn-default"
+				ng-click="switchView('public')" id="button-view-public">
+				Public providers</button>
+		</div>
+	</div>
+	</uib-tab> </uib-tabset>
 </div>
 <div class="col-md-8">
-    <div class="btn-group row " id="btnDivHist">
-        <div class="btn-group" ng-if="authenticated">
-            <button type="button" class="btn btn-default active" ng-click="switchView('user')" id="button-view-user">
-                User providers
-            </button>
-        </div>
-        <div class="btn-group" ng-if="authenticated">
-            <button type="button" class="btn btn-default" ng-click="switchView('public')" id="button-view-public">
-               Public providers
-            </button>
-        </div>
-    </div>
-    <speed-histogram class="row"></speed-histogram>
-    </div>
+
+	<speed-histogram class="row"></speed-histogram>
+</div>

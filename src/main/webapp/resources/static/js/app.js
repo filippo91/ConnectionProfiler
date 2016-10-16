@@ -465,4 +465,79 @@ angular.module('myApp', [
             });
             return ret.sort(function(a,b){ return parseInt(a) > parseInt(b);});
         };
+    })
+    
+    .directive('plotInfo', function(){
+    	return {
+    		restrict: 'E',
+    		templateUrl: 'partials/restricted/plotInfo/plotInfo.html',
+    		scope: {
+    			plot: '='
+    		}
+    	}
+    })
+    .factory('plotsInfoService', function(){
+    	var plotsInfo = {};
+    	var db = {
+    			domainsBySize: {
+    				name: "domainsBySize Pie Chart",
+    				description: "Nam quis erat eget quam consectetur dictum non in mi. " +
+    						"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+    						"Sed ut ultricies purus. ",
+    				hint: "Nam quis erat eget quam consectetur dictum non in mi. " +
+					"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+					"Sed ut ultricies purus. "
+    			},
+    			domainsByAccess: {
+    				name: "domainsByAccess",
+    				description: "Nam quis erat eget quam consectetur dictum non in mi. " +
+    						"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+    						"Sed ut ultricies purus. ",
+    				hint: "Nam quis erat eget quam consectetur dictum non in mi. " +
+					"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+					"Sed ut ultricies purus. "
+    			},
+    			speedGraph: {
+    				name: "speedGraph",
+    				description: "Nam quis erat eget quam consectetur dictum non in mi. " +
+    						"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+    						"Sed ut ultricies purus. ",
+    				hint: "Nam quis erat eget quam consectetur dictum non in mi. " +
+					"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+					"Sed ut ultricies purus. "
+    			},
+    			speedTable: {
+    				name: "speedTable",
+    				description: "Nam quis erat eget quam consectetur dictum non in mi. " +
+    						"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+    						"Sed ut ultricies purus. ",
+    				hint: "Nam quis erat eget quam consectetur dictum non in mi. " +
+					"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+					"Sed ut ultricies purus. "
+    			},
+    			speedHistogram: {
+    				name: "speedHistogram",
+    				description: "Nam quis erat eget quam consectetur dictum non in mi. " +
+    						"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+    						"Sed ut ultricies purus. ",
+    				hint: "Nam quis erat eget quam consectetur dictum non in mi. " +
+					"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+					"Sed ut ultricies purus. "
+    			},
+    			latency: {
+    				name: "latency",
+    				description: "Nam quis erat eget quam consectetur dictum non in mi. " +
+    						"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+    						"Sed ut ultricies purus. ",
+    				hint: "Nam quis erat eget quam consectetur dictum non in mi. " +
+					"In porttitor purus luctus pretium dapibus. Sed scelerisque et lorem at interdum. " +
+					"Sed ut ultricies purus. "
+    			}
+    	};
+    	
+    	plotsInfo.getInfo = function(plotName){
+    		return db[plotName];
+    	};
+    	
+    	return plotsInfo;
     });

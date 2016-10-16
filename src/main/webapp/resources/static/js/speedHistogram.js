@@ -382,4 +382,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 });
             }
         }
-    });
+    })
+    .controller('speedHistogramPlotInfoController', ['plotsInfoService', function(plotsInfoService){
+    	self = this;
+    	
+    	self.plotInfo = plotsInfoService.getInfo('speedHistogram');
+    }]);

@@ -1,4 +1,7 @@
- <div class="container">
+<div class="col-md-2 col-md-offset-1" ng-controller="speedHistogramPlotInfoController as ctrl">
+<plot-info plot="ctrl.plotInfo"></plot-info>
+</div>
+<div class="col-md-9">
     <div class="btn-group row " id="btnDivHist">
         <div class="btn-group" ng-if="authenticated">
             <button type="button" class="btn btn-default active" ng-click="switchView('user')" id="button-view-user">

@@ -238,4 +238,9 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                 });
             }
         }
-});
+})
+.controller('accessPlotInfoController', ['plotsInfoService', function(plotsInfoService){
+	self = this;
+	
+	self.plotInfo = plotsInfoService.getInfo('domainsByAccess');
+}]);

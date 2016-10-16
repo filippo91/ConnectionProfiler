@@ -1,4 +1,7 @@
-<div class="container">
+<div class="col-md-2 col-md-offset-1" ng-controller="speedTablePlotInfoController as ctrl">
+<plot-info plot="ctrl.plotInfo"></plot-info>
+</div>
+<div class="col-md-9">
 <button class="btn btn-default" ng-click="prevDownload()">-</button>
 <button class="btn btn-default" ng-click="succDownload()">+</button>
 <table class="table table-striped graph" style="position: relative; top: 40px;" id="download-table">

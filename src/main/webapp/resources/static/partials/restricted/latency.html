@@ -1,3 +1,6 @@
-<div class="container">
+<div class="col-md-2 col-md-offset-1" ng-controller="latencyPlotInfoController as ctrl">
+<plot-info plot="ctrl.plotInfo"></plot-info>
+</div>
+<div class="col-md-9">
 <latency-histogram id = "latency-histogram" class="graph row"></latency-histogram>
 </div>

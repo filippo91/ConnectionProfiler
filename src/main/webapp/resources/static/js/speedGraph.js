@@ -559,4 +559,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 });
             }
         }
-    });
+    })
+    .controller('speedGraphPlotInfoController', ['plotsInfoService', function(plotsInfoService){
+	self = this;
+	
+	self.plotInfo = plotsInfoService.getInfo('speedGraph');
+}]);

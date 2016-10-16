@@ -307,4 +307,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             });
         }
     }
-});
+})
+.controller('latencyPlotInfoController', ['plotsInfoService', function(plotsInfoService){
+	self = this;
+	
+	self.plotInfo = plotsInfoService.getInfo('latency');
+}]);

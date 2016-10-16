@@ -10,7 +10,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 }])
 
 .controller('domainsBySize', ['$route', '$routeParams', '$scope', 'domainsDownloadFactory', '$rootScope', function($route, $routeParams, $scope, domainsDownloadFactory, $rootScope ) {
-
+	
 	$rootScope.enableChangeView = true;
 	
         $scope.trigger = {arrived:false, newData: undefined};
@@ -195,4 +195,9 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                 });
             }
         }
-    });
+    })
+    .controller('plotInfoController', ['plotsInfoService', function(plotsInfoService){
+    	self = this;
+    	
+    	self.plotInfo = plotsInfoService.getInfo('domainsBySize');
+    }]);

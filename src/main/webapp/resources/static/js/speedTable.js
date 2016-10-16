@@ -89,4 +89,9 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
             if (parseInt(d) > 1000) return "" + parseInt(parseInt(d) / 1000) + " Kbps";
             return "" + d;
         };
-});
+})
+.controller('speedTablePlotInfoController', ['plotsInfoService', function(plotsInfoService){
+	self = this;
+	
+	self.plotInfo = plotsInfoService.getInfo('speedTable');
+}]);

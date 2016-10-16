@@ -193,7 +193,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
                         //Tooltip
                         var pane = $('.arc');
-                        var offset = pane.offset();
+                        var offset = pane.parent().parent().offset();
                         pane.mousemove(function(e){
                             var x = e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
                             pane.css('cursor', 'pointer');
@@ -240,7 +240,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
         }
 })
 .controller('accessPlotInfoController', ['plotsInfoService', function(plotsInfoService){
-	self = this;
+	var self = this;
 	
 	self.plotInfo = plotsInfoService.getInfo('domainsByAccess');
 }]);

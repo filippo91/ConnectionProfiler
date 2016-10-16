@@ -252,7 +252,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         .text(function(d) { return d; });
 
                     var tmp = $(".bar");
-                    var offset = tmp.offset();
+                    var offset = tmp.parent().parent().parent().offset();
                     tmp.mousemove(function(e){
                         var x = e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
                         tmp.css('cursor', 'pointer');
@@ -263,7 +263,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                             d3.select(this).data()[0].nRecords + " (" +
                             f((d3.select(this).data()[0].nRecords / tot)*100) + "%)</b>")
                             .style("left", (x) + "px")
-                            .style("top", (y - 28)  + "px");
+                            .style("top", (y - 18)  + "px");
                     })
                         .mouseleave(function(){
                             div.transition()
@@ -309,7 +309,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
     }
 })
 .controller('latencyPlotInfoController', ['plotsInfoService', function(plotsInfoService){
-	self = this;
+	var self = this;
 	
 	self.plotInfo = plotsInfoService.getInfo('latency');
 }]);

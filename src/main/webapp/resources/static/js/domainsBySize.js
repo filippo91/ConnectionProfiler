@@ -151,9 +151,10 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                         //Tooltip
                         var pane = $('.arc');
-                        var offset = pane.offset();
+                        var offset = pane.parent().parent().offset();
                         pane.mousemove(function(e){
                             var x = e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
+
                             pane.css('cursor', 'pointer');
                             div.transition()
                                 .duration(200)
@@ -197,7 +198,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
         }
     })
     .controller('plotInfoController', ['plotsInfoService', function(plotsInfoService){
-    	self = this;
+    	var self = this;
     	
     	self.plotInfo = plotsInfoService.getInfo('domainsBySize');
     }]);

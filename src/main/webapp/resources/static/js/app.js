@@ -65,11 +65,13 @@ angular.module('myApp', [
           self.speedTableParams.pageSize = 10;
           
           // ///////////////
-          
-          $rootScope.rowUserDownloadList =[];
-          $rootScope.rowPublicDownloadList =[];
+
+          $rootScope.userSpeedData =[];
+          $rootScope.publicSpeedData =[];
+          $rootScope.maxViewValue = undefined;
+          $rootScope.minViewValue = undefined;
           $rootScope.enableChangeView = false;
-          
+
           $rootScope.currentDate = moment();
           
           /**
@@ -110,29 +112,28 @@ angular.module('myApp', [
               console.log($rootScope.currentDate.format("YYYY MM DD"));
               $route.updateParams({year : $rootScope.currentDate.year(), month : $rootScope.currentDate.month(), day : $rootScope.currentDate.date(), view : $routeParams.view});
           };
+
+        $rootScope.getCurrentExtentDate = function(){
+            var curDate_end = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
+            var curDate_start = moment(curDate_end);
+            switch ($routeParams.view) {
+                case "week":    curDate_start.subtract(7, "days");      break;
+                case "month":   curDate_start.subtract(1, "months");    break;
+                case "months":  curDate_start.subtract(3, "months");    break;
+            }
+            return [curDate_start, curDate_end];
+        };
       $rootScope.isRelevant = function (download) {
           var time = moment(download.timestamp);
-          var curDate_end = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-
-          var curDate_start = moment(curDate_end);
-
-          switch ($routeParams.view) {
-              case "week":
-                  curDate_start.subtract(7, "days");
-                  break;
-              case "month":
-                  curDate_start.subtract(1, "months");
-                  break;
-              case "months":
-                  curDate_start.subtract(3, "months");
-                  break;
-          }
+          var extent = $rootScope.getCurrentExtentDate();
+          var curDate_end = extent[1];
+          var curDate_start = extent[0];
           console.log(time.format('YYYY MM DD') +  " è prima di " + curDate_end.format('YYYY MM DD') + " dopo " + curDate_start.format('YYYY MM DD'));
           var ret = (time.isBefore(curDate_end) && curDate_start.isBefore(time));
           console.log(ret);
           return ret;
       };
-      
+
 
           // //////////////
       $rootScope.socketConnected = false;

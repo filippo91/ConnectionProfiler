@@ -207,15 +207,15 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(speedFormat);
 
                     var brush = d3.svg.brush().x(x2).on("brush", brushed);
-
+/*
                     var area = d3.svg.area()
                         .interpolate("monotone")
                         //.interpolate("linear ")
                         .x(function (d) {return x(d.timestamp);})
                         .y0(height)
                         .y1(function (d) {return y(d.speed);});
-
-                    var area2 = d3.svg.area()
+*/
+                    var area = d3.svg.area()
                         .interpolate("monotone")
                         //.interpolate("linear ")
                         .x(function (d) {return x2(d.timestamp);})
@@ -392,9 +392,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         updateTooltipListener();
 
                         context.append("path")
-                            .datum(allDownloadList)
+                            .datum(allDownloadList.sort(function(a,b){return a.timestamp - b.timestamp;}))
                             .attr("class", "area")
-                            .attr("d", area2);
+                            .attr("d", area);
 
                         context.append("g")
                             .attr("class", "x axis")
@@ -430,8 +430,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
                         console.log($rootScope.getCurrentExtentDate().map(function(d){return d.valueOf();}));
                         console.log($rootScope.getCurrentExtentDate());
-                        brush.extent($rootScope.getCurrentExtentDate().map(function(d){return d.valueOf();}));//[new Date(d3.min(valueList_x)), new Date(d3.max(valueList_x))]);
 
+                        if($rootScope.lastExtent != undefined) {
+                            brush.extent($rootScope.lastExtent);
+                            brush(d3.select(".brush"));
+                            brush.event(d3.select(".brush"));
+                        }
+
+                        brush.extent($rootScope.getCurrentExtentDate().map(function(d){return d.valueOf();}));
                         brush(d3.select(".brush").transition());
                         brush.event(d3.select(".brush").transition());
 

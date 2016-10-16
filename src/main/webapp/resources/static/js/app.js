@@ -60,6 +60,11 @@ angular.module('myApp', [
 		/* Global variable holding user details */ 
 		$rootScope.user = {};
 	
+		/* Global variable to redirect the user after authentication */
+		if($rootScope.previousLocation === undefined){
+			$rootScope.previousLocation = '/';
+		}
+		
 		/* Instance variables */
 		
 		var self = this;
@@ -195,11 +200,10 @@ angular.module('myApp', [
       	  }else{
       		  pagePrefix = thisPageUrlSplitted[0];
       	  }
-      	  
-      	  	console.info(pagePrefix, PUBLIC_PAGES);
       	  	
       	    if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf(pagePrefix) < 0) {
       	    	event.preventDefault();
+      	    	$rootScope.previousLocation = $location.path();
       	        $rootScope.$evalAsync(function() {
       	        	$location.path("/login");
       	        });
@@ -386,13 +390,17 @@ angular.module('myApp', [
           self.login = function() {
         	  console.log(self.credentials);
             authenticate(self.credentials, function() {
+            	console.info($rootScope.previousLocation);
               if ($rootScope.authenticated) {
-                $location.path("/");
+
+                $location.path($rootScope.previousLocation);
+                $rootScope.previousLocation = '/';
                 self.error = false;
               } else {
                 $location.path("/login");
                 self.error = true;
               }
+              console.info($location.path);
             });
           };
           self.logout = function() {

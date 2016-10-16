@@ -143,7 +143,6 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var binWidth = $routeParams.bin_width;
 
                     if(values === undefined || values.length === 0){
-                        svg.attr("transform", "translate(" + real_width / 2 + "," + real_height / 2 + ")");
                         svg.append('defs')
                             .append('pattern')
                             .attr('id', 'diagonalHatch')
@@ -159,11 +158,16 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                             .attr('height', 10)
                             .attr('opacity', 0.1);
 
-                        svg.append("circle")
-                            .attr("r", radius)
+                        svg.append("rect")
+                            .attr("x", 0)
+                            .attr("y", 0)
+                            .attr("width", real_width)
+                            .attr("height", real_height)
                             .attr('fill', 'url(#diagonalHatch)');
 
                         svg.append("text")
+                            .attr("x", real_width / 2)
+                            .attr("y", real_height / 2)
                             .style("text-anchor", "middle")
                             .style("font-family", "sans-serif")
                             .style("font-size", "20px")

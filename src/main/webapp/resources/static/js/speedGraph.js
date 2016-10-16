@@ -453,6 +453,12 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             var offset = $(this).parent().offset();
                             var x = e.pageX - parseInt(offset.left) - margin.left, y = e.pageY - parseInt(offset.top) - margin.top;//e.pageX, y = e.pageY;//parseInt(offset.left), y = parseInt(offset.top);//e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
 
+
+                            console.log("parent off: " + offset.left);
+                            console.log("parent parent off: " + $(this).parent().offset().left);
+                            console.log("pane parent off: " + pane.parent().offset().left);
+                            console.log("pane off: " + pane.offset().left);
+
                             //console.log("x: " + x + ", y: " + y);
                             var elements = $('.point').filter("[isvisible='true']").map(function () {
                                 var $this = $(this);
@@ -479,8 +485,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .duration(200)
                                 .style("opacity", .9);
                             div.html(speedFormat(ds) + "<br/><i>" + ts + "</i>")
-                                .style("left", (e.pageX) + "px")
-                                .style("top", (e.pageY - 28) + "px");
+                                .style("left", x + "px")
+                                .style("top", (y - 9) + "px");
                         });
                     }
                     function updateGraph(newDownloadList, type, asname){

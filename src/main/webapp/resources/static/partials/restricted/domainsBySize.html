@@ -1,6 +1,10 @@
-<div class="col-md-2 col-md-offset-1" ng-controller="plotInfoController as ctrl">
-<plot-info plot="ctrl.plotInfo"></plot-info>
+<div class="col-md-3 col-md-offset-1" ng-controller="plotInfoController as ctrl">
+<uib-tabset active="activePill">
+    <uib-tab index="0" heading="Info">
+		<plot-info plot="ctrl.plotInfo"></plot-info>
+	</uib-tab>
+</uib-tabset>
 </div>
-<div class="col-md-9">
+<div class="col-md-8">
 <usage-pie id = "usage-pie1"  class="graph "></usage-pie>
 </div>

@@ -1,6 +1,25 @@
-<div class="col-md-2 col-md-offset-1" ng-controller="latencyPlotInfoController as ctrl">
-<plot-info plot="ctrl.plotInfo"></plot-info>
+<div class="col-md-3 col-md-offset-1" ng-controller="latencyPlotInfoController as ctrl">
+<uib-tabset active="activePill">
+    <uib-tab index="0" heading="Info">
+		<plot-info plot="ctrl.plotInfo"></plot-info>
+	</uib-tab>
+    <uib-tab index="1" heading="Your Providers">
+		<div class="checkbox">
+	      <label>
+	        <input type="checkbox"> Provider 1
+	      </label>
+	    </div>
+	    <div class="checkbox">
+	      <label>
+	        <input type="checkbox"> Provider 2
+	      </label>
+   	 	</div>
+    </uib-tab>
+    <uib-tab index="2" heading="Providers">
+		
+    </uib-tab>
+</uib-tabset>
 </div>
-<div class="col-md-9">
+<div class="col-md-8">
 <latency-histogram id = "latency-histogram" class="graph row"></latency-histogram>
 </div>

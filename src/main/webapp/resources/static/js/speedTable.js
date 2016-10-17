@@ -27,48 +27,10 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
          * Web Socket callbacks
          */
         $rootScope.websocketCallbackUser = function (download) {
-            $scope.downloadList.push(download);
+            $scope.downloadList.unshift(download);
             $scope.$apply();
         };
         $rootScope.websocketCallbackPublic = function(download){};
-/*
-        var privateSubscription = null;
-        var socket = null;
-
-        $scope.connectPrivate = function () {
-            socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
-            var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function (frame) {
-                console.log('Connected: ' + frame);
-                privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
-                    var download =JSON.parse(packet.body).payload;
-                    $scope.downloadList.push(download);//{timestamp : download.timestamp, download_speed : download.download_speed});
-                    console.log("pushato");
-                    $scope.downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                    $scope.$apply();
-                });
-            });
-        };
-
-        $scope.disconnectPrivate = function(){
-            if(privateSubscription != null){
-                privateSubscription.unsubscribe();
-                privateSubscription = null;
-            }
-        };
-        $scope.$on('$destroy',function(){
-            console.log(privateSubscription);
-            if (privateSubscription != null) {
-                privateSubscription.unsubscribe();
-            }
-        });
-
-        function websocketCallback(scope){
-            var download;
-            scope.downloadList.push({timestamp : download.timestamp, download_speed : download.download_speed});
-            downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-        }
-        */
 }])
 .factory('speedTable_downloadManager', ['$resource', function($resource) {
         var serverURI = "http://localhost:8080/connectionProfiler/speedTable/:page/:size";
@@ -84,14 +46,14 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
 }])
 .filter('speedFormat',function(){
         return function(d){
-            if (parseInt(d) > 1000 * 1000 * 1000) return "" + parseInt(parseInt(d) / (1000 * 1000 * 1000)) + " Gbps";
-            if (parseInt(d) > 1000 * 1000) return "" + parseInt(parseInt(d) / (1000 * 1000)) + " Mbps";
-            if (parseInt(d) > 1000) return "" + parseInt(parseInt(d) / 1000) + " Kbps";
+            if (parseInt(d) > 1000 * 1000 * 1000) return "" + parseFloat(parseInt(d) / (1000 * 1000 * 1000)).toFixed(2) + " Gbps";
+            if (parseInt(d) > 1000 * 1000) return "" + parseFloat(parseInt(d) / (1000 * 1000)).toFixed(2) + " Mbps";
+            if (parseInt(d) > 1000) return "" + parseFloat(parseInt(d) / 1000).toFixed(2) + " Kbps";
             return "" + d;
         };
 })
 .controller('speedTablePlotInfoController', ['plotsInfoService', function(plotsInfoService){
-	self = this;
+	var self = this;
 	
 	self.plotInfo = plotsInfoService.getInfo('speedTable');
 }]);

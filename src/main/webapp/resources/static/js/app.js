@@ -319,6 +319,7 @@ angular.module('myApp', [
         $rootScope.maxViewValue = undefined;
         $rootScope.minViewValue = undefined;
         $rootScope.lastExtent = undefined;
+        $rootScope.timeList = [];
         $rootScope.enableChangeView = false;
 
         $rootScope.currentDate = moment();

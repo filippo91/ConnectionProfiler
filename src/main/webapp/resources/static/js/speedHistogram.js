@@ -13,7 +13,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
 	$rootScope.enableChangeView = true;
 	
-        $scope.trigger = {arrived: false, count : 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
+        $scope.trigger = {arrived: false, count : 0, nData : 1, newDataPublic : undefined, newDataUser : undefined};
 
         console.log(" AUTH: " + $rootScope.authenticated);
         if($rootScope.authenticated) {
@@ -21,31 +21,6 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             $scope.speedDataUser = speedFactory.getSpeedDataUser($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
         }
         $scope.speedDataPublic = speedFactory.getSpeedDataPublic($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $routeParams.bin_width, $scope.trigger);
-/*
-        $scope.showAllAsname = function(aType){
-            var ele = $('#'+aType+'-showAll');
-            if(ele.hasClass('active')){
-                $("."+aType+"-asnameButton").removeClass("active");
-                $(".bar-" + aType).fadeTo(500, 0);
-                ele.removeClass("active");
-                ele.text("Show All")
-            }else {
-                $("."+aType+"-asnameButton").addClass("active");
-                $(".bar-" + aType).fadeTo(500, 1);
-                ele.addClass("active");
-                ele.text("Hide All");
-            }
-        };
-        $scope.showAsname = function(asname,aType){
-            var ele = $("#"+aType+"-button-"+asname);
-            if(ele.hasClass("active")){ //hide
-                ele.removeClass("active");
-                $(".bar-" + aType + "-" + asname).fadeTo(500, 0);
-            }else{ //show
-                ele.addClass("active");
-                $(".bar-" + aType + "-" + asname).fadeTo(500, 1);
-            }
-        };*/
 
 
         $scope.switchView = function(type){
@@ -63,18 +38,24 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
          */
         $rootScope.websocketCallbackUser = function (download) {
             if($rootScope.isRelevant(download)) {
+                console.log("entro e aggiorno")
                 speedFactory.updateSpeedData($scope.speedDataUser,download, $routeParams.bin_width);
                 $scope.$apply(function () {
-                    $scope.trigger.newSpeedDataUser = $scope.trigger.newSpeedDataUser !== true;
+                    console.log("trigger new data user: " +  $scope.trigger.newDataUser);
+                    $scope.trigger.newDataUser = $scope.trigger.newDataUser !== true;
                 });
+                $scope.$apply();
             }
         };
         $rootScope.websocketCallbackPublic = function(download){
             if($rootScope.isRelevant(download)) {
+                console.log("entro e aggiorno")
                 speedFactory.updateSpeedData($scope.speedDataPublic,download, $routeParams.bin_width);
                 $scope.$apply(function () {
-                    $scope.trigger.newSpeedDataPublic = $scope.trigger.newSpeedDataPublic !== true;
+                    console.log("trigger new data public: " +  $scope.trigger.newDataPublic);
+                    $scope.trigger.newDataPublic = $scope.trigger.newDataPublic !== true;
                 });
+                $scope.$apply();
             }
         };
 }])
@@ -125,6 +106,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             return ret;
         };
         factory.updateSpeedData = function(speedList, download, bin_width){
+            console.log("userSpeedData: " + JSON.stringify(speedList));
             var index = parseInt(download.download_speed / (bin_width * 1000000));
             var i;
             for( i = 0; i<speedList.length; i++){
@@ -146,13 +128,14 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             link: function(scope,element){
                 d3Service.d3().then(function(d3){
 
-                    var margin = {top: 10, right: 30, bottom: 30, left: 30},
+                    var margin = {top: 10, right: 30, bottom: 50, left: 50},
                         real_width = 700, real_height = 500,
                         width = real_width - margin.left - margin.right,
                         height = real_height - margin.top - margin.bottom,
                         radius = Math.min(width, height) / 2;
 
                     var color = d3.scale.category10();
+                    var f = d3.format(".1f");
 
                     var svg = d3.select(element[0]).append("svg")
                         .attr("width", width + margin.left + margin.right)
@@ -188,10 +171,14 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         svg.selectAll(".loading").remove();
 
                         var valuesUser = undefined;
+                        var totUser;
                         if($rootScope.authenticated) {
                             valuesUser = speedFactory.splitByBin(scope.speedDataUser);
+                            totUser = d3.sum(scope.speedDataUser, function(d){ return d.nRecords;});
                         }
                         var valuesPublic = speedFactory.splitByBin(scope.speedDataPublic);
+                        var totPublic = d3.sum(scope.speedDataPublic, function(d){ return d.nRecords;});
+
                         var asnameList = getAsnameListFilter(scope.speedDataPublic);
 
                         var binWidth = $routeParams.bin_width;
@@ -245,7 +232,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         var bins = [], bar = [], rect = [],text = [];
 
-                        function drawBars(values, type){
+                        function drawBars(values, type, tot){
                             bins[type] = svg.selectAll(".bin-" + type)
                                 .data(values)
                                 .enter().append("g")
@@ -279,7 +266,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             text[type] = bar[type].append("text")
                                 .attr("dy", ".75em")
                                 .attr("x", function(d) {
-                                    return parseInt(x1(d.asname) + x1.rangeBand()) / 2;
+                                    return x1(d.asname) + x1.rangeBand() / 2;
                                 })
                                 .attr("text-anchor", "middle")
                                 .style("fill","white")
@@ -298,16 +285,19 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             }
 
                             var tmp = $(".bar");
-                            var offset = tmp.offset();
+                            var offset = tmp.parent().parent().parent().offset();
                             tmp.mousemove(function(e){
                                 var x = e.pageX - parseInt(offset.left), y = e.pageY - parseInt(offset.top);
                                 tmp.css('cursor', 'pointer');
                                 div.transition()
                                     .duration(200)
                                     .style("opacity", .9);
-                                div.html("<i>Asname: </i><b>" + d3.select(this).data()[0].asname + "</b><br><i>nRecords: </i><b>" + d3.select(this).data()[0].nRecords + "</b>")
+                                div.html(
+                                    "<i>Provider: </i><b>" + d3.select(this).data()[0].asname + "</b><br>" +
+                                    "<i>n: </i><b>" + d3.select(this).data()[0].nRecords + " (" +
+                                    f((d3.select(this).data()[0].nRecords / tot)*100)  +"%)</b>")
                                     .style("left", (x) + "px")
-                                    .style("top", (y - 28)  + "px");
+                                    .style("top", (y - 8)  + "px");
                             })
                                 .mouseleave(function(){
                                     div.transition()
@@ -317,9 +307,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         }
 
                         if($rootScope.authenticated){
-                            drawBars(valuesUser, 'user');
+                            drawBars(valuesUser, 'user', totUser);
                         }
-                        drawBars(valuesPublic, 'public');
+                        drawBars(valuesPublic, 'public', totPublic);
 
                         var legend = svg.selectAll(".legend")
                             .data(asnameList.slice().reverse())
@@ -340,14 +330,26 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
                             .text(function(d) { return d; });
+
                         svg.append("g")
                             .attr("class", "x axis")
                             .attr("transform", "translate(0," + height + ")")
-                            .call(xAxis);
+                            .call(xAxis)
+                            .append("text")
+                            .attr("x", width / 2)
+                            .attr("y", 30)
+                            .attr("dy", ".35em")
+                            .style("text-anchor", "end")
+                            .text("Speeds [bps]");
 
                         svg.append("g")
                             .attr("class", "y axis")
-                            .call(yAxis);
+                            .call(yAxis)
+                            .append("text")
+                            .attr("dy", ".35em")
+                            .style("text-anchor", "end")
+                            .attr("transform", "translate(-40,"+(height/3)+")rotate(-90)")
+                            .text("Numbers of occurrences");
                     };
 
                     scope.$watch('trigger.arrived',function(newVal){
@@ -358,8 +360,10 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         }
                     });
 
-                    scope.$watch('trigger.newSpeedDataUser',function(asname){
+                    scope.$watch('trigger.newDataUser',function(asname){
+                        console.log("asdfsafdasdfsdfasfda\nasdfsadfsadfasdf");
                         if(asname !== undefined) {
+                            console.log("DISEGNO USER");
                             drawHistogram(false);
 
                             if(!$('#button-view-public').hasClass("active"))
@@ -369,8 +373,10 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         }
                     });
-                    scope.$watch('trigger.newSpeedDataPublic',function(asname){
+                    scope.$watch('trigger.newDataPublic',function(asname){
+                        console.log("asdfsafdasdfsdfasfda\nasdfsadfsadfasdf");
                         if(asname !== undefined) {
+                            console.log("DISEGNO PUBLIC");
                             drawHistogram(false);
 
                             if(!$('#button-view-public').hasClass("active"))
@@ -384,7 +390,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         }
     })
     .controller('speedHistogramPlotInfoController', ['plotsInfoService', function(plotsInfoService){
-    	self = this;
-    	
+    	var self = this;
+
     	self.plotInfo = plotsInfoService.getInfo('speedHistogram');
     }]);

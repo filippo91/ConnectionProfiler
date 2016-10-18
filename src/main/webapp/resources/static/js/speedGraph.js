@@ -14,9 +14,42 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
 
-
         function updateRootScopeCallback(data, t){
-            var toAdd;
+            var toAdd,i;
+            if(t) {
+                for(i = 0; i < data.length; i++) {
+                    toAdd = false;
+                    if ($rootScope.userTimeList[data[i].timestamp] === undefined) {
+                        $rootScope.userTimeList[data[i].timestamp] = [data[i].asname];
+                        toAdd = true;
+                    } else if ($rootScope.userTimeList[data[i].timestamp].indexOf(data[i].asname) < 0) {
+                        $rootScope.userTimeList[data[i].timestamp].push(data[i].asname);
+                        toAdd = true;
+                    }
+                    if (toAdd) {
+                        console.log("aggiungo a user");
+                        downloadManager.updateDownloads($rootScope.userSpeedData, data[i]);
+                    }
+                }
+            }else {
+                for(i = 0; i < data.length; i++) {
+                    toAdd = false;
+                    if ($rootScope.publicTimeList[data[i].timestamp] === undefined) {
+                        $rootScope.publicTimeList[data[i].timestamp] = [data[i].asname];
+                        toAdd = true;
+                    } else if ($rootScope.publicTimeList[data[i].timestamp].indexOf(data[i].asname) < 0) {
+                        $rootScope.publicTimeList[data[i].timestamp].push(data[i].asname);
+                        toAdd = true;
+                    }
+                    if (toAdd) {
+                        console.log("aggiungo a public");
+                        downloadManager.updateDownloads($rootScope.publicSpeedData, data[i]);
+                    }
+                }
+            }
+        }
+
+            /*
             for(var i = 0; i < data.length; i++){
                 toAdd = false;
                 if($rootScope.timeList[data[i].timestamp] === undefined){
@@ -28,33 +61,19 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 }
                 if(toAdd){
                     if(t) {
+                        console.log("aggiungo a user");
                         downloadManager.updateDownloads($rootScope.userSpeedData,data[i]);
                     }else {
+                        console.log("aggiungo a public");
                         downloadManager.updateDownloads($rootScope.publicSpeedData,data[i]);
                     }
                 }
             }
-            /*
-            for(var i = 0; i < data.length; i++){
-                for(var j = 0; j < list.length; j++) {
-                    if (data[i].asname === list[j].asname && data[i].timestamp === list[j].timestamp) {
-                        console.log("c'è gia!");
-                        break;
-                    }
-                }
-                if(j === list.length){
-                    if(t) {
-                        $rootScope.userSpeedData = $rootScope.userSpeedData.concat([data[i]]);
-                    }else {
-                        $rootScope.publicSpeedData = $rootScope.publicSpeedData.concat([data[i]]);
-                    }
-                }
-            }
             */
-        }
 
         if ($rootScope.authenticated) {
             $scope.trigger.nData++;
+            console.log("SONO AUTH");
             downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
         }
         downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
@@ -140,6 +159,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         factory.getUserDownloads = function (year,month,day,view,trigger, callback){
             return $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                console.log("arrivati user");
                 callback(downloadList,true);
                 trigger.arrived = ++trigger.count === trigger.nData;
             });
@@ -147,6 +167,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         factory.getPublicDownloads = function (year,month,day,view,trigger, callback){
             return $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+                console.log("arrivati public");
                 callback(downloadList,false);
                 trigger.arrived = ++trigger.count === trigger.nData;
             });

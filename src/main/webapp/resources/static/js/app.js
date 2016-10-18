@@ -71,7 +71,7 @@ angular.module('myApp', [
         /*
          * They hold the start and end date of the timespan to show
          */
-        self.startDate = moment().startOf('week');
+        self.startDate = moment().startOf('isoWeek');
         /* compute and set end date */
         self.endDate = computeEndDate(self.startDate.clone(), 'week');
 
@@ -151,7 +151,7 @@ angular.module('myApp', [
         self.move = function (direction) {
             var view = self.activeView.view;
             if (direction == 'today') {
-                self.startDate = moment().startOf('week');
+                self.startDate = moment().startOf('isoWeek');
             } else {
                 self.startDate = computeStartDate(self.startDate.clone(), view, direction);
             }
@@ -269,7 +269,7 @@ angular.module('myApp', [
             var directionSign = direction == 'forward' ? 1 : -1;
             switch (view) {
                 case "week":
-                    date.startOf('week');
+                    date.startOf('isoWeek');
                     date.add(7 * directionSign, "days");
                     break;
                 case "month":
@@ -289,7 +289,7 @@ angular.module('myApp', [
             console.info(date.format('YYYY MM DD'), view)
             switch (view) {
                 case "week":
-                    date.endOf("week");
+                    date.endOf("isoWeek");
                     break;
                 case "month":
                     date.endOf("month");

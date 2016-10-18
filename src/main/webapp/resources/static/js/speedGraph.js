@@ -49,28 +49,6 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             }
         }
 
-            /*
-            for(var i = 0; i < data.length; i++){
-                toAdd = false;
-                if($rootScope.timeList[data[i].timestamp] === undefined){
-                    $rootScope.timeList[data[i].timestamp] = [data[i].asname];
-                    toAdd = true;
-                }else if( $rootScope.timeList[data[i].timestamp].indexOf(data[i].asname) < 0){
-                    $rootScope.timeList[data[i].timestamp].push(data[i].asname);
-                    toAdd = true;
-                }
-                if(toAdd){
-                    if(t) {
-                        console.log("aggiungo a user");
-                        downloadManager.updateDownloads($rootScope.userSpeedData,data[i]);
-                    }else {
-                        console.log("aggiungo a public");
-                        downloadManager.updateDownloads($rootScope.publicSpeedData,data[i]);
-                    }
-                }
-            }
-            */
-
         if ($rootScope.authenticated) {
             $scope.trigger.nData++;
             console.log("SONO AUTH");
@@ -121,13 +99,15 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             }
         };
         $scope.showAsname = function(asname,aType){
-            var ele = $("#"+aType+"-button-"+asname);
+            var ele = $("#"+aType+"-button-"+asname), graphEle = $("." + aType + "-graph-" + asname);
             if(ele.hasClass("active")){ //hide
                 ele.removeClass("active");
-                $("." + aType + "-graph-" + asname).fadeTo(200, 0);
+                graphEle.fadeTo(200, 0);
+                graphEle.attr("isvisible","false");
             }else{ //show
                 ele.addClass("active");
-                $("." + aType + "-graph-" + asname).fadeTo(200, 1);
+                graphEle.fadeTo(200, 1);
+                graphEle.attr("isvisible","true");
             }
         };
 
@@ -172,24 +152,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 trigger.arrived = ++trigger.count === trigger.nData;
             });
         };
-        /*
-        factory.updateDownloads = function(downloadList, download){
-            var i;
-            download.timestamp = moment(download.timestamp).millisecond(0).second(0).minute(0).hour(0).valueOf();
-            console.log("downloadList" + JSON.stringify(downloadList));
-            for(i = 0; i< downloadList.length; i++){
-                if(downloadList[i].asname === download.asname && downloadList[i].timestamp === download.timestamp){
-                    downloadList[i].speed = (downloadList[i].count * downloadList[i].speed + download.download_speed) / (downloadList[i].count + 1);
-                    console.log("new speed + " + downloadList[i].speed  );
-                    break;
-                }
-            }
-            if(i === downloadList.length)
-                downloadList.push({asname : download.asname, count : 1,speed : download.download_speed, timestamp : download.timestamp})
 
-            console.log("downloadList" + JSON.stringify(downloadList));
-        };
-*/
         factory.updateDownloads = function(downloadList, download){
             console.log("downloadList" + JSON.stringify(downloadList));
             download.timestamp = moment(download.timestamp).millisecond(0).second(0).minute(0).hour(0).valueOf();
@@ -254,6 +217,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     var circleSize = 5;
                     var asnameList;
                     var colors = d3.scale.category20();
+                    var legend;
 
                     var margin = {top: 10, right: 10, bottom: 100, left: 50},
                         margin2 = {top: 430, right: 10, bottom: 20, left: 0},
@@ -274,14 +238,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(speedFormat).innerTickSize(-width).outerTickSize(0).tickPadding(10);
 
                     var brush = d3.svg.brush().x(x2).on("brush", brushed);
-/*
-                    var area = d3.svg.area()
-                        .interpolate("monotone")
-                        //.interpolate("linear ")
-                        .x(function (d) {return x(d.timestamp);})
-                        .y0(height)
-                        .y1(function (d) {return y(d.speed);});
-*/
+
                     var area = d3.svg.area()
                         .interpolate("monotone")
                         //.interpolate("linear ")
@@ -358,9 +315,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     function drawGraph(userDownloadList, publicDownloadList){
                         asnameList = publicDownloadList.map(function(d){return d.asname;});
 
-                        asnameList.forEach(function (asn, i) {
-                            $('#general-graph-button-' + asn).css('color', colors(i));
-                            $('#user-graph-button-' + asn).css('color', colors(i));
+                        asnameList.forEach(function (asn) {
+                            $('#public-button-' + asn).css('color', colors(asn));
+                            $('#user-button-' + asn).css('color', colors(asn));
                         });
 
 
@@ -409,7 +366,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                     .attr("r", circleSize)
                                     .attr("ds", function (d) {return d.speed;})
                                     .attr("ts", function (d) {return formatTime(new Date(d.timestamp));})
-                                    .attr("fill", colors(asnameList.indexOf(asname.asname)));
+                                    .attr("fill", colors(asname.asname));
                             });
 
                             focus.append("path")
@@ -419,7 +376,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .attr("isvisible", function(){return $rootScope.authenticated ? "false" : "true";})
                                 .attr("clip-path", "url(#clip)")
                                 .attr("fill", "none")//,function(){return colors(i);})
-                                .attr("stroke", colors(asnameList.indexOf(asname.asname)))
+                                .attr("stroke", colors(asname.asname))
                                 .style("stroke-dasharray", ("3, 3"));
                         });
 
@@ -447,7 +404,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                             return formatTime(new Date(d.timestamp));
                                         })
                                         .attr("r", circleSize)
-                                        .attr("fill", colors(asnameList.indexOf(e.asname)));
+                                        .attr("fill", colors(e.asname));
                                 });
                                 focus.append("path")
                                     .datum(e.downloads)
@@ -456,7 +413,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                     .attr("isvisible", "true")
                                     .attr("clip-path", "url(#clip)")
                                     .attr("fill", "none")
-                                    .attr("stroke", colors(asnameList.indexOf(e.asname)));
+                                    .attr("stroke", colors(e.asname));
                             });
                         }
 
@@ -478,6 +435,26 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             .selectAll("rect")
                             .attr("y", -6)
                             .attr("height", height2 + 7);
+
+                        legend = svg.selectAll(".legend")
+                            .data(asnameList.slice().reverse())
+                            .enter().append("g")
+                            .attr("class", "legend")
+                            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+                        legend.append("rect")
+                            .attr("x", width - 18)
+                            .attr("width", 18)
+                            .attr("opacity",.5)
+                            .attr("height", 18)
+                            .style("fill", colors);
+
+                        legend.append("text")
+                            .attr("x", width - 24)
+                            .attr("y", 9)
+                            .attr("dy", ".35em")
+                            .style("text-anchor", "end")
+                            .text(function(d) { return d; });
 
                         focus.append("g")
                             .attr("class", "x axis")
@@ -555,6 +532,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         });
                     }
                     function updateGraph(newDownloadList, type, asname){
+                        if(asnameList.indexOf(asname) < 0)
+                            asnameList.push(asname);
                         console.log("ASNUM LIST " + JSON.stringify(asnameList));
                         //asnameList = scope.publicDownloadList.map(function(d){return d.asname;});
                         var isVisible = $('.point.' + type + "-graph-" + asname).attr("isvisible");
@@ -570,6 +549,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         var element =  focus.selectAll("." + type + "-graph-" + asname);
                         console.log(element);
                         element.remove();
+                        legend.remove();
 
                         newDownloadList.forEach(function(e){
                             //e.timestamp = new Date(e.timestamp);
@@ -582,7 +562,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 .attr("isvisible", isVisible)
                                 .attr("ds", function (d) {return d.speed;})
                                 .attr("ts", function (d) {return formatTime(new Date(d.timestamp));})
-                                .attr("fill", colors(asnameList.indexOf(asname)));
+                                .attr("fill", colors(asname));
                         });
                         var newLine = focus.append("path")
                             .datum(newDownloadList)
@@ -591,7 +571,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             .attr("d", line)
                             .attr("clip-path", "url(#clip)")
                             .attr("fill", "none")
-                            .attr("stroke", colors(asnameList.indexOf(asname)));
+                            .attr("stroke", colors(asname));
 
                         if(type === "public")
                             newLine.style("stroke-dasharray", ("3, 3"));
@@ -604,6 +584,26 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             $("." + type + "-graph-" + asname).hide();
                             console.log("NASCONDO");
                         }
+
+                        legend = svg.selectAll(".legend")
+                            .data(asnameList.slice().reverse())
+                            .enter().append("g")
+                            .attr("class", "legend")
+                            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+                        legend.append("rect")
+                            .attr("x", width - 18)
+                            .attr("width", 18)
+                            .attr("opacity",.5)
+                            .attr("height", 18)
+                            .style("fill", colors);
+
+                        legend.append("text")
+                            .attr("x", width - 24)
+                            .attr("y", 9)
+                            .attr("dy", ".35em")
+                            .style("text-anchor", "end")
+                            .text(function(d) { return d; });
 
                         updateTooltipListener();
 

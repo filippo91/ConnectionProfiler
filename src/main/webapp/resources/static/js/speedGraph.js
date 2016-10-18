@@ -159,7 +159,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         factory.getUserDownloads = function (year,month,day,view,trigger, callback){
             return $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                console.log("arrivati user");
+                console.log("arrivati user: \n" + JSON.stringify(downloadList));
                 callback(downloadList,true);
                 trigger.arrived = ++trigger.count === trigger.nData;
             });
@@ -167,7 +167,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         factory.getPublicDownloads = function (year,month,day,view,trigger, callback){
             return $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                console.log("arrivati public");
+                console.log("arrivati public:\n" + JSON.stringify(downloadList));
                 callback(downloadList,false);
                 trigger.arrived = ++trigger.count === trigger.nData;
             });
@@ -193,7 +193,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         factory.updateDownloads = function(downloadList, download){
             console.log("downloadList" + JSON.stringify(downloadList));
             download.timestamp = moment(download.timestamp).millisecond(0).second(0).minute(0).hour(0).valueOf();
-            var i,j;
+            var i, j, count = 1;
+            if(download.count !== undefined) count = download.count;
             for(i = 0; i < downloadList.length; i++){
                 if(downloadList[i].asname === download.asname){
                     for(j = 0; j < downloadList[i].downloads.length; j++){
@@ -205,14 +206,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         }
                     }
                     if(j === downloadList[i].downloads.length){
-                        downloadList[i].downloads.push({asname : download.asname, count : 1,speed : download.speed, timestamp : download.timestamp})
+                        downloadList[i].downloads.push({asname : download.asname, count : count,speed : download.speed, timestamp : download.timestamp})
                         downloadList[i].downloads.sort(function(a,b){return a.timestamp - b.timestamp;});
                     }
                     break;
                 }
             }
             if(i === downloadList.length){
-                downloadList.push({asname : download.asname, downloads : [{asname : download.asname, count : 1,speed : download.speed, timestamp : download.timestamp}]});
+                downloadList.push({asname : download.asname, downloads : [{asname : download.asname, count : count,speed : download.speed, timestamp : download.timestamp}]});
             }
             console.log("downloadList" + JSON.stringify(downloadList));
         };

@@ -214,7 +214,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             restrict: 'E',
             link: function(scope, element, attrs){
                 d3Service.d3().then(function (d3) {
-                    var circleSize = 5;
+                    var circleSize = 4;
                     var asnameList;
                     var colors = d3.scale.category20();
                     var legend;

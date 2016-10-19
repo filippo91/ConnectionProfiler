@@ -1,8 +1,9 @@
 <!-- navigation buttons -->
 <div class="container col-md-8">
-	<div class="row col-md-2">
-		<button class="btn btn-default" ng-click="prevDownload()">-</button>
-		<button class="btn btn-default" ng-click="succDownload()">+</button>
+ 
+	<div class="row btn-group col-md-4">
+		<button type="button" class="col-md-4 btn btn-default" ng-click="prevDownload()">Previous
+		<button type="button" class="col-md-4 btn btn-default" ng-click="succDownload()">Next
 	</div>
 </div>
 
@@ -21,12 +22,13 @@
 <div class="col-md-7">
 	<div class="row col-md-12">
 		<table class="table table-striped graph" id="download-table">
-		    <tr><th>#</th><th>Date</th><th>Donwload Speed</th><th>Provider</th><th>Latency</th></tr>
+		    <tr><th>#</th><th>Resource</th><th>Provider</th><th>Date</th><th>Speed</th><th>Latency</th></tr>
 		    <tr ng-repeat="ele in downloadList">
 		        <th>{{$index + 1 + nRecords}}</th>
+		        <td>{{ele.url | resource}}</td>
+		        <td>{{ele.asname }}</td>
 		        <td>{{ele.timestamp | date:'dd-MM-yyyy'}}</td>
 		        <td>{{ele.download_speed | speedFormat }}</td>
-		        <td>{{ele.asname }}</td>
 		        <td>{{ele.connect_time }} ms</td>
 		
 		    </tr>

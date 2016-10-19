@@ -52,6 +52,26 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
             return "" + d;
         };
 })
+
+/*
+ * Filter to get the resource name off a URL.
+ */
+.filter('resource',function(){
+        return function(url){
+        	var urlSplitted = url.split('/');
+        	var resourceName;
+        	if(urlSplitted.length > 0){
+        		//get the last element of the array
+        		resourceName = urlSplitted.pop();
+        	}else{
+        		//split unsuccessful, return the whole string
+        		resourceName = urlSplitted;
+        	}
+        	
+           return resourceName;
+        };
+})
+
 .controller('speedTablePlotInfoController', ['plotsInfoService', function(plotsInfoService){
 	var self = this;
 	

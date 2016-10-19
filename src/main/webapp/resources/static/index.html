@@ -108,13 +108,13 @@
 			<div id="timeManager" class="col-md-4 col-md-offset-1">
 				<div class="btn-group" role="group">
 					<input value="Week" type="button" id="weekBtn" class="btn btn-default" 
-					ng-class="{active : nav.activeView === 'week'}"
+					ng-class="{active : nav.activeView.view === 'week'}"
 					ng-click="nav.changeActiveView('week')"> 
 					<input value="Month" type="button" id="monthBtn" class="btn btn-default" 
-					ng-class="{active : nav.activeView === 'month'}"
+					ng-class="{active : nav.activeView.view === 'month'}"
 					ng-click="nav.changeActiveView('month')"> 
 					<input value="3 Months" type="button" id="monthsBtn" class="btn btn-default" 
-					ng-class="{active : nav.activeView === 'months'}"
+					ng-class="{active : nav.activeView.view === 'months'}"
 					ng-click="nav.changeActiveView('months')"> 
 				</div>
 			</div>

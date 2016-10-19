@@ -115,7 +115,7 @@ public class PlotsServiceImpl implements PlotsService{
 
 
 	
-	private Date getEndDate(int year, int month, int day, View view) {
+	public Date getEndDate(int year, int month, int day, View view) {
 		DateTime date;
 		date = new DateTime(year, month+1, day, 0, 0);
 		
@@ -134,7 +134,7 @@ public class PlotsServiceImpl implements PlotsService{
 		return date.toDate();
 	}
 
-	private Date getStartDate(int year, int month, int day, View view) {
+	public Date getStartDate(int year, int month, int day, View view) {
 		DateTime date;
 		date = new DateTime(year, month+1, day, 0, 0);
 		

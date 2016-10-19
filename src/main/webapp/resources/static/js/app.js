@@ -321,6 +321,8 @@ angular.module('myApp', [
         function setActiveViewDate(start, end) {
             self.activeView.startDate = start.valueOf();
             self.activeView.endDate = end.valueOf();
+            $rootScope.startDate = self.activeView.startDate;
+            $rootScope.endDate = self.activeView.endDate;
             self.activeView.day = start.date();
             self.activeView.month = start.month();
             self.activeView.year = start.year();

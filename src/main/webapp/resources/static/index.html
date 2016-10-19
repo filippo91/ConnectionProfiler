@@ -87,7 +87,7 @@
 	</nav>
 	
 	<div class="container col-md-3 col-md-offset-1" ng-controller="navigation as nav" >
-		<div ng-if="enableChangeView" class="row">
+		<div ng-if="enableChangeView || nav.enableRealTime" class="row">
 			<img src="img/icon-set-graph.png" height="70px" width="120px" class="center-block">
 		</div>
 	</div>
@@ -101,7 +101,6 @@
 					&#62;</button>
 			</div>
 
-			
 			<div ng-if="nav.activeView.view === 'week'" class="col-md-3 ng-cloak">{{ nav.activeView.startDate | date : 'MMM dd' }} - {{ nav.activeView.endDate | date : 'MMM dd' }}, {{nav.activeView.endDate | date : 'yyyy' }}</div>
 			<div ng-if="nav.activeView.view === 'month'" class="col-md-3 ng-cloak">{{ nav.activeView.startDate | date : 'MMMM yyyy' }}</div>
 			<div ng-if="nav.activeView.view === 'months'" class="col-md-3 ng-cloak">{{ nav.activeView.startDate | date : 'MMMM' }} - {{ nav.activeView.endDate | date : 'MMMM yyyy' }}</div>
@@ -120,25 +119,26 @@
 				</div>
 			</div>
 		</div>
-		<div ng-if="enableChangeView" class="row">
-			<div class="col-md-2" id="realtimediv">
+	</div>
+	<div class="container col-md-8" ng-controller="navigation as nav">
+		<div class="row">
+			<div ng-show="nav.enableRealTime" class="col-md-2" id="realtimediv">
 				<button ng-click="realtime();" class="btn"
 					ng-class="socketConnected ? 'btn-danger active' : 'btn-default'">
 					<span
 						ng-class="socketConnected ? 'glyphicon glyphicon-pause' : 'glyphicon glyphicon-play'"
 						aria-hidden="true"></span> realtime
-				</button>
+			</button>
 			</div>
-			<div ng-if="nav.binSelector != null" class="col-md-3 col-md-offset-5 ng-cloak">
+			<div ng-show="nav.binSelector" class="col-md-3 col-md-offset-5 ng-cloak">
 				<input id="btn-bin-minus" type="button" class="btn btn-default" value="-" ng-click="nav.changeBinSize($event)">
 				<input id="btn-bin-plus" type="button" class="btn btn-default" value="+" ng-click="nav.changeBinSize($event)">
 				<span>Bin width: {{ nav.binSelector.width }}</span>
 			</div>
 		</div>
-		
-		
-		
 	</div>
+		
+	
 	<div ng-view></div>
 
 	<hr>

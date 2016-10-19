@@ -1,22 +1,35 @@
-<div class="col-md-3 col-md-offset-1" ng-controller="speedTablePlotInfoController as ctrl">
-<uib-tabset active="activePill">
-    <uib-tab index="0" heading="Info">
-		<plot-info plot="ctrl.plotInfo"></plot-info>
-	</uib-tab>
-</uib-tabset>
+<!-- navigation buttons -->
+<div class="container col-md-8">
+	<div class="row col-md-2">
+		<button class="btn btn-default" ng-click="prevDownload()">-</button>
+		<button class="btn btn-default" ng-click="succDownload()">+</button>
+	</div>
 </div>
-<div class="col-md-7">
-<button class="btn btn-default" ng-click="prevDownload()">-</button>
-<button class="btn btn-default" ng-click="succDownload()">+</button>
-<table class="table table-striped graph" id="download-table">
-    <tr><th>#</th><th>Date</th><th>Donwload Speed</th><th>Provider</th><th>Latency</th></tr>
-    <tr ng-repeat="ele in downloadList">
-        <th>{{$index + 1 + nRecords}}</th>
-        <td>{{ele.timestamp | date:'dd-MM-yyyy'}}</td>
-        <td>{{ele.download_speed | speedFormat }}</td>
-        <td>{{ele.asname }}</td>
-        <td>{{ele.connect_time }} ms</td>
 
-    </tr>
-</table>
+<!-- left panel -->
+<div class="col-md-3 col-md-offset-1" ng-controller="speedTablePlotInfoController as ctrl">
+	<div class="row col-md-12" id="left-panel-pills">
+		<uib-tabset active="activePill">
+		    <uib-tab index="0" heading="Info">
+				<plot-info plot="ctrl.plotInfo"></plot-info>
+			</uib-tab>
+		</uib-tabset>
+	</div>
+</div>
+
+<!-- downloads table -->
+<div class="col-md-7">
+	<div class="row col-md-12">
+		<table class="table table-striped graph" id="download-table">
+		    <tr><th>#</th><th>Date</th><th>Donwload Speed</th><th>Provider</th><th>Latency</th></tr>
+		    <tr ng-repeat="ele in downloadList">
+		        <th>{{$index + 1 + nRecords}}</th>
+		        <td>{{ele.timestamp | date:'dd-MM-yyyy'}}</td>
+		        <td>{{ele.download_speed | speedFormat }}</td>
+		        <td>{{ele.asname }}</td>
+		        <td>{{ele.connect_time }} ms</td>
+		
+		    </tr>
+		</table>
+	</div>
 </div>

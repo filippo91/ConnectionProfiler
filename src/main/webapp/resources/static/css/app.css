@@ -94,3 +94,7 @@ div.providers{
     opacity: 0.2;
     stroke-dasharray: 3, 3;
 }
+
+#left-panel-pills {
+	padding-right: 0px;
+}

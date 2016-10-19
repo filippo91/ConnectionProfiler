@@ -107,8 +107,12 @@ angular.module('myApp', [
 
         /* Time Manager Visualization logic */
         self.TIME_MANAGER_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency'];
+        self.REAL_TIME_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency', 'speedTable'];
+        
+        console.log("reset");
         self.timeManager = false;
-
+        self.enableRealTime = false;
+        
         /* public methods */
 
         /*
@@ -254,6 +258,14 @@ angular.module('myApp', [
             } else {
                 self.timeManager = true;
             }
+            
+            console.info(self.REAL_TIME_PAGES, pagePrefix);
+            if (self.REAL_TIME_PAGES.indexOf(pagePrefix) < 0) {
+                self.enableRealTime = false;
+            } else {
+                self.enableRealTime = true;
+            }
+            
 
         });
 

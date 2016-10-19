@@ -1,10 +1,14 @@
-<div class="col-md-3 col-md-offset-1" ng-controller="plotInfoController as ctrl">
-<uib-tabset active="activePill">
-    <uib-tab index="0" heading="Info">
-		<plot-info plot="ctrl.plotInfo"></plot-info>
-	</uib-tab>
-</uib-tabset>
+<!-- left panel -->
+<div class="col-md-3 col-md-offset-1" ng-controller="speedTablePlotInfoController as ctrl">
+	<div class="row col-md-12" id="left-panel-pills">
+		<uib-tabset active="activePill">
+		    <uib-tab index="0" heading="Info">
+				<plot-info plot="ctrl.plotInfo"></plot-info>
+			</uib-tab>
+		</uib-tabset>
+	</div>
 </div>
+
 <div class="col-md-8">
 <usage-pie id = "usage-pie1"  class="graph "></usage-pie>
 </div>

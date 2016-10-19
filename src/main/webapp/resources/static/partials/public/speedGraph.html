@@ -1,39 +1,47 @@
 <div ng-controller="speedGraph">
     user: {{trigger.newDataUser}}
     public: {{trigger.newDataPublic}}
+
+	<!-- left panel -->
     <div class="col-md-3 col-md-offset-1" >
-        <uib-tabset active="activePill" >
-            <uib-tab index="0" heading="Info">
-            <div ng-controller="speedGraphPlotInfoController as ctrl">
-                <plot-info plot="ctrl.plotInfo"></plot-info>
-                </div>
-            </uib-tab>
-            <uib-tab index="1" heading="Your Providers">
-                <div class="providers pre-scrollable">
-                    <ul>
-                                <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a></li>
-                                <li ng-repeat="ele in userSpeedData" id="user-graph-asname-{{ele.asname}}">
-                                    <a class="btn btn-default active user-asnameButton" id="user-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'user')">{{ele.asname}}</a>
-                                </li>
-                   </ul>
-               </div>
-            </uib-tab>
-            <uib-tab index="2" heading="Providers" >
-                <div class="providers pre-scrollable">
-                    <ul>
-                        <li ><a id="public-showAll" ng-click="showAllAsname('public');"
-                                        ng-class="authenticated ? 'btn btn-default' : 'btn btn-default active'">
-                                    {{authenticated ? 'Show All' : 'Hide All'}}</a></li>
-                        <li ng-repeat="ele in publicSpeedData" id="public-graph-asname-{{ele.asname}}">
-                                    <a ng-class="authenticated ? 'btn btn-default public-asnameButton' : 'btn btn-default active public-asnameButton'"
-                                       id="public-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'public')">{{ele.asname}}</a>
-                                </li>
-                    </ul>
-                </div>
-            </uib-tab>
-        </uib-tabset>
+    	<div class="row col-md-12" id="left-panel-pills">
+	        <uib-tabset active="activePill" >
+	            <uib-tab index="0" heading="Info">
+	            <div ng-controller="speedGraphPlotInfoController as ctrl">
+	                <plot-info plot="ctrl.plotInfo"></plot-info>
+	                </div>
+	            </uib-tab>
+	            <uib-tab index="1" heading="Your Providers">
+	                <div class="providers pre-scrollable">
+	                    <ul>
+	                                <li ><a class="btn btn-default active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a></li>
+	                                <li ng-repeat="ele in userSpeedData" id="user-graph-asname-{{ele.asname}}">
+	                                    <a class="btn btn-default active user-asnameButton" id="user-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'user')">{{ele.asname}}</a>
+	                                </li>
+	                   </ul>
+	               </div>
+	            </uib-tab>
+	            <uib-tab index="2" heading="Providers" >
+	                <div class="providers pre-scrollable">
+	                    <ul>
+	                        <li ><a id="public-showAll" ng-click="showAllAsname('public');"
+	                                        ng-class="authenticated ? 'btn btn-default' : 'btn btn-default active'">
+	                                    {{authenticated ? 'Show All' : 'Hide All'}}</a></li>
+	                        <li ng-repeat="ele in publicSpeedData" id="public-graph-asname-{{ele.asname}}">
+	                                    <a ng-class="authenticated ? 'btn btn-default public-asnameButton' : 'btn btn-default active public-asnameButton'"
+	                                       id="public-button-{{ele.asname}}" ng-click="showAsname(ele.asname,'public')">{{ele.asname}}</a>
+	                                </li>
+	                    </ul>
+	                </div>
+	            </uib-tab>
+	        </uib-tabset>
+		</div>
     </div>
+
+	<!-- downloads speed graph -->
     <div class="col-md-8">
-        <download-speed-temporal-graph class="row"></download-speed-temporal-graph>
+    	<div class="col-md-11" id="speed-graph-canvas">
+        	<download-speed-temporal-graph class="row"></download-speed-temporal-graph>
+        </div>
     </div>
 </div>

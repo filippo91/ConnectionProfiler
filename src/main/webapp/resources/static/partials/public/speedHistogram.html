@@ -1,25 +1,32 @@
 <div ng-controller="speedHistogram">
+
+	<!-- left panel -->
     <div class="col-md-3 col-md-offset-1"
         ng-controller="speedHistogramPlotInfoController as ctrl">
-        <uib-tabset active="activePill"> <uib-tab index="0"
-            heading="Info"> <plot-info plot="ctrl.plotInfo"></plot-info>
-        </uib-tab> <uib-tab index="1" heading="Providers">
-        <div class="btn-group row " id="btnDivHist">
-            user: {{trigger.newDataUser}}
-            public : {{trigger.newDataPublic}}
-            <div class="btn-group" ng-if="authenticated">
-                <button type="button" class="btn btn-default active"
-                    ng-click="switchView('user')" id="button-view-user">User
-                    providers</button>
-            </div>
-            <div class="btn-group" ng-if="authenticated">
-                <button type="button" class="btn btn-default"
-                    ng-click="switchView('public')" id="button-view-public">
-                    Public providers</button>
-            </div>
+        <div class="row col-md-12" id="left-panel-pills">
+	        <uib-tabset active="activePill"> <uib-tab index="0"
+	            heading="Info"> <plot-info plot="ctrl.plotInfo"></plot-info>
+	        </uib-tab> <uib-tab index="1" heading="Providers">
+	        <div class="btn-group row " id="btnDivHist">
+	            user: {{trigger.newDataUser}}
+	            public : {{trigger.newDataPublic}}
+	            <div class="btn-group" ng-if="authenticated">
+	                <button type="button" class="btn btn-default active"
+	                    ng-click="switchView('user')" id="button-view-user">User
+	                    providers</button>
+	            </div>
+	            <div class="btn-group" ng-if="authenticated">
+	                <button type="button" class="btn btn-default"
+	                    ng-click="switchView('public')" id="button-view-public">
+	                    Public providers</button>
+	            </div>
+	        </div>
+	        </uib-tab> 
+	        </uib-tabset>
         </div>
-        </uib-tab> </uib-tabset>
     </div>
+    
+    <!-- downloads speed histogram -->
     <div class="col-md-8">
         <speed-histogram class="row"></speed-histogram>
     </div>

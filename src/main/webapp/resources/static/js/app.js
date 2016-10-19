@@ -238,37 +238,39 @@ angular.module('myApp', [
 
             if (!$rootScope.authenticated && PUBLIC_PAGES.indexOf(pagePrefix) < 0) {
                 event.preventDefault();
+                self.timeManager = self.enableRealTime = false;
                 $rootScope.previousLocation = $location.path();
                 $rootScope.$evalAsync(function () {
                     $location.path("/login");
                 });
-            }
-            if (self.BIN_SELECTOR_PAGES.indexOf(pagePrefix) < 0) {
-                self.binSelector = null;
-            } else {
-                if (pagePrefix === 'latency') {
-                    self.binSelector = self.latencyBin;
-                } else {
-                    self.binSelector = self.speedHistogramBin;
-                }
-            }
-
-            if (self.TIME_MANAGER_PAGES.indexOf(pagePrefix) < 0) {
-                self.timeManager = false;
-            } else {
-                self.timeManager = true;
-            }
-            
-            console.info(self.REAL_TIME_PAGES, pagePrefix);
-            if (self.REAL_TIME_PAGES.indexOf(pagePrefix) < 0) {
-                self.enableRealTime = false;
-            } else {
-                self.enableRealTime = true;
-            }
-            
+            }else{            
+	            if (self.BIN_SELECTOR_PAGES.indexOf(pagePrefix) < 0) {
+	                self.binSelector = null;
+	            } else {
+	                if (pagePrefix === 'latency') {
+	                    self.binSelector = self.latencyBin;
+	                } else {
+	                    self.binSelector = self.speedHistogramBin;
+	                }
+	            }
+	
+	            if (self.TIME_MANAGER_PAGES.indexOf(pagePrefix) < 0) {
+	                self.timeManager = false;
+	            } else {
+	                self.timeManager = true;
+	            }
+	            
+	            console.info(self.REAL_TIME_PAGES, pagePrefix);
+	            if (self.REAL_TIME_PAGES.indexOf(pagePrefix) < 0) {
+	                self.enableRealTime = false;
+	            } else {
+	                self.enableRealTime = true;
+	            }
+            }    
 
         });
 
+        
         /* private methods */
 
         function computeStartDate(date, view, direction) {
@@ -609,7 +611,7 @@ angular.module('myApp', [
     .directive('plotInfo', function () {
         return {
             restrict: 'E',
-            templateUrl: 'partials/restricted/plotInfo/plotInfo.html',
+            templateUrl: 'partials/public/plotInfo/plotInfo.html',
             scope: {
                 plot: '='
             }

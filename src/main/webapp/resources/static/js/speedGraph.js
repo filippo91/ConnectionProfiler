@@ -485,7 +485,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             brush.event(d3.select(".brush"));
                         }
 
-                        brush.extent($rootScope.getCurrentExtentDate().map(function(d){return d.valueOf();}));
+                        brush.extent([$rootScope.startDate, $rootScope.endDate]);
                         brush(d3.select(".brush").transition().duration(1000));
                         brush.event(d3.select(".brush").transition().duration(1000));
 

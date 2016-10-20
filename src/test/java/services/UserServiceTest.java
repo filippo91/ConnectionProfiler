@@ -17,7 +17,7 @@ import models.User;
 import repositories.UserRepository;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UserServiceImplTest {
+public class UserServiceTest {
 	
 	@Mock UserRepository userRepository;
 	@Mock TokenServiceImpl tokenService;

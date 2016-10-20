@@ -1,8 +1,6 @@
 package services;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.Date;
+import static org.junit.Assert.assertEquals;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -32,14 +30,8 @@ public class PlotsServiceTest {
 		
 		View weekView = View.week;
 		
-		Date date = plotsService.getStartDate(year, month, day, weekView);
-		DateTime dateTime = new DateTime(date);
-		dateTime.
-		System.out.println("Date dow: " + dateTime.get(DateTimeFieldType.dayOfWeek()));
-		
-		System.out.println("Monday: " + x);
-		System.out.println(dateTime.get(DateTimeFieldType.dayOfWeek()));
-		
-		
+		DateTime date = plotsService.getStartDate(year, month, day, weekView);
+
+		assertEquals(date.get(DateTimeFieldType.dayOfWeek()), MONDAY);
 	}
 }

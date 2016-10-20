@@ -1,8 +1,8 @@
 package repositories;
 
 import java.util.Collection;
-import java.util.Date;
 
+import org.joda.time.DateTime;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import models.AvgDaySpeedDownload;
@@ -13,8 +13,8 @@ import models.SizeDownload;
 
 @NoRepositoryBean
 public interface CustomDownloadRepository {
-	Collection<BinLatencyDownload> getLatencyBins(int bin_width, Date start, Date end);
-
+	Collection<BinLatencyDownload> getLatencyBins(int bin_width, DateTime start, DateTime end);
+	
 	/**
 	 * 
 	 * @param uuid user unique identifier
@@ -22,7 +22,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return day average download speed grouped by ISP, for all days in the given time span.
 	 */
-	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, Date start, Date end);
+	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, DateTime start, DateTime end);
 	/**
 	 * 
 	 * @param bin_width bin width in bits (e.g. bin_width = 1000 to get bins of 1 kbps)
@@ -31,7 +31,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return bin size differentiated by ISP, considering the provided time span
 	 */
-	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, Date start, Date end);
+	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, int uuid, DateTime start, DateTime end);
 	
 	/**
 	 * 
@@ -41,7 +41,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return bin size differentiated by ISP, considering the provided time span
 	 */
-	Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, Date start, Date end);
+	Collection<BinLatencyDownload> getLatencyBins(int bin_width, int uuid, DateTime start, DateTime end);
 	
 	/**
 	 * 
@@ -50,7 +50,7 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return number of visits for each domain in the given time span 
 	 */
-	Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, Date start, Date end);
+	Collection<FrequencyAccess> getFrequencyAccessesByDomain(int uuid, DateTime start, DateTime end);
 	
 	/**
 	 * 
@@ -59,8 +59,8 @@ public interface CustomDownloadRepository {
 	 * @param end
 	 * @return downloads' size for each domain in the given time span
 	 */
-	Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, Date start, Date end);
-	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(Date start, Date end);
+	Collection<SizeDownload> getSizeDownloadsByDomain(int uuid, DateTime start, DateTime end);
+	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(DateTime start, DateTime end);
 
-	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, Date start, Date end);
+	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, DateTime start, DateTime end);
 }

@@ -1,7 +1,6 @@
 package services;
 
 import java.util.Collection;
-import java.util.Date;
 
 import org.jboss.logging.Logger;
 import org.joda.time.DateTime;
@@ -34,18 +33,17 @@ public class PlotsServiceImpl implements PlotsService{
 	
 	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int uuid, int year, int month, int day, View view) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
 		
 		return downloadRepository.getAvgDayDownloadsSpeed(uuid, start, end);
 	}
-
 	
 	@Override
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(int uuid, int year, int month, int day, View view, int speedBinWidth) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
@@ -55,7 +53,7 @@ public class PlotsServiceImpl implements PlotsService{
 	
 	@Override
 	public Collection<BinSpeedDownload> getBinSpeedDownloads(int year, int month, int day, View view, int speedBinWidth) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
@@ -65,7 +63,7 @@ public class PlotsServiceImpl implements PlotsService{
 	
 	@Override
 	public Collection<BinLatencyDownload> getBinLatencyDownloads(int uuid, int year, int month, int day, View view, int bin_width) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
@@ -76,7 +74,7 @@ public class PlotsServiceImpl implements PlotsService{
 
 	@Override
 	public Collection<FrequencyAccess> getDomainFrequencyAccess(int uuid, int year, int month, int day, View view) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
@@ -89,7 +87,7 @@ public class PlotsServiceImpl implements PlotsService{
 
 	@Override
 	public Collection<SizeDownload> getDomainSizeDownload(int uuid, int year, int month, int day, View view) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
@@ -102,7 +100,7 @@ public class PlotsServiceImpl implements PlotsService{
 
 	@Override
 	public Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(int year, int month, int day, View view) {
-		Date start, end;
+		DateTime start, end;
 		
 		start = getStartDate(year, month, day, view);
 		end = getEndDate(year, month, day, view);
@@ -115,7 +113,7 @@ public class PlotsServiceImpl implements PlotsService{
 
 
 	
-	public Date getEndDate(int year, int month, int day, View view) {
+	public DateTime getEndDate(int year, int month, int day, View view) {
 		DateTime date;
 		date = new DateTime(year, month+1, day, 0, 0);
 		
@@ -131,10 +129,10 @@ public class PlotsServiceImpl implements PlotsService{
 			break;
 		}
 		
-		return date.toDate();
+		return date;
 	}
 
-	public Date getStartDate(int year, int month, int day, View view) {
+	public DateTime getStartDate(int year, int month, int day, View view) {
 		DateTime date;
 		date = new DateTime(year, month+1, day, 0, 0);
 		
@@ -150,6 +148,6 @@ public class PlotsServiceImpl implements PlotsService{
 			break;
 		}
 		
-		return date.toDate();
+		return date;
 	}	
 }

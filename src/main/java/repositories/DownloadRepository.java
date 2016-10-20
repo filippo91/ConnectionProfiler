@@ -18,7 +18,4 @@ public interface DownloadRepository extends MongoRepository<Download, String>, C
 	 * 
 	 */
 	Page<Download> findAllByUuidOrderByTimestampDesc(int uuid, Pageable pageable);
-
-	
-	
 }

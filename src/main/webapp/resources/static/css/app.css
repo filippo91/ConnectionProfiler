@@ -1,100 +1,112 @@
 /* app css stylesheet */
-
 div.tooltip {
-    position: absolute;
-    text-align: center;
-    width: 60px;
-    height: 28px;
-    padding: 2px;
-    font: 12px sans-serif;
-    background: lightsteelblue;
-    border: 0px;
-    border-radius: 8px;
-    pointer-events: none;
+	position: absolute;
+	text-align: center;
+	width: 60px;
+	height: 28px;
+	padding: 2px;
+	font: 12px sans-serif;
+	background: lightsteelblue;
+	border: 0px;
+	border-radius: 8px;
+	pointer-events: none;
 }
 
-div.tooltip-large{
-    height: 30px;
-    width: 120px;
+div.tooltip-large {
+	height: 30px;
+	width: 120px;
 }
 
 textarea {
-    width: 99%;
-    height: 400px;
-    border: 0px;
-    background: transparent;
-    -webkit-box-shadow: 0px 0px 0px 0px;
-    box-shadow: 0px 0px 0px 0px;
-    font-size: 11pt;
-    font-weight:bold;
+	width: 99%;
+	height: 400px;
+	border: 0px;
+	background: transparent;
+	-webkit-box-shadow: 0px 0px 0px 0px;
+	box-shadow: 0px 0px 0px 0px;
+	font-size: 11pt;
+	font-weight: bold;
 }
 
-
 .close {
-    opacity: 1.0;
+	opacity: 1.0;
 }
 
 svg {
-    font: 10px sans-serif;
+	font: 10px sans-serif;
 }
 
 .area {
-    fill: lightgray;
-    clip-path: url(#clip);
+	fill: lightgray;
+	clip-path: url(#clip);
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
+.axis path, .axis line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
 }
 
 .brush .extent {
-    stroke: #fff;
-    fill-opacity: .125;
-    shape-rendering: crispEdges;
-    clip-path: url(#clip);
+	stroke: #fff;
+	fill-opacity: .125;
+	shape-rendering: crispEdges;
+	clip-path: url(#clip);
 }
 
 rect.pane {
-    cursor: move;
-    fill: none;
-    pointer-events: all;
+	cursor: move;
+	fill: none;
+	pointer-events: all;
 }
 
-#container{
-    text-align: center;
+#container {
+	text-align: center;
 }
 
-.changeView{
+.changeView {
 	margin-top: 5px;
-    margin-bottom: 5px;
-    
+	margin-bottom: 5px;
 }
 
 .btn-group.changeView {
 	padding: 0px;
 }
 
-.row { 
-	margin-top:10px; 
+.row {
+	margin-top: 10px;
 }
 
-#change-view-bar div{
+#change-view-bar div {
 	padding: 5px;
 }
 
-div.providers{
+div.providers {
 	overflow-x: hidden;
 	min-height: 400px;
 }
 
-.tick line{
-    opacity: 0.2;
-    stroke-dasharray: 3, 3;
+.tick line {
+	opacity: 0.2;
+	stroke-dasharray: 3, 3;
 }
 
 #left-panel-pills {
 	padding-right: 0px;
+}
+
+.tab-pane .providers .list-group-item.active {
+	background-color: #f5f5f5;
+	border-color: currentColor;
+	background-image: none;
+	text-shadow: none;
+}
+
+#public-showAll.active, #user-showAll.active {
+	text-shadow: 0 -1px 0 #286090;
+	background-image: linear-gradient(to bottom, #337ab7 0, #2b669a 100%);
+	background-repeat: repeat-x;
+	background-color: #337ab7;
+	color: #fff;
+	z-index: 2;
 }

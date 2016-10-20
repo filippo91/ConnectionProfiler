@@ -122,7 +122,7 @@
 	</div>
 	<div class="container col-md-8" ng-controller="navigation as nav">
 		<div class="row">
-			<div ng-show="nav.enableRealTime" class="col-md-2" id="realtimediv">
+			<div ng-show="nav.enableRealTime" class="col-md-3" id="realtimediv">
 				<button ng-click="realtime();" class="btn"
 					ng-class="socketConnected ? 'btn-danger active' : 'btn-default'">
 					<span
@@ -130,9 +130,14 @@
 						aria-hidden="true"></span> realtime
 			</button>
 			</div>
-			<div ng-show="nav.binSelector" class="col-md-3 col-md-offset-5 ng-cloak">
-				<input id="btn-bin-minus" type="button" class="btn btn-default" value="-" ng-click="nav.changeBinSize($event)">
-				<input id="btn-bin-plus" type="button" class="btn btn-default" value="+" ng-click="nav.changeBinSize($event)">
+			<div ng-show="nav.binSelector" class="col-md-3 col-md-offset-5 btn-group ng-cloak">
+			
+				<button id="btn-bin-minus" type="button" class="btn btn-default" ng-click="nav.changeBinSize($event)">
+					<span class="glyphicon glyphicon-zoom-out"></span>
+				</button>
+				<button id="btn-bin-plus" type="button" class="btn btn-default" ng-click="nav.changeBinSize($event)">
+					<span class="glyphicon glyphicon-zoom-in"></span>
+				</button>
 				<span>Bin width: {{ nav.binSelector.width }}</span>
 			</div>
 		</div>

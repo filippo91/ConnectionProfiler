@@ -273,7 +273,9 @@ public class Download {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((asnum == null) ? 0 : asnum.hashCode());
+		result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
 		return result;
 	}
 
@@ -286,13 +288,25 @@ public class Download {
 		if (!(obj instanceof Download))
 			return false;
 		Download other = (Download) obj;
-		if (id == null) {
-			if (other.id != null)
+		if (asnum == null) {
+			if (other.asnum != null)
 				return false;
-		} else if (!id.equals(other.id))
+		} else if (!asnum.equals(other.asnum))
+			return false;
+		if (timestamp == null) {
+			if (other.timestamp != null)
+				return false;
+		} else if (!timestamp.equals(other.timestamp))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
 			return false;
 		return true;
 	}
+
+	
 	
 	
 }

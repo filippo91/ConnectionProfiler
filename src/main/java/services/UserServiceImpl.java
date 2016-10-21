@@ -1,17 +1,17 @@
 package services;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import exceptions.TokenNotValidException;
+import exceptions.UsernameAlreadyExistException;
 import listeners.OnRegistrationCompleteEvent;
 import models.User;
 import models.VerificationToken;
@@ -21,16 +21,22 @@ import repositories.UserRepository;
 public class UserServiceImpl implements UserService {
 	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 	
-	private static final String APP_URL = "http://localhost:8080/connectionProfiler/index.html#!/confirmRegistration";
+	private static final String APP_URL = "http://localhost:8080/connectionProfiler";
 	
 	@Autowired private UserRepository userRepository;
 	@Autowired private TokenService tokenService;
 	@Autowired private ApplicationEventPublisher eventPublisher;
 	
+	@Transactional
 	@Override
 	public void register(User user, Date registrationDate) {
 		log.info("Try to register a new user with the following information: " + user);
 		
+		User userDB = userRepository.findByUsername(user.getUsername());
+		if(userDB != null){
+			throw new UsernameAlreadyExistException();
+		}
+
 		/*
 		 * Fill the spring related fields for a user object and 
 		 * save it in the repository.
@@ -41,9 +47,8 @@ public class UserServiceImpl implements UserService {
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         user.setRole("ROLE_USER");
-        user.setId(createUserId(user));
 		userRepository.save(user);
-		
+
 		// create and save a verification token for this user
 		String token = tokenService.createToken(user, registrationDate);
 		
@@ -58,24 +63,6 @@ public class UserServiceImpl implements UserService {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		String encryptedPassword = encoder.encode(password);
 		return encryptedPassword;
-	}
-
-	private Integer createUserId(User user) {
-		Integer id = null;
-		User foundUser = user;
-		
-		assertNotNull(foundUser);
-		
-		int collisionsCounter = 0;
-		while(foundUser != null){
-			id = user.hashCode() + collisionsCounter;
-			foundUser = userRepository.findById(id);
-			collisionsCounter++;
-		}
-		
-		assertNotNull(id);
-		
-		return id;
 	}
 
 	@Override
@@ -93,16 +80,5 @@ public class UserServiceImpl implements UserService {
 		User user = verificationToken.getUser();
 		user.setEnabled(true);
 		userRepository.save(user);
-	}
-
-	@Override
-	public User getCurrentUser() {
-		/* 
-		 * leverage spring security mechanism to get the current
-		 * user from the security context.
-		 */
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		User user = userRepository.findByUsername(username);
-		return user;
 	}
 }

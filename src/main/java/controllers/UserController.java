@@ -36,26 +36,21 @@ public class UserController {
 		return user;
 	}
 
-	@PostMapping("/publics/newUser")
-	//@ResponseStatus(value = HttpStatus.CREATED)
+	@PostMapping("/user")
+	@ResponseStatus(value = HttpStatus.CREATED)
 	public void register(@RequestBody @Valid User user, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			log.error("Binding Result contains errors");
 			throw new InvalidParameterException();
 		}
-
-		try{
-			userService.register(user, DateTime.now().toDate());
-		}catch(DataIntegrityViolationException ex){
-			log.info("Impossible to save the user into the DB");
-			throw ex;
-		}
+		
+		userService.register(user, DateTime.now().toDate());
 		
 		log.info("User successfully registered.");
 		log.info("New user details: " + user);
 	}
 
-	@PostMapping(value = "/publics/newUser/confirmRegistration")
+	@PostMapping(value = "/user/confirm")
 	public void confirmRegistration(@RequestBody String token) {
 		userService.confirmRegistration(token, new Date());
 	}
@@ -63,13 +58,14 @@ public class UserController {
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
 	@ExceptionHandler(InvalidParameterException.class)
 	public void badInputForNewUser() {
-		// Nothing to do
+		log.info("InvalidParameterException");
 	}
 	
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
 	@ExceptionHandler(DataIntegrityViolationException.class)
-	public void duplicateInformationForNewUser() {
-		// Nothing to do
+	public void duplicateInformationForNewUser(DataIntegrityViolationException dive) {
+		log.info("Impossible to save the user into the DB");
+		System.out.println(dive);
 	}
 	
 }

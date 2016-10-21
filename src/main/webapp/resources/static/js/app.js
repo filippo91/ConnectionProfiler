@@ -58,8 +58,8 @@ angular.module('myApp', [
     	urls.authenticate = '/user'
     	urls.login = '/login';
     	urls.logout = '/logout';
-    	urls.createUser = '/publics/user';
-    	urls.confirmRegistration = '/publics/user/confirmRegistration';
+    	urls.createUser = '/user';
+    	urls.confirmRegistration = '/user/confirmRegistration';
     	urls.websocket = '/connection-profiler-websocket';
     	
     	return urls;
@@ -80,9 +80,9 @@ angular.module('myApp', [
     	restAPI.pieSize = root + '/pieSize/:year/:month/:day/:view';
     	restAPI.latency = root + '/latencyHistogram/:year/:month/:day/:view/:bin_width';
     	restAPI.speedTable = root + '/speedTable/:page/:size';
-    	restAPI.speedGraphPublic = root + '/publics/speedGraph/:year/:month/:day/:view';
+    	restAPI.speedGraphPublic = root + '/public/speedGraph/:year/:month/:day/:view';
     	restAPI.speedGraphUser = root + '/speedGraph/:year/:month/:day/:view';    	
-        restAPI.speedHistogramPublic = root + '/publics/speedHistogram/:year/:month/:day/:view';
+        restAPI.speedHistogramPublic = root + '/public/speedHistogram/:year/:month/:day/:view';
         restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view';
         
     	return restAPI;

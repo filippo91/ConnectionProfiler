@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
 
@@ -30,7 +32,7 @@ public class User implements UserDetails {
 	 */
 	private static final long serialVersionUID = 5004792185908475274L;
 
-	@Id
+	@Column(unique=true)
 	@Size(min=3, max=20)
 	private  String username;
 	
@@ -40,7 +42,8 @@ public class User implements UserDetails {
 	
     private String password;
 
-    @Column(unique=true)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
     private boolean accountNonExpired;
@@ -150,4 +153,13 @@ public class User implements UserDetails {
         
         return authorities;
 	}
+
+	@Override
+	public String toString() {
+		return "User [username=" + username + ", email=" + email + ", id=" + id + ", accountNonExpired="
+				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked + ", credentialsNonExpired="
+				+ credentialsNonExpired + ", enabled=" + enabled + ", role=" + role + "]";
+	}
+	
+	
 }

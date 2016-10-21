@@ -55,6 +55,7 @@ angular.module('myApp', [
     	console.info('root application url: ' + root);
     	
     	urls.root = root;
+    	urls.authenticate = '/user'
     	urls.login = '/login';
     	urls.logout = '/logout';
     	urls.createUser = '/publics/user';
@@ -539,7 +540,7 @@ angular.module('myApp', [
             } : {};
 
             console.log(headers);
-            var auth_url = appURLs.root + appURLs.login; 
+            var auth_url = appURLs.root + appURLs.authenticate; 
             
             $http.get(auth_url, {headers: headers}).then(function (response) {
                 if (response.data.name) {
@@ -563,16 +564,16 @@ angular.module('myApp', [
         self.credentials = {};
         self.login = function () {
             console.log(self.credentials);
+            self.dataLoading = true;
             authenticate(self.credentials, function () {
                 
                 if ($rootScope.authenticated) {
-
                     $location.path($rootScope.previousLocation);
                     $rootScope.previousLocation = '/';
                     self.error = false;
                 } else {
-                    $location.path(appURLs.login);
                     self.error = true;
+                    self.dataLoading = false;
                 }
                 
             });
@@ -592,7 +593,7 @@ angular.module('myApp', [
     })
 
     .controller('register',
-    function ($rootScope, $http, $location) {
+    function ($rootScope, $http, $location, appURLs) {
         $rootScope.enableChangeView = false;
 
         var self = this;
@@ -603,10 +604,10 @@ angular.module('myApp', [
             console.log(self.user);
             var createUser_url = appURLs.root + appURLs.createUser;
             $http.post(createUser_url, user).then(function () {
-                    $location.path(appURLs.login);
+            		$location.path(appURLs.confirmRegistration);
                 }, function () {
-                    $location.path('/');
-                    self.dataLoading = false;
+                	self.error = true;
+                	self.dataLoading = false;
                 }
             );
         };

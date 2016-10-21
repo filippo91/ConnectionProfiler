@@ -45,7 +45,7 @@ public class SpeedGraphController {
 	}
 	
 	@PreAuthorize("permitAll()")
-	@GetMapping("/publics/speedGraph/{year}/{month}/{day}/{view}")
+	@GetMapping("/public/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getPublicDownloadsSpeed(
 			@PathVariable int year, 
 			@PathVariable int month, 

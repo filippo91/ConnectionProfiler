@@ -44,7 +44,7 @@ public class SpeedHistogramController {
 	}
 	
 	@PreAuthorize("permitAll()")
-	@GetMapping("/publics/speedHistogram/{year}/{month}/{day}/{view}/{width}")
+	@GetMapping("/public/speedHistogram/{year}/{month}/{day}/{view}/{width}")
 	public Collection<BinSpeedDownload> getPublicBinSpeedDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 

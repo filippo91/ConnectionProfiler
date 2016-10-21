@@ -184,7 +184,7 @@ angular.module('myApp', [
                     view: view,
                     bin_width: self.binSelector.width
                 });
-                console.info($routeParams);
+                
             }
         };
 
@@ -223,7 +223,7 @@ angular.module('myApp', [
                     view: view,
                     bin_width: self.binWidthSelector
                 });
-                console.info($routeParams);
+                
             }
         };
 
@@ -301,7 +301,6 @@ angular.module('myApp', [
 	                self.timeManager = true;
 	            }
 	            
-	            console.info(self.REAL_TIME_PAGES, pagePrefix);
 	            if (self.REAL_TIME_PAGES.indexOf(pagePrefix) < 0) {
 	                self.enableRealTime = false;
 	            } else {
@@ -336,12 +335,12 @@ angular.module('myApp', [
                     date.add(3 * directionSign, "months");
                     break;
             }
-            console.info(date.format('YYYY MM DD'));
+            
             return date;
         }
 
         function computeEndDate(date, view) {
-            console.info(date.format('YYYY MM DD'), view)
+            
             switch (view) {
                 case "week":
                     date.endOf("isoWeek");
@@ -353,7 +352,7 @@ angular.module('myApp', [
                     date.add(2, "months");
                     break;
             }
-            console.info(date.format('YYYY MM DD'));
+            
             return date;
         }
 
@@ -541,7 +540,7 @@ angular.module('myApp', [
 
             console.log(headers);
             var auth_url = appURLs.root + appURLs.login; 
-            console.info('contacting: ' + auth_url + ' for authentication');
+            
             $http.get(auth_url, {headers: headers}).then(function (response) {
                 if (response.data.name) {
                     $rootScope.authenticated = true;
@@ -565,7 +564,7 @@ angular.module('myApp', [
         self.login = function () {
             console.log(self.credentials);
             authenticate(self.credentials, function () {
-                console.info($rootScope.previousLocation);
+                
                 if ($rootScope.authenticated) {
 
                     $location.path($rootScope.previousLocation);
@@ -575,7 +574,7 @@ angular.module('myApp', [
                     $location.path(appURLs.login);
                     self.error = true;
                 }
-                console.info($location.path);
+                
             });
         };
         self.logout = function () {

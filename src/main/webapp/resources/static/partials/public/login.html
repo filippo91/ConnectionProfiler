@@ -1,6 +1,10 @@
-<div class="container">
+<div id="login" class="container">
 	<div class="col-md-6 col-md-offset-3" style="height: 700px">
 		<h2>Login</h2>
+		<div ng-show="controller.error" class="bg-danger">username or password is incorrect</div>
+		<div id="loading" ng-show="controller.dataLoading">
+			<img alt="loading" src="img/Preloader_1.gif">
+		</div>
 		<form name="form" ng-submit="controller.login()" role="form">
 			<div class="form-group"
 				ng-class="{ 'has-error': form.username.$dirty && form.username.$error.required }">
@@ -19,7 +23,7 @@
 					class="help-block">Password is required</span>
 			</div>
 			<div class="form-actions">
-				<button type="submit" ng-disabled="form.$invalid || vm.dataLoading"
+				<button type="submit" ng-disabled="form.$invalid || controller.dataLoading || !form.$dirty"
 					class="btn btn-primary">Login</button>
 				<a href="#!/register" class="btn btn-link">Register</a>
 			</div>

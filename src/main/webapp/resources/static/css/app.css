@@ -110,3 +110,9 @@ div.providers {
 	color: #fff;
 	z-index: 2;
 }
+
+#login #loading, #register #loading {
+	z-index: 2;
+	position: absolute;
+	left: 200px;
+}

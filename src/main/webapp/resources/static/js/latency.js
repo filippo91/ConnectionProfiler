@@ -33,8 +33,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         $rootScope.websocketCallbackPublic = function(){};
     }])
 
-    .factory('latencyFactory',['$resource', function($resource){
-        var requestURL = "http://localhost:8080/connectionProfiler/latencyHistogram/:year/:month/:day/:view/:bin_width";
+    .factory('latencyFactory',['$resource', 'REST_API_URLs', function($resource, api){
+        var requestURL = api.latency;
+        
         var factory = {};
         factory.getLatencyData = function(year, month, day, view, bin_width, trigger){
             return $resource(requestURL).query({year : year, month : month, day : day, view : view, bin_width : bin_width}, function(latencyData){

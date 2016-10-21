@@ -34,9 +34,10 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
 
     }])
 
-    .factory('domainsDownloadFactory',['$resource', function($resource){
-        var pieAccessUri = "http://localhost:8080/connectionProfiler/pieAccesses/:year/:month/:day/:view";
-        var pieSizeUri = "http://localhost:8080/connectionProfiler/pieSize/:year/:month/:day/:view";
+    .factory('domainsDownloadFactory',['$resource', 'REST_API_URLs', function($resource, api){
+        var pieAccessUri = api.pieAccess;
+        var pieSizeUri = api.pieSize;
+        	
         var factory = {};
 
         factory.getDomainsAccessData = function(year, month, day, view, trigger){

@@ -64,6 +64,29 @@ angular.module('myApp', [
     	return urls;
     }])
     
+    .factory('REST_API_URLs', [function(){
+    	var restAPI = {};
+    	
+    	var pathArray = location.href.split( '/' );
+    	var protocol = pathArray[0];
+    	var host = pathArray[2];
+    	
+    	var root = protocol + '//' + host + '/connectionProfiler';
+    	
+    	console.info('root REST API url: ' + root);
+    	
+    	restAPI.pieAccess = root + '/pieAccesses/:year/:month/:day/:view';
+    	restAPI.pieSize = root + '/pieSize/:year/:month/:day/:view';
+    	restAPI.latency = root + '/latencyHistogram/:year/:month/:day/:view/:bin_width';
+    	restAPI.speedTable = root + '/speedTable/:page/:size';
+    	restAPI.speedGraphPublic = root + '/publics/speedGraph/:year/:month/:day/:view';
+    	restAPI.speedGraphUser = root + '/speedGraph/:year/:month/:day/:view';    	
+        restAPI.speedHistogramPublic = root + '/publics/speedHistogram/:year/:month/:day/:view';
+        restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view';
+        
+    	return restAPI;
+    }])
+    
     .controller('home', function ($rootScope, $http) {
         $rootScope.enableChangeView = false;
 

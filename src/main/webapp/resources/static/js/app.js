@@ -13,9 +13,8 @@ angular.module('myApp', [
     'myApp.domainsBySize',
     'myApp.userProfile'
 ])
-
     .constant("PUBLIC_PAGES", ['', 'login', 'register', 'confirmRegistration', 'speedGraph', 'speedHistogram'])
-
+    
     .config(['$locationProvider', '$routeProvider', '$httpProvider', function ($locationProvider, $routeProvider, $httpProvider) {
         $locationProvider.hashPrefix('!');
         $routeProvider.
@@ -44,16 +43,37 @@ angular.module('myApp', [
         $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
     }])
 
+    .factory('appURLs', [function(){
+    	var urls = {};
+    	
+    	var pathArray = location.href.split( '/' );
+    	var protocol = pathArray[0];
+    	var host = pathArray[2];
+    	
+    	var root = protocol + '//' + host + '/connectionProfiler';
+    	
+    	console.info('root application url: ' + root);
+    	
+    	urls.root = root;
+    	urls.login = '/login';
+    	urls.logout = '/logout';
+    	urls.createUser = '/publics/user';
+    	urls.confirmRegistration = '/publics/user/confirmRegistration';
+    	urls.websocket = '/connection-profiler-websocket';
+    	
+    	return urls;
+    }])
+    
     .controller('home', function ($rootScope, $http) {
         $rootScope.enableChangeView = false;
 
     })
 
-    .controller('navigation', function ($rootScope, $http, $location, $route, $routeParams, PUBLIC_PAGES, $scope) {
+    .controller('navigation', function ($rootScope, $http, $location, $route, $routeParams, PUBLIC_PAGES, $scope, appURLs) {
         /*
-         * Global variable used to show/hide the time navigation bar.
-         * Set it to true in your controller, if you want show that bar in your view.
-         * */
+		 * Global variable used to show/hide the time navigation bar. Set it to
+		 * true in your controller, if you want show that bar in your view.
+		 */
         $rootScope.enableChangeView = false;
 
         /* Global variable holding user details */
@@ -69,16 +89,16 @@ angular.module('myApp', [
         var self = this;
 
         /*
-         * They hold the start and end date of the timespan to show
-         */
+		 * They hold the start and end date of the timespan to show
+		 */
         self.startDate = moment().startOf('isoWeek');
         /* compute and set end date */
         self.endDate = computeEndDate(self.startDate.clone(), 'week');
 
         /*
-         * Holds the current view type: {'week', 'month', 'year'}
-         * initialize it using route params
-         */
+		 * Holds the current view type: {'week', 'month', 'year'} initialize it
+		 * using route params
+		 */
         self.activeView = {};
         self.activeView.view = 'week';
         setActiveViewDate(self.startDate, self.endDate);
@@ -90,7 +110,7 @@ angular.module('myApp', [
 
         /* Bin Width Params */
         self.BIN_SELECTOR_PAGES = ['speedHistogram', 'latency'];
-        //holds the current bin selector, either latency or speedHistogram
+        // holds the current bin selector, either latency or speedHistogram
         self.binSelector = null;
 
         self.latencyBin = {};
@@ -116,10 +136,9 @@ angular.module('myApp', [
         /* public methods */
 
         /*
-         * update (start, end dates) and route parameters
-         * in order to change the view
-         * view : (week, month, months)
-         */
+		 * update (start, end dates) and route parameters in order to change the
+		 * view view : (week, month, months)
+		 */
         self.changeActiveView = function (view) {
             self.activeView.view = view;
             // update end date according with the new view type
@@ -147,11 +166,10 @@ angular.module('myApp', [
         };
 
         /*
-         * move timespan back and forward according
-         * with the direction input parameter
-         * direction : (backward, forwars, today)
-         *
-         */
+		 * move timespan back and forward according with the direction input
+		 * parameter direction : (backward, forwars, today)
+		 * 
+		 */
         self.move = function (direction) {
             var view = self.activeView.view;
             if (direction == 'today') {
@@ -160,7 +178,7 @@ angular.module('myApp', [
                 self.startDate = computeStartDate(self.startDate.clone(), view, direction);
             }
 
-            /// TODO
+            // / TODO
             $rootScope.lastExtent = [self.activeView.startDate,self.activeView.endDate];
 
             self.endDate = computeEndDate(self.startDate.clone(), view);
@@ -187,9 +205,9 @@ angular.module('myApp', [
         };
 
         /*
-         * event handler to change the bin size where it's possible.
-         * Trigger update parameters.
-         */
+		 * event handler to change the bin size where it's possible. Trigger
+		 * update parameters.
+		 */
         self.changeBinSize = function ($event) {
             var btn = $event.currentTarget.id === 'btn-bin-plus' ? 1 : -1;
 
@@ -212,19 +230,19 @@ angular.module('myApp', [
         };
 
         /*
-         * Basic navigation logic to enable part of the logic or the access to 
-         * 'private' pages.
-         * 
-         * PUBLIC_PAGES list is a predefined application constant that 
-         * holds the name of the pages that are meant to be publicly available.
-         * 
-         * BIN_SELECTOR_PAGES contains the pages that needs a bin selector
-         * input field.
-         * 
-         * TIME_MANAGER_PAGES lists the pages that needs a time manager 
-         * bar to navigate the plots.
-         * 
-         */
+		 * Basic navigation logic to enable part of the logic or the access to
+		 * 'private' pages.
+		 * 
+		 * PUBLIC_PAGES list is a predefined application constant that holds the
+		 * name of the pages that are meant to be publicly available.
+		 * 
+		 * BIN_SELECTOR_PAGES contains the pages that needs a bin selector input
+		 * field.
+		 * 
+		 * TIME_MANAGER_PAGES lists the pages that needs a time manager bar to
+		 * navigate the plots.
+		 * 
+		 */
         $rootScope.$on('$routeChangeStart', function (event, next, prev) {
             var pagePrefix = null;
             var thisPageUrl = $location.url();
@@ -241,7 +259,7 @@ angular.module('myApp', [
                 self.timeManager = self.enableRealTime = false;
                 $rootScope.previousLocation = $location.path();
                 $rootScope.$evalAsync(function () {
-                    $location.path("/login");
+                    $location.path(appURLs.login);
                 });
             }else{            
 	            if (self.BIN_SELECTOR_PAGES.indexOf(pagePrefix) < 0) {
@@ -275,11 +293,11 @@ angular.module('myApp', [
 
         function computeStartDate(date, view, direction) {
             /*
-             * direction == 'forward': add
-             *
-             * direction == 'backward': subtract = call same moment method (add)
-             * with negative quantities
-             */
+			 * direction == 'forward': add
+			 * 
+			 * direction == 'backward': subtract = call same moment method (add)
+			 * with negative quantities
+			 */
             var directionSign = direction == 'forward' ? 1 : -1;
             switch (view) {
                 case "week":
@@ -317,9 +335,9 @@ angular.module('myApp', [
         }
 
         /*
-         * put (day, month, year) in the scope for the view
-         * put also start and end milliseconds
-         */
+		 * put (day, month, year) in the scope for the view put also start and
+		 * end milliseconds
+		 */
         function setActiveViewDate(start, end) {
             self.activeView.startDate = start.valueOf();
             self.activeView.endDate = end.valueOf();
@@ -342,8 +360,8 @@ angular.module('myApp', [
         $rootScope.currentDate = moment();
 
         /**
-         * Functions for controlling time
-         */
+		 * Functions for controlling time
+		 */
         $rootScope.changeView = function (ele) {
             $(".view").removeClass("active");
             var currentParam = $routeParams;
@@ -444,13 +462,14 @@ angular.module('myApp', [
 
         // //////////////
         $rootScope.socketConnected = false;
-        //connect();
+        // connect();
         $rootScope.realtime = function () {
             $rootScope.socketConnected ? disconnect() : connect();
             console.log("is conn: " + $rootScope.socketConnected);
         };
         function connect() {
-            var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+        	var websocket_url = appURLs.root + appURLs.websocket;
+            var socket = new SockJS(websocket_url);
             var stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 $rootScope.$apply(function () {
@@ -498,8 +517,9 @@ angular.module('myApp', [
             } : {};
 
             console.log(headers);
-
-            $http.get('http://localhost:8080/connectionProfiler/user', {headers: headers}).then(function (response) {
+            var auth_url = appURLs.root + appURLs.login; 
+            console.info('contacting: ' + auth_url + ' for authentication');
+            $http.get(auth_url, {headers: headers}).then(function (response) {
                 if (response.data.name) {
                     $rootScope.authenticated = true;
                     $rootScope.user = {};
@@ -529,14 +549,15 @@ angular.module('myApp', [
                     $rootScope.previousLocation = '/';
                     self.error = false;
                 } else {
-                    $location.path("/login");
+                    $location.path(appURLs.login);
                     self.error = true;
                 }
                 console.info($location.path);
             });
         };
         self.logout = function () {
-            $http.post('http://localhost:8080/connectionProfiler/logout', {}).finally(function () {
+        	var logout_url = appURLs.root + appURLs.logout;
+            $http.post(logout_url, {}).finally(function () {
                 $rootScope.authenticated = false;
                 disconnect();
                 $location.path("/");
@@ -558,8 +579,9 @@ angular.module('myApp', [
         self.user.password = "";
         var createUser = function (user) {
             console.log(self.user);
-            $http.post('http://localhost:8080/connectionProfiler/publics/user', user).then(function () {
-                    $location.path('/login');
+            var createUser_url = appURLs.root + appURLs.createUser;
+            $http.post(createUser_url, user).then(function () {
+                    $location.path(appURLs.login);
                 }, function () {
                     $location.path('/');
                     self.dataLoading = false;
@@ -575,13 +597,14 @@ angular.module('myApp', [
     }
 )
     .controller('confirmRegistration',
-    function ($rootScope, $http, $location) {
+    function ($rootScope, $http, $location, appURLs) {
         $rootScope.enableChangeView = false;
         var self = this;
         self.token = "";
         var sendToken = function (token) {
-            $http.post('http://localhost:8080/connectionProfiler/publics/user/confirmRegistration', token).then(function () {
-                    $location.path('/login');
+        	var sendToken_url = appURLs.root + appURLs.confirmRegistration;
+            $http.post(sendToken_url, token).then(function () {
+                    $location.path(appURLs.login);
                 }, function () {
                     $location.path('/');
                     self.dataLoading = false;

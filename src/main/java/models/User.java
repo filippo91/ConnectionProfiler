@@ -63,6 +63,7 @@ public class User implements UserDetails {
     
     private String role;
     
+    @JsonIgnore
     @OneToMany(mappedBy="user", cascade=CascadeType.PERSIST)
     private Set<Subscription> subscriptions = new HashSet<>();
     

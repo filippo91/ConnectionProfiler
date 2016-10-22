@@ -562,7 +562,6 @@ angular.module('myApp', [
         authenticate();
         self.credentials = {};
         self.login = function () {
-            console.log(self.credentials);
             self.dataLoading = true;
             authenticate(self.credentials, function () {
                 

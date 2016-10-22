@@ -55,7 +55,8 @@ angular.module('myApp', [
     	console.info('root application url: ' + root);
     	
     	urls.root = root;
-    	urls.authenticate = '/user'
+    	urls.authenticate = '/user';
+    	urls.userDetails = '/user';
     	urls.login = '/login';
     	urls.logout = '/logout';
     	urls.createUser = '/user';
@@ -82,8 +83,8 @@ angular.module('myApp', [
     	restAPI.speedTable = root + '/speedTable/:page/:size';
     	restAPI.speedGraphPublic = root + '/public/speedGraph/:year/:month/:day/:view';
     	restAPI.speedGraphUser = root + '/speedGraph/:year/:month/:day/:view';    	
-        restAPI.speedHistogramPublic = root + '/public/speedHistogram/:year/:month/:day/:view';
-        restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view';
+        restAPI.speedHistogramPublic = root + '/public/speedHistogram/:year/:month/:day/:view/:bin_width';
+        restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view/:bin_width';
         
     	return restAPI;
     }])

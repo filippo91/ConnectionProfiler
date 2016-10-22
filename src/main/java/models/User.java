@@ -21,6 +21,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 
 /**
@@ -46,7 +48,7 @@ public class User implements UserDetails {
 	@Column(unique=true)
 	private String email;
 	
-	@JsonIgnore
+	@JsonProperty(access = Access.WRITE_ONLY)
     private String password;
 
     @Id
@@ -61,7 +63,7 @@ public class User implements UserDetails {
     
     private String role;
     
-    @OneToMany(mappedBy="userId", cascade=CascadeType.PERSIST)
+    @OneToMany(mappedBy="user", cascade=CascadeType.PERSIST)
     private Set<Subscription> subscriptions = new HashSet<>();
     
     public User() {
@@ -100,6 +102,7 @@ public class User implements UserDetails {
 		this.uid = id;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
@@ -173,11 +176,7 @@ public class User implements UserDetails {
 	}
 
 	public void addSubscription(Subscription s){
-		//TODO
-	}
-	
-	public void deleteSubscription(Subscription s){
-		//TODO
+		this.subscriptions.add(s);
 	}
 	
 	@Override

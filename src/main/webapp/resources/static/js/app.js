@@ -154,7 +154,6 @@ angular.module('myApp', [
         self.TIME_MANAGER_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency'];
         self.REAL_TIME_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency', 'speedTable'];
         
-        console.log("reset");
         self.timeManager = false;
         self.enableRealTime = false;
         
@@ -540,7 +539,6 @@ angular.module('myApp', [
                 + btoa(credentials.username + ":" + credentials.password)
             } : {};
 
-            console.log(headers);
             var auth_url = appURLs.root + appURLs.authenticate; 
             
             $http.get(auth_url, {headers: headers}).then(function (response) {
@@ -599,10 +597,8 @@ angular.module('myApp', [
 
         var self = this;
         self.user = {};
-        self.user.username = "";
-        self.user.password = "";
+        
         var createUser = function (user) {
-            console.log(self.user);
             var createUser_url = appURLs.root + appURLs.createUser;
             $http.post(createUser_url, user).then(function () {
             		$location.path(appURLs.confirmRegistration);
@@ -613,10 +609,10 @@ angular.module('myApp', [
             );
         };
 
-        self.register = function () {
+        self.register = function (form) {
+        	var user = {username: form.username, password: form.password, email: form.email};
             self.dataLoading = true;
-            createUser(self.user);
-
+            createUser(user);
         };
     }
 )

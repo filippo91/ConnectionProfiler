@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import exceptions.TokenNotValidException;
 import exceptions.UsernameAlreadyExistException;
 import listeners.OnRegistrationCompleteEvent;
+import models.Subscription;
 import models.User;
 import models.VerificationToken;
 import repositories.UserRepository;
@@ -21,15 +22,13 @@ import repositories.UserRepository;
 public class UserServiceImpl implements UserService {
 	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 	
-	private static final String APP_URL = "http://localhost:8080/connectionProfiler";
-	
 	@Autowired private UserRepository userRepository;
 	@Autowired private TokenService tokenService;
 	@Autowired private ApplicationEventPublisher eventPublisher;
 	
 	@Transactional
 	@Override
-	public void register(User user, Date registrationDate) {
+	public void register(User user, VerificationToken verificationToken) {
 		log.info("Try to register a new user with the following information: " + user);
 		
 		User userDB = userRepository.findByUsername(user.getUsername());
@@ -48,23 +47,23 @@ public class UserServiceImpl implements UserService {
         user.setCredentialsNonExpired(true);
         user.setRole("ROLE_USER");
 		userRepository.save(user);
-
-		// create and save a verification token for this user
-		String token = tokenService.createToken(user, registrationDate);
 		
 		/* set up an event that causes the system to send an email
 		 * to the user in order to verify his account through the 
 		 * verification token just created.
 		 */		
-		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user, APP_URL, token));
+		verificationToken.setUser(user);
+		tokenService.save(verificationToken);
+
+		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(verificationToken));
 	}
 
 	private String getEncrypted(String password) {
 		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		System.out.println(password);
 		String encryptedPassword = encoder.encode(password);
 		return encryptedPassword;
 	}
-
 	@Override
 	public void confirmRegistration(String token, Date confirmationDate) {
 		VerificationToken verificationToken = tokenService.findByToken(token);
@@ -79,6 +78,12 @@ public class UserServiceImpl implements UserService {
 		 */
 		User user = verificationToken.getUser();
 		user.setEnabled(true);
+		userRepository.save(user);
+	}
+
+	@Override
+	public void addSubscription(User user, Subscription s) {
+		user.addSubscription(s);
 		userRepository.save(user);
 	}
 }

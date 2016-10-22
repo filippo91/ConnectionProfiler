@@ -6,7 +6,6 @@ import java.util.Date;
 
 import javax.validation.Valid;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import models.User;
+import models.VerificationToken;
 import services.UserService;
 
 @CrossOrigin
@@ -38,13 +38,12 @@ public class UserController {
 
 	@PostMapping("/user")
 	@ResponseStatus(value = HttpStatus.CREATED)
-	public void register(@RequestBody @Valid User user, BindingResult bindingResult) {
+	public void register(@RequestBody @Valid User user, BindingResult bindingResult, VerificationToken verificatioToken) {
 		if (bindingResult.hasErrors()) {
 			log.error("Binding Result contains errors");
 			throw new InvalidParameterException();
 		}
-		
-		userService.register(user, DateTime.now().toDate());
+		userService.register(user, verificatioToken);
 		
 		log.info("User successfully registered.");
 		log.info("New user details: " + user);

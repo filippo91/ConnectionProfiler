@@ -39,7 +39,7 @@ public class SpeedGraphController {
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		
 		//User user = userService.getCurrentUser();
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		
 		return plotsService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}

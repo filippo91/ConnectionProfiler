@@ -32,7 +32,7 @@ public class PieSizeController {
 			@PathVariable View view, 
 			@AuthenticationPrincipal User user){
 		//User user = userService.getCurrentUser();
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		log.debug("getDomainSizeDownload for " + uuid);
 		return plotsService.getDomainSizeDownload(uuid, year, month, day, view);

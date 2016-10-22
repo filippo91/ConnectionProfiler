@@ -34,7 +34,7 @@ private static final Logger log = LoggerFactory.getLogger(LatencyHistogramContro
 			@PathVariable int bin_width,
 			@AuthenticationPrincipal User user){
 		
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		return plotsService.getBinLatencyDownloads(uuid, year, month, day, view, bin_width);
 	}

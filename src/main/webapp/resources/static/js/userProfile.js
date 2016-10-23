@@ -53,10 +53,11 @@ myAppUserProfile.factory('providersFactory', ['$resource', 'REST_API_URLs', func
 	var factory = {};
 	///subscriptions/:asnum
 	var subscriptionsResource =  $resource(api.subscriptions);
-													
+	var subscriptionsSummaryResource =  $resource(api.subscriptionsSummary);
+	
 	console.log(api.subscriptions);
 	factory.getAll = function(){
-		return subscriptionsResource.query();
+		return subscriptionsSummaryResource.query();
 	};
 	
 	factory.addProvider = function(p){

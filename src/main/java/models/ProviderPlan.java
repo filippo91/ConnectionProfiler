@@ -1,5 +1,6 @@
 package models;
 
+
 public class ProviderPlan {
 	private Integer asnum;
 	private String asname;	

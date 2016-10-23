@@ -1,13 +1,11 @@
 package repositories;
 
-import static org.junit.Assert.*;
-
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,152 +13,144 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import models.AvgDaySpeedDownload;
+import models.BinLatencyDownload;
+import models.BinSpeedDownload;
 import models.Download;
+import models.FrequencyAccess;
 import models.SizeDownload;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DownloadRepositoryTestConfiguration.class)
 public class DownloadRepositoryTest {
-	@Autowired DownloadRepository downloadRepository;
+	private static final int N_WEEKS = 2;
+	private static final int N_RECORDS_PER_WEEKDAY = 10;
+	private static final int N_USERS = 5;
+	private static final String[] DOMAIN = { "google.com", "yahoo.com", "facebook.com" };
+	private static final String[] ASNAME = { "vodafone", "tim", "fastweb" };
+	private static final Integer[] ASNUM = { 1, 2, 3 };
+	private static final int BIN_WIDTH = 10;
+	private static final int N_BINS = 3;
+	private static final long[] SPEED = {10, 20, 30};
+	private static final int[] CONNECT_TIME = {10, 20, 30};
+	
+	
+	private DateTime start = new DateTime(0).withDayOfWeek(DateTimeConstants.MONDAY).plusWeeks(1);
+	
+	@Autowired
+	DownloadRepository downloadRepository;
+
+	@Before
+	public void init() {
+		DateTime date = start;
+		Download d;
+		int uuid;
+		
+		for (int j = 0; j < N_USERS; j++) {
+			uuid = j;
+			for (int k = 0; k < DateTimeConstants.DAYS_PER_WEEK * N_WEEKS; k++) {
+				for(int z = 0; z < ASNUM.length; z++){
+					for (int i = 0; i < N_RECORDS_PER_WEEKDAY || i < N_BINS; i++) {
+						d = new Download();
+						d.setUuid(uuid);
+						d.setAsname(ASNAME[z]);
+						d.setAsnum(ASNUM[z]);
+						d.setTimestamp(date.toDate());
+						d.setDownload_speed(SPEED[i%SPEED.length]);
+						d.setSize(1L);
+						d.setDuration(1L);
+						d.setResource_type("img/jpg");
+						d.setServer_domain(DOMAIN[i % DOMAIN.length]);
+						d.setConnect_time(CONNECT_TIME[i%CONNECT_TIME.length]);
+						d.setClient_address("31.10.5.7");
+	
+						downloadRepository.save(d);
+					}
+				}
+				
+				date = date.plusDays(1);
+			}
+		}
+		
+		Collection<Download> allRecords = downloadRepository.findAll();
+		int expectedRecords = N_WEEKS * N_RECORDS_PER_WEEKDAY * DateTimeConstants.DAYS_PER_WEEK * N_USERS*ASNUM.length;
+		
+		assert(allRecords.size() == expectedRecords);
+	}
+
+	@After
+	public void tearDown() {
+		downloadRepository.deleteAll();
+	}
 
 	@Test
-	public void getSizeDownloadsByDomain_ReturnsZeroRecords_whenNoRecordInTheRange() {
-		downloadRepository.deleteAll();
-		
-		DateTime start = new DateTime(0);
-		DateTime end = start.plusDays(7);
-		
-		Download d1 = new Download();
-		d1.setTimestamp(start.toDate());
-		d1.setUuid(0);
-		downloadRepository.save(d1);
-		
-		Collection<SizeDownload> d = downloadRepository.getSizeDownloadsByDomain(0, end.toDate(), end.plusDays(7).toDate());
-		
-		assertTrue(d.size() == 0);
-	}
-	
-	@Test
-	public void getSizeDownloadsByDomain_ZeroRecords_IfNoRecordForTheUser() {
-		downloadRepository.deleteAll();
-		
-		DateTime start = new DateTime(0);
-		DateTime end = start.plusDays(7);
-		
-		int download_uuid = 1;
-		int query_uuid = 0;
-		
-		Download d1 = new Download();
-		d1.setUuid(download_uuid);
-		d1.setTimestamp(start.toDate());
-		
-		downloadRepository.save(d1);
-		
-		Collection<SizeDownload> d = downloadRepository.getSizeDownloadsByDomain(query_uuid, start.toDate(), end.toDate());
-		
-		assertTrue(d.size() == 0);
-	}
-	
-	@Test
-	public void getSizeDownloadsByDomain_OneRecord_IfOneRecordInTheRange() {
-		downloadRepository.deleteAll();
-		
-		DateTime start = new DateTime(0);
-		DateTime end = start.plusDays(7);
-		
+	public void getSizeDownloadsByDomain_shouldReturnOneRecordPerDomain() {
 		int uuid = 0;
-		
-		Download d1 = new Download();
-		d1.setUuid(uuid);
-		
-		d1.setServer_domain("google.com");
-		d1.setTimestamp(start.toDate());
-		
-		downloadRepository.save(d1);
-		
-		Collection<SizeDownload> d = downloadRepository.getSizeDownloadsByDomain(uuid, start.toDate(), end.toDate());
-		
-		assertTrue(d.size() == 1);
+		DateTime end = start.plusDays(7);
+		Collection<SizeDownload> result = downloadRepository.getSizeDownloadsByDomain(uuid, start, end);
+
+		assert (result.size() == DOMAIN.length);
 	}
 	
 	@Test
-	public void getSizeDownloadsByDomain_OneRecordPerDomain() {
-		downloadRepository.deleteAll();
-		
-		DateTime start = new DateTime(0);
-		DateTime end = start.plusDays(7);
-		
+	public void getFrequencyAccessesByDomain_shouldReturnOneRecordPerDomain() {
 		int uuid = 0;
-		
-		Collection<Download> downloads = new HashSet<Download>(); 
-		
-		Download d1 = new Download();
-		d1.setUuid(uuid);
-		d1.setServer_domain("google.com");
-		d1.setTimestamp(start.toDate());
-		downloads.add(d1);
-		
-		Download d2 = new Download();
-		d2.setUuid(uuid);
-		d2.setServer_domain("cisco.com");
-		d2.setTimestamp(start.toDate());
-		downloads.add(d2);
-		
-		downloadRepository.save(downloads);
-		
-		Collection<SizeDownload> result = downloadRepository.getSizeDownloadsByDomain(uuid, start.toDate(), end.toDate());
-		
-		assertTrue(result.size() == downloads.size());
+		DateTime end = start.plusDays(7);
+		Collection<FrequencyAccess> result = downloadRepository.getFrequencyAccessesByDomain(uuid, start, end);
+
+		assert (result.size() == DOMAIN.length);
+	}
+	
+
+	@Test
+	public void getLatencyBins_shouldReturnOneRecordPerBin() {
+		int uuid = 0;
+		DateTime end = start.plusDays(7);
+		Collection<BinLatencyDownload> result = downloadRepository.getLatencyBins(BIN_WIDTH, uuid, start, end);
+
+		int expectedResult =  N_BINS * ASNAME.length;
+		assert (result.size() == expectedResult);
 	}
 	
 	@Test
-	public void getAvgDayDownloadsSpeed() {
-		downloadRepository.deleteAll();
-		
-		DateTime start = new DateTime(0);
+	public void getAvgDayDownloadsSpeed_shouldReturnOneRecordPerDay() {
+		int uuid = 0;
 		DateTime end = start.plusDays(7);
+		Collection<AvgDaySpeedDownload> result = downloadRepository.getAvgDayDownloadsSpeed(uuid, start, end);
+
+		int expectedResult = DateTimeConstants.DAYS_PER_WEEK * ASNAME.length;
 		
-		Download d1 = new Download();
-		d1.setUuid(0);
-		d1.setServer_domain("google.com");
-		d1.setTimestamp(start.plusDays(1).toDate());
-		d1.setSize(1L);
-		d1.setAsname("fastweb");
-		d1.setAsnum(1);
-		d1.setDownload_speed(1L);
+		assert (result.size() == expectedResult);
+	}
+	
+	@Test
+	public void getAvgDayDownloadsSpeed_Public_shouldReturnOneRecordPerDay() {
+		DateTime end = start.plusDays(7);
+		Collection<AvgDaySpeedDownload> result = downloadRepository.getAvgDayDownloadsSpeed(start, end);
+
+		int expectedResult = DateTimeConstants.DAYS_PER_WEEK * ASNAME.length;
 		
-		downloadRepository.save(d1);
+		assert (result.size() == expectedResult);
+	}
+	
+	@Test
+	public void getDownloadsSpeedBins_shouldReturnOneRecordPerBin() {
+		int uuid = 0;
+		DateTime end = start.plusDays(7);
+		Collection<BinSpeedDownload> result = downloadRepository.getDownloadsSpeedBins(BIN_WIDTH, uuid, start, end);
+
+		int expectedResult = N_BINS * ASNAME.length;
 		
-		Download d2 = new Download();
-		d2.setUuid(0);
-		d2.setServer_domain("google.com");
-		d2.setTimestamp(start.plusDays(1).toDate());
-		d2.setSize(1L);
-		d2.setAsname("fastweb");
-		d2.setAsnum(1);
-		d2.setDownload_speed(4L);
+		assert (result.size() == expectedResult);
+	}
+	
+	@Test
+	public void getDownloadsSpeedBins_Public_shouldReturnOneRecordPerBin() {
+		DateTime end = start.plusDays(7);
+		Collection<BinSpeedDownload> result = downloadRepository.getDownloadsSpeedBins(BIN_WIDTH, start, end);
+
+		int expectedResult = N_BINS * ASNAME.length;
 		
-		downloadRepository.save(d2);
-		
-		Download d3 = new Download();
-		d3.setUuid(1);
-		d3.setServer_domain("google.com");
-		d3.setTimestamp(start.plusDays(1).toDate());
-		d3.setSize(1L);
-		d3.setAsname("vodafone");
-		d3.setAsnum(2);
-		d3.setDownload_speed(4L);
-		
-		downloadRepository.save(d3);
-		
-		Collection<AvgDaySpeedDownload> daySpeed = downloadRepository.getAvgDayDownloadsSpeed(0, start.toDate(), end.toDate());
-		
-		System.out.println(daySpeed);
-		
-		assertTrue(daySpeed.size() == 1);
-		long expectedAvgSpeed = (d1.getDownload_speed() + d2.getDownload_speed()) / 2;
-		long avgSpeed = daySpeed.iterator().next().getSpeed();
-		assertEquals(expectedAvgSpeed, avgSpeed);
+		assert (result.size() == expectedResult);
 	}
 	
 }

@@ -24,4 +24,9 @@ public class DownloadServiceImpl implements DownloadService {
 	public Collection<Download> saveDownload(Collection<Download> download) {
 		return downloadRepository.save(download);
 	}
+
+	@Override
+	public Bandwidth getBandwidthSummary(Integer uid, Integer asnum) {
+		return downloadRepository.getBandwidthSummary(uid, asnum);
+	}
 }

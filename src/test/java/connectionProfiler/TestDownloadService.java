@@ -8,10 +8,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import configurations.mvc.ConnectionProfilerAppInitializer;
 import configurations.root.ConnectionProfilerAppConfig;
 import models.BinSpeedDownload;
-import services.DownloadService;
 import services.PlotsService;
 import services.PlotsService.View;
 

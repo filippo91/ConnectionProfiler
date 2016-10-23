@@ -9,11 +9,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import models.ProviderPlan;
-import models.UserSubscription;
+import models.SubscriptionSummary;
 import models.User;
+import models.UserSubscription;
 import services.SubscriptionService;
 
 @RestController
@@ -35,9 +37,15 @@ public class SubscriptionController {
 		return subscriptionService.getSubscriptions(user);
 	}
 	
-	@RequestMapping(value="/subscriptions/{asnum}", method=RequestMethod.GET)
-	public UserSubscription getSubscription(@AuthenticationPrincipal User user){
+	@RequestMapping(value="/subscriptions/summary/{asnum}", method=RequestMethod.GET)
+	public SubscriptionSummary getSubscriptionInfo(@AuthenticationPrincipal User user, @RequestParam Integer asnum){
 		//TODO
-		return null;
+		return subscriptionService.getSubscriptionInfo(user.getUid(), asnum);
+	}
+	
+	@RequestMapping(value="/subscriptions/summary", method=RequestMethod.GET)
+	public List<SubscriptionSummary> getSubscriptionsInfo(@AuthenticationPrincipal User user){
+		//TODO:do query and get results
+		return subscriptionService.getSubscriptionInfo(user.getUid());
 	}
 }

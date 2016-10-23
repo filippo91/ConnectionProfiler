@@ -1,7 +1,6 @@
 package services;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,18 +47,6 @@ public class TokenServiceTest {
 	public void isValid_shouldReturnFalse_whenItIsExpired(){
 		when(tokenRepository.findByToken("token")).thenReturn(token);
 		assertFalse(tokenService.isValid("token", verificationDateTooLate));
-	}
-	
-	@Test
-	public void create_shouldCreateANewToken(){	
-		User user = new User();
-		
-		String newToken = tokenService.createToken(user, creationDate);
-		
-		assertNotNull(newToken);
-		
-		verify(tokenRepository, times(1)).save(any(VerificationToken.class));
-		
 	}
 	
 	@Test

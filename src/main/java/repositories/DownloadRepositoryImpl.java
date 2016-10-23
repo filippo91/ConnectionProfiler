@@ -199,4 +199,30 @@ public class DownloadRepositoryImpl implements CustomDownloadRepository {
 
 		return mappedResult;
 	}
+	
+	@Override
+	public Bandwidth getBandwidthSummary(int uuid, int asnum) {
+		
+		Aggregation agg = newAggregation(
+				match(Criteria.where("uuid").is(uuid)),
+				match(Criteria.where("asnum").is(asnum)),
+				project("asnum", "download_speed"),
+				group("asnum")
+					.count().as("samples")
+					.avg("download_speed").as("average")
+					.min("download_speed").as("minimum")
+					.max("download_speed").as("maximum"),
+				project("samples", "average", "minimum", "maximum")
+			);
+		
+		AggregationResults<Bandwidth> results = mongoTemplate.aggregate(agg, "DOWNLOADS", Bandwidth.class);
+		List<Bandwidth> mappedResult = results.getMappedResults();
+		
+		if(mappedResult.size() == 0){
+			//TODO
+			return new Bandwidth();
+		}
+		
+		return mappedResult.get(0);
+	}
 }

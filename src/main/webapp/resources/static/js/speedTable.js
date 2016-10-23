@@ -45,15 +45,6 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
         };
         return factory;
 }])
-.filter('speedFormat',function(){
-        return function(d){
-            if (parseInt(d) > 1000 * 1000 * 1000) return "" + parseFloat(parseInt(d) / (1000 * 1000 * 1000)).toFixed(2) + " Gbps";
-            if (parseInt(d) > 1000 * 1000) return "" + parseFloat(parseInt(d) / (1000 * 1000)).toFixed(2) + " Mbps";
-            if (parseInt(d) > 1000) return "" + parseFloat(parseInt(d) / 1000).toFixed(2) + " Kbps";
-            return "" + d;
-        };
-})
-
 /*
  * Filter to get the resource name off a URL.
  */

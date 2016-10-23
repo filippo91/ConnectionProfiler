@@ -32,14 +32,6 @@
 						class="help-block">asnum is required</span>
 				</div>
 				<div class="form-group"
-					ng-class="{ 'has-error': form.asname.$dirty && form.asname.$error.required }">
-					<label for="asname">asname</label> <input type="text" name="asname"
-						id="asname" class="form-control"
-						ng-model="controller.newProvider.asname" required /> <span
-						ng-show="form.asname.$dirty && form.asname.$error.required"
-						class="help-block">asname is required</span>
-				</div>
-				<div class="form-group"
 					ng-class="{ 'has-error': form.bandwidth.$dirty && form.bandwidth.$error.required }">
 					<label for="asname">bandwidth</label> <input type="text"
 						name="bandwidth" id="bandwidth" class="form-control"
@@ -51,6 +43,9 @@
 
 			</form>
 		</div>
+		<p>{{ provider }}</p>
+		<p>{{ provider.providerPlan}}</p>
+		<p>{{ provider.bandwidth}}</p>
 		<div class="row">
 			<table class="table table-bordered table-striped">
 				<tr>
@@ -67,11 +62,11 @@
 					<th></th>
 				</tr>
 				<tr ng-repeat="provider in controller.providers">
-					<td>{{ provider.asname }}</td>
-					<td>{{ provider.bandwidth.nominal }}</td>
-					<td>{{ provider.bandwidth.avg }}</td>
-					<td>{{ provider.bandwidth.max }}</td>
-					<td>{{ provider.bandwidth.min }}</td>
+					<td>{{ provider.providerPlan.asname }}</td>
+					<td>{{ provider.providerPlan.bandwidth }}</td>
+					<td>{{ provider.bandwidth.average | speedFormat }}</td>
+					<td>{{ provider.bandwidth.maximum | speedFormat }}</td>
+					<td>{{ provider.bandwidth.minimum | speedFormat }}</td>
 					<td>{{ provider.bandwidth.samples }}</td>
 				</tr>
 			</table>

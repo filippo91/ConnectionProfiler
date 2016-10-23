@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import models.AvgDaySpeedDownload;
+import models.Bandwidth;
 import models.BinLatencyDownload;
 import models.BinSpeedDownload;
 import models.FrequencyAccess;
@@ -63,4 +64,6 @@ public interface CustomDownloadRepository {
 	Collection<AvgDaySpeedDownload> getAvgDayDownloadsSpeed(DateTime start, DateTime end);
 
 	Collection<BinSpeedDownload> getDownloadsSpeedBins(int bin_width, DateTime start, DateTime end);
+
+	Bandwidth getBandwidthSummary(int uuid, int asnum);
 }

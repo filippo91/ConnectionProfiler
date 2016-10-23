@@ -87,6 +87,7 @@ angular.module('myApp', [
         restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view/:bin_width';
         
         restAPI.subscriptions = root + '/subscriptions/:asnum';
+        restAPI.subscriptionsSummary = root + '/subscriptions/summary/:asnum';
         
     	return restAPI;
     }])
@@ -727,4 +728,12 @@ angular.module('myApp', [
         };
 
         return plotsInfo;
-    });
+    })
+    .filter('speedFormat',function(){
+        return function(d){
+            if (parseInt(d) > 1000 * 1000 * 1000) return "" + parseFloat(parseInt(d) / (1000 * 1000 * 1000)).toFixed(2) + " Gbps";
+            if (parseInt(d) > 1000 * 1000) return "" + parseFloat(parseInt(d) / (1000 * 1000)).toFixed(2) + " Mbps";
+            if (parseInt(d) > 1000) return "" + parseFloat(parseInt(d) / 1000).toFixed(2) + " Kbps";
+            return "" + d;
+        };
+});

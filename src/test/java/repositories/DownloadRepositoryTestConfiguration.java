@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 
 @Configuration
@@ -18,7 +19,7 @@ public class DownloadRepositoryTestConfiguration{
 	private static final String DATABASE_NAME = "dbnameTest";
 
     public @Bean Mongo mongo() throws UnknownHostException, MongoException {
-            Mongo mongo = new Mongo("localhost");
+            Mongo mongo = new MongoClient("localhost");
             return mongo;
     }
 

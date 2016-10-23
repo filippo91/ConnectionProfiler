@@ -1,5 +1,4 @@
 <div ng-controller="speedGraph">
-
 	<!-- left panel -->
 	<div class="col-md-3 col-md-offset-1">
 		<div class="row col-md-12" id="left-panel-pills">
@@ -17,8 +16,8 @@
 					<a href="" class="list-group-item active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a>
 				</div>
 					<div ng-repeat="ele in userSpeedData" 
-						id="public-graph-asname-{{ele.asname}}">
-						<a href="" class="list-group-item"
+						id="user-graph-asname-{{ele.asname}}">
+						<a href="" class="list-group-item user-asnameButton"
 							ng-click="showAsname(ele.asname,'user')"
 							id="user-button-{{ele.asname}}"> {{ele.asname}} el </a>
 					</div>
@@ -34,7 +33,7 @@
 	              </div>
 					<div ng-repeat="ele in publicSpeedData"
 						id="public-graph-asname-{{ele.asname}}">
-						<a href="" class="list-group-item"
+						<a href="" class="list-group-item public-asnameButton"
 							ng-click="showAsname(ele.asname,'public')"
 							id="public-button-{{ele.asname}}"> {{ele.asname}} </a>
 					</div>

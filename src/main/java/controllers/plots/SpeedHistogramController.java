@@ -36,7 +36,7 @@ public class SpeedHistogramController {
 			@AuthenticationPrincipal User user){
 		
 		log.info("try to get bin speed downloads: " + year + month + day + view + user);
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		width *= ONE_MBIT;
 		log.info("after date is converted");
@@ -44,7 +44,7 @@ public class SpeedHistogramController {
 	}
 	
 	@PreAuthorize("permitAll()")
-	@GetMapping("/publics/speedHistogram/{year}/{month}/{day}/{view}/{width}")
+	@GetMapping("/public/speedHistogram/{year}/{month}/{day}/{view}/{width}")
 	public Collection<BinSpeedDownload> getPublicBinSpeedDownloads(
 			@PathVariable int year, 
 			@PathVariable int month, 

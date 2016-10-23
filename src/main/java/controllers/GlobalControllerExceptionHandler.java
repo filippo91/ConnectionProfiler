@@ -22,6 +22,6 @@ public class GlobalControllerExceptionHandler {
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
 	@ExceptionHandler(IllegalArgumentException.class)
 	public void duplicateInformationForNewUser() {
-		// Nothing to do
+		log.error("duplicateInformationForNewUser.");
 	}
 }

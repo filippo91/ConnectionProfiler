@@ -113,9 +113,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
     }])
 
-    .factory('downloadFactory', ['$resource', function($resource) {
-        var serverURI_user = "http://localhost:8080/connectionProfiler/speedGraph/:year/:month/:day/:view",
-            serverURI_public = "http://localhost:8080/connectionProfiler/publics/speedGraph/:year/:month/:day/:view";
+    .factory('downloadFactory', ['$resource', 'REST_API_URLs', function($resource, api) {
+        var serverURI_user = api.speedGraphUser; 
+        var serverURI_public = api.speedGraphPublic;
+        
         var factory = {};
 
         factory.splitByAsname = function(downloadList){

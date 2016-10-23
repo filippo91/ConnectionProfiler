@@ -31,7 +31,7 @@ public class PieAccessesController {
 			@PathVariable int day,
 			@PathVariable View view,
 			@AuthenticationPrincipal User user){
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		return plotsService.getDomainFrequencyAccess(uuid, year, month, day, view);
 	}

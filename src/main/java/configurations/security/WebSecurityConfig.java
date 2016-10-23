@@ -23,40 +23,25 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth
 		.userDetailsService(customUserDetailsService)
 		.passwordEncoder(new BCryptPasswordEncoder());
-	
 	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		/*
-		http
-			.authorizeRequests()
-			.anyRequest()
-			.permitAll()
-			.and()
-			.csrf()
-			.disable();
-				*/
 		http
 		
 			.authorizeRequests()
 				.antMatchers(
+						"/",
+						"/user", "/user/confirm",
 						"/img/**", "/css/**", "/js/**", "/fonts/**", "/partials/public/**", "/index.html",
-						"/connection-profiler-websocket/**", 
-						"/publics/**").permitAll()
+						"/connection-profiler-websocket/**",
+						"/public/**")
+				.permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.httpBasic()
 				.and()
 			.csrf()
-				.disable();
-	
-				/*
-			.csrf()
-				.disable();
-				/*.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-				.and()
-			.httpBasic();
-			*/
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 	}
 }

@@ -13,9 +13,8 @@ angular.module('myApp', [
     'myApp.domainsBySize',
     'myApp.userProfile'
 ])
-
     .constant("PUBLIC_PAGES", ['', 'login', 'register', 'confirmRegistration', 'speedGraph', 'speedHistogram'])
-
+    
     .config(['$locationProvider', '$routeProvider', '$httpProvider', function ($locationProvider, $routeProvider, $httpProvider) {
         $locationProvider.hashPrefix('!');
         $routeProvider.
@@ -44,16 +43,62 @@ angular.module('myApp', [
         $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
     }])
 
+    .factory('appURLs', [function(){
+    	var urls = {};
+    	
+    	var pathArray = location.href.split( '/' );
+    	var protocol = pathArray[0];
+    	var host = pathArray[2];
+    	
+    	var root = protocol + '//' + host + '/connectionProfiler';
+    	
+    	console.info('root application url: ' + root);
+    	
+    	urls.root = root;
+    	urls.authenticate = '/user';
+    	urls.userDetails = '/user';
+    	urls.login = '/login';
+    	urls.logout = '/logout';
+    	urls.createUser = '/user';
+    	urls.confirmRegistration = '/user/confirmRegistration';
+    	urls.websocket = '/connection-profiler-websocket';
+    	
+    	return urls;
+    }])
+    
+    .factory('REST_API_URLs', [function(){
+    	var restAPI = {};
+    	
+    	var pathArray = location.href.split( '/' );
+    	var protocol = pathArray[0];
+    	var host = pathArray[2];
+    	
+    	var root = protocol + '//' + host + '/connectionProfiler';
+    	
+    	console.info('root REST API url: ' + root);
+    	
+    	restAPI.pieAccess = root + '/pieAccesses/:year/:month/:day/:view';
+    	restAPI.pieSize = root + '/pieSize/:year/:month/:day/:view';
+    	restAPI.latency = root + '/latencyHistogram/:year/:month/:day/:view/:bin_width';
+    	restAPI.speedTable = root + '/speedTable/:page/:size';
+    	restAPI.speedGraphPublic = root + '/public/speedGraph/:year/:month/:day/:view';
+    	restAPI.speedGraphUser = root + '/speedGraph/:year/:month/:day/:view';    	
+        restAPI.speedHistogramPublic = root + '/public/speedHistogram/:year/:month/:day/:view/:bin_width';
+        restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view/:bin_width';
+        
+    	return restAPI;
+    }])
+    
     .controller('home', function ($rootScope, $http) {
         $rootScope.enableChangeView = false;
 
     })
 
-    .controller('navigation', function ($rootScope, $http, $location, $route, $routeParams, PUBLIC_PAGES, $scope) {
+    .controller('navigation', function ($rootScope, $http, $location, $route, $routeParams, PUBLIC_PAGES, $scope, appURLs) {
         /*
-         * Global variable used to show/hide the time navigation bar.
-         * Set it to true in your controller, if you want show that bar in your view.
-         * */
+		 * Global variable used to show/hide the time navigation bar. Set it to
+		 * true in your controller, if you want show that bar in your view.
+		 */
         $rootScope.enableChangeView = false;
 
         /* Global variable holding user details */
@@ -69,16 +114,16 @@ angular.module('myApp', [
         var self = this;
 
         /*
-         * They hold the start and end date of the timespan to show
-         */
+		 * They hold the start and end date of the timespan to show
+		 */
         self.startDate = moment().startOf('isoWeek');
         /* compute and set end date */
         self.endDate = computeEndDate(self.startDate.clone(), 'week');
 
         /*
-         * Holds the current view type: {'week', 'month', 'year'}
-         * initialize it using route params
-         */
+		 * Holds the current view type: {'week', 'month', 'year'} initialize it
+		 * using route params
+		 */
         self.activeView = {};
         self.activeView.view = 'week';
         setActiveViewDate(self.startDate, self.endDate);
@@ -90,7 +135,7 @@ angular.module('myApp', [
 
         /* Bin Width Params */
         self.BIN_SELECTOR_PAGES = ['speedHistogram', 'latency'];
-        //holds the current bin selector, either latency or speedHistogram
+        // holds the current bin selector, either latency or speedHistogram
         self.binSelector = null;
 
         self.latencyBin = {};
@@ -109,17 +154,15 @@ angular.module('myApp', [
         self.TIME_MANAGER_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency'];
         self.REAL_TIME_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency', 'speedTable'];
         
-        console.log("reset");
         self.timeManager = false;
         self.enableRealTime = false;
         
         /* public methods */
 
         /*
-         * update (start, end dates) and route parameters
-         * in order to change the view
-         * view : (week, month, months)
-         */
+		 * update (start, end dates) and route parameters in order to change the
+		 * view view : (week, month, months)
+		 */
         self.changeActiveView = function (view) {
             self.activeView.view = view;
             // update end date according with the new view type
@@ -142,16 +185,15 @@ angular.module('myApp', [
                     view: view,
                     bin_width: self.binSelector.width
                 });
-                console.info($routeParams);
+                
             }
         };
 
         /*
-         * move timespan back and forward according
-         * with the direction input parameter
-         * direction : (backward, forwars, today)
-         *
-         */
+		 * move timespan back and forward according with the direction input
+		 * parameter direction : (backward, forwars, today)
+		 * 
+		 */
         self.move = function (direction) {
             var view = self.activeView.view;
             if (direction == 'today') {
@@ -160,7 +202,7 @@ angular.module('myApp', [
                 self.startDate = computeStartDate(self.startDate.clone(), view, direction);
             }
 
-            /// TODO
+            // / TODO
             $rootScope.lastExtent = [self.activeView.startDate,self.activeView.endDate];
 
             self.endDate = computeEndDate(self.startDate.clone(), view);
@@ -182,14 +224,14 @@ angular.module('myApp', [
                     view: view,
                     bin_width: self.binWidthSelector
                 });
-                console.info($routeParams);
+                
             }
         };
 
         /*
-         * event handler to change the bin size where it's possible.
-         * Trigger update parameters.
-         */
+		 * event handler to change the bin size where it's possible. Trigger
+		 * update parameters.
+		 */
         self.changeBinSize = function ($event) {
             var btn = $event.currentTarget.id === 'btn-bin-plus' ? 1 : -1;
 
@@ -212,19 +254,19 @@ angular.module('myApp', [
         };
 
         /*
-         * Basic navigation logic to enable part of the logic or the access to 
-         * 'private' pages.
-         * 
-         * PUBLIC_PAGES list is a predefined application constant that 
-         * holds the name of the pages that are meant to be publicly available.
-         * 
-         * BIN_SELECTOR_PAGES contains the pages that needs a bin selector
-         * input field.
-         * 
-         * TIME_MANAGER_PAGES lists the pages that needs a time manager 
-         * bar to navigate the plots.
-         * 
-         */
+		 * Basic navigation logic to enable part of the logic or the access to
+		 * 'private' pages.
+		 * 
+		 * PUBLIC_PAGES list is a predefined application constant that holds the
+		 * name of the pages that are meant to be publicly available.
+		 * 
+		 * BIN_SELECTOR_PAGES contains the pages that needs a bin selector input
+		 * field.
+		 * 
+		 * TIME_MANAGER_PAGES lists the pages that needs a time manager bar to
+		 * navigate the plots.
+		 * 
+		 */
         $rootScope.$on('$routeChangeStart', function (event, next, prev) {
             var pagePrefix = null;
             var thisPageUrl = $location.url();
@@ -241,7 +283,7 @@ angular.module('myApp', [
                 self.timeManager = self.enableRealTime = false;
                 $rootScope.previousLocation = $location.path();
                 $rootScope.$evalAsync(function () {
-                    $location.path("/login");
+                    $location.path(appURLs.login);
                 });
             }else{            
 	            if (self.BIN_SELECTOR_PAGES.indexOf(pagePrefix) < 0) {
@@ -260,7 +302,6 @@ angular.module('myApp', [
 	                self.timeManager = true;
 	            }
 	            
-	            console.info(self.REAL_TIME_PAGES, pagePrefix);
 	            if (self.REAL_TIME_PAGES.indexOf(pagePrefix) < 0) {
 	                self.enableRealTime = false;
 	            } else {
@@ -275,11 +316,11 @@ angular.module('myApp', [
 
         function computeStartDate(date, view, direction) {
             /*
-             * direction == 'forward': add
-             *
-             * direction == 'backward': subtract = call same moment method (add)
-             * with negative quantities
-             */
+			 * direction == 'forward': add
+			 * 
+			 * direction == 'backward': subtract = call same moment method (add)
+			 * with negative quantities
+			 */
             var directionSign = direction == 'forward' ? 1 : -1;
             switch (view) {
                 case "week":
@@ -295,12 +336,12 @@ angular.module('myApp', [
                     date.add(3 * directionSign, "months");
                     break;
             }
-            console.info(date.format('YYYY MM DD'));
+            
             return date;
         }
 
         function computeEndDate(date, view) {
-            console.info(date.format('YYYY MM DD'), view)
+            
             switch (view) {
                 case "week":
                     date.endOf("isoWeek");
@@ -312,14 +353,14 @@ angular.module('myApp', [
                     date.add(2, "months");
                     break;
             }
-            console.info(date.format('YYYY MM DD'));
+            
             return date;
         }
 
         /*
-         * put (day, month, year) in the scope for the view
-         * put also start and end milliseconds
-         */
+		 * put (day, month, year) in the scope for the view put also start and
+		 * end milliseconds
+		 */
         function setActiveViewDate(start, end) {
             self.activeView.startDate = start.valueOf();
             self.activeView.endDate = end.valueOf();
@@ -342,8 +383,8 @@ angular.module('myApp', [
         $rootScope.currentDate = moment();
 
         /**
-         * Functions for controlling time
-         */
+		 * Functions for controlling time
+		 */
         $rootScope.changeView = function (ele) {
             $(".view").removeClass("active");
             var currentParam = $routeParams;
@@ -444,13 +485,14 @@ angular.module('myApp', [
 
         // //////////////
         $rootScope.socketConnected = false;
-        //connect();
+        // connect();
         $rootScope.realtime = function () {
             $rootScope.socketConnected ? disconnect() : connect();
             console.log("is conn: " + $rootScope.socketConnected);
         };
         function connect() {
-            var socket = new SockJS('http://localhost:8080/connectionProfiler/connection-profiler-websocket');
+        	var websocket_url = appURLs.root + appURLs.websocket;
+            var socket = new SockJS(websocket_url);
             var stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 $rootScope.$apply(function () {
@@ -497,9 +539,9 @@ angular.module('myApp', [
                 + btoa(credentials.username + ":" + credentials.password)
             } : {};
 
-            console.log(headers);
-
-            $http.get('http://localhost:8080/connectionProfiler/user', {headers: headers}).then(function (response) {
+            var auth_url = appURLs.root + appURLs.authenticate; 
+            
+            $http.get(auth_url, {headers: headers}).then(function (response) {
                 if (response.data.name) {
                     $rootScope.authenticated = true;
                     $rootScope.user = {};
@@ -520,23 +562,23 @@ angular.module('myApp', [
         authenticate();
         self.credentials = {};
         self.login = function () {
-            console.log(self.credentials);
+            self.dataLoading = true;
             authenticate(self.credentials, function () {
-                console.info($rootScope.previousLocation);
+                
                 if ($rootScope.authenticated) {
-
                     $location.path($rootScope.previousLocation);
                     $rootScope.previousLocation = '/';
                     self.error = false;
                 } else {
-                    $location.path("/login");
                     self.error = true;
+                    self.dataLoading = false;
                 }
-                console.info($location.path);
+                
             });
         };
         self.logout = function () {
-            $http.post('http://localhost:8080/connectionProfiler/logout', {}).finally(function () {
+        	var logout_url = appURLs.root + appURLs.logout;
+            $http.post(logout_url, {}).finally(function () {
                 $rootScope.authenticated = false;
                 disconnect();
                 $location.path("/");
@@ -549,39 +591,39 @@ angular.module('myApp', [
     })
 
     .controller('register',
-    function ($rootScope, $http, $location) {
+    function ($rootScope, $http, $location, appURLs) {
         $rootScope.enableChangeView = false;
 
         var self = this;
         self.user = {};
-        self.user.username = "";
-        self.user.password = "";
+        
         var createUser = function (user) {
-            console.log(self.user);
-            $http.post('http://localhost:8080/connectionProfiler/publics/user', user).then(function () {
-                    $location.path('/login');
+            var createUser_url = appURLs.root + appURLs.createUser;
+            $http.post(createUser_url, user).then(function () {
+            		$location.path(appURLs.confirmRegistration);
                 }, function () {
-                    $location.path('/');
-                    self.dataLoading = false;
+                	self.error = true;
+                	self.dataLoading = false;
                 }
             );
         };
 
-        self.register = function () {
+        self.register = function (form) {
+        	var user = {username: form.username, password: form.password, email: form.email};
             self.dataLoading = true;
-            createUser(self.user);
-
+            createUser(user);
         };
     }
 )
     .controller('confirmRegistration',
-    function ($rootScope, $http, $location) {
+    function ($rootScope, $http, $location, appURLs) {
         $rootScope.enableChangeView = false;
         var self = this;
         self.token = "";
         var sendToken = function (token) {
-            $http.post('http://localhost:8080/connectionProfiler/publics/user/confirmRegistration', token).then(function () {
-                    $location.path('/login');
+        	var sendToken_url = appURLs.root + appURLs.confirmRegistration;
+            $http.post(sendToken_url, token).then(function () {
+                    $location.path(appURLs.login);
                 }, function () {
                     $location.path('/');
                     self.dataLoading = false;

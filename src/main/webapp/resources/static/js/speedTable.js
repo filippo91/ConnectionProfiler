@@ -32,8 +32,9 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
         };
         $rootScope.websocketCallbackPublic = function(download){};
 }])
-.factory('speedTable_downloadManager', ['$resource', function($resource) {
-        var serverURI = "http://localhost:8080/connectionProfiler/speedTable/:page/:size";
+.factory('speedTable_downloadManager', ['$resource', 'REST_API_URLs', function($resource, api) {
+        var serverURI = api.speedTable;
+        
         var factory = {};
         factory.getDownloads = function (page,size) {
             return $resource(serverURI).query({page: page, size: size}, function (downloadList) {

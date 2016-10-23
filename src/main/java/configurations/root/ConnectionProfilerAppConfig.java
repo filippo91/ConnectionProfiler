@@ -1,7 +1,6 @@
 package configurations.root;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -24,10 +23,12 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.ui.velocity.VelocityEngineFactory;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+
+import factories.SubscriptionFactory;
+import factories.VerificationTokenFactory;
 
 @Configuration
 @ComponentScan(basePackages = { "services", "configurations.security", "listeners", "configurations.root",
@@ -58,7 +59,19 @@ public class ConnectionProfilerAppConfig {
 		
 		return dataSource;
 	}
-
+	
+	public @Bean SubscriptionFactory subscriptionFactory(){
+		SubscriptionFactory factory = new SubscriptionFactory();
+		factory.setSingleton(false);
+		return factory;
+	}
+	
+	public @Bean VerificationTokenFactory verificationTokenFactory(){
+		VerificationTokenFactory factory = new VerificationTokenFactory();
+		factory.setSingleton(false);
+		return factory;
+	}
+	
 	public @Bean EntityManagerFactory entityManagerFactory(DataSource dataSource) {
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
@@ -90,12 +103,12 @@ public class ConnectionProfilerAppConfig {
 
 	@Bean
 	public VelocityEngine velocityEngine() throws VelocityException, IOException {
-		VelocityEngineFactory factory = new VelocityEngineFactory();
-		Properties props = new Properties();
-		props.put("resource.loader", "class");
-		props.put("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
-		factory.setVelocityProperties(props);
-		return factory.createVelocityEngine();
+		VelocityEngine velocityEngine = new VelocityEngine();
+
+		velocityEngine.addProperty("resource.loader", "class");
+		velocityEngine.addProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+		
+		return velocityEngine;
 	}
 
 	@Bean

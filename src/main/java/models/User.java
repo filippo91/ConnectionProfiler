@@ -2,17 +2,27 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 
 /**
@@ -30,7 +40,7 @@ public class User implements UserDetails {
 	 */
 	private static final long serialVersionUID = 5004792185908475274L;
 
-	@Id
+	@Column(unique=true)
 	@Size(min=3, max=20)
 	private  String username;
 	
@@ -38,10 +48,12 @@ public class User implements UserDetails {
 	@Column(unique=true)
 	private String email;
 	
+	@JsonProperty(access = Access.WRITE_ONLY)
     private String password;
 
-    @Column(unique=true)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer uid;
 	
     private boolean accountNonExpired;
     private boolean accountNonLocked;
@@ -50,6 +62,10 @@ public class User implements UserDetails {
     private boolean enabled;
     
     private String role;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy="user", cascade=CascadeType.PERSIST)
+    private Set<Subscription> subscriptions = new HashSet<>();
     
     public User() {
 	}
@@ -66,7 +82,7 @@ public class User implements UserDetails {
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.id = id;
+		this.uid = id;
 	}
 
 
@@ -79,14 +95,15 @@ public class User implements UserDetails {
 		this.username = username;
 	}
 
-	public Integer getId() {
-		return id;
+	public Integer getUid() {
+		return uid;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setUid(Integer id) {
+		this.uid = id;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
@@ -150,4 +167,25 @@ public class User implements UserDetails {
         
         return authorities;
 	}
+	
+	public Set<Subscription> getSubscriptions() {
+		return subscriptions;
+	}
+
+	public void setSubscriptions(Set<Subscription> subscriptions) {
+		this.subscriptions = subscriptions;
+	}
+
+	public void addSubscription(Subscription s){
+		this.subscriptions.add(s);
+	}
+	
+	@Override
+	public String toString() {
+		return "User [username=" + username + ", email=" + email + ", id=" + uid + ", accountNonExpired="
+				+ accountNonExpired + ", accountNonLocked=" + accountNonLocked + ", credentialsNonExpired="
+				+ credentialsNonExpired + ", enabled=" + enabled + ", role=" + role + "]";
+	}
+	
+	
 }

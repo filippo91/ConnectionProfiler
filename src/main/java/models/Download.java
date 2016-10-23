@@ -268,6 +268,45 @@ public class Download {
 				+ size + ", duration=" + duration + ", download_speed=" + download_speed + ", connectTime="
 				+ connect_time + ", resource_type=" + resource_type + ", timestamp=" + timestamp + "]";
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((asnum == null) ? 0 : asnum.hashCode());
+		result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Download))
+			return false;
+		Download other = (Download) obj;
+		if (asnum == null) {
+			if (other.asnum != null)
+				return false;
+		} else if (!asnum.equals(other.asnum))
+			return false;
+		if (timestamp == null) {
+			if (other.timestamp != null)
+				return false;
+		} else if (!timestamp.equals(other.timestamp))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		return true;
+	}
+
+	
 	
 	
 }

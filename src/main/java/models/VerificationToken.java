@@ -22,7 +22,7 @@ public class VerificationToken {
     private String token;
    
     @OneToOne(targetEntity = User.class)
-    @JoinColumn(nullable = false, name = "username")
+    @JoinColumn(nullable = false, name = "id")
     private User user;
      
     private Date creationDate;

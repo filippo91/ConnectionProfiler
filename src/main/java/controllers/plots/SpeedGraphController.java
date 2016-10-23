@@ -39,13 +39,13 @@ public class SpeedGraphController {
 		DateTime d = new DateTime(year, month+1, day, 0, 0);
 		
 		//User user = userService.getCurrentUser();
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		
 		return plotsService.getAvgDayDownloadsSpeed(uuid, year, month, day, view);
 	}
 	
 	@PreAuthorize("permitAll()")
-	@GetMapping("/publics/speedGraph/{year}/{month}/{day}/{view}")
+	@GetMapping("/public/speedGraph/{year}/{month}/{day}/{view}")
 	public Collection<AvgDaySpeedDownload> getPublicDownloadsSpeed(
 			@PathVariable int year, 
 			@PathVariable int month, 

@@ -2,7 +2,6 @@ package services;
 
 import java.util.Collection;
 
-import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +11,7 @@ import repositories.DownloadRepository;
 
 
 @Service
-public class DownloadServiceImpl implements DownloadService {
-	Logger log = Logger.getLogger(DownloadServiceImpl.class);
-	
+public class DownloadServiceImpl implements DownloadService {	
 	@Autowired
 	private DownloadRepository downloadRepository;
 	

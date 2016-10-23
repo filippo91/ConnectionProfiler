@@ -18,7 +18,7 @@ import models.VerificationToken;
 import repositories.VerificationTokenRepository;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TokenServiceImplTest {
+public class TokenServiceTest {
 	@Mock VerificationTokenRepository tokenRepository;
 	
 	@InjectMocks

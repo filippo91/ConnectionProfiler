@@ -28,7 +28,7 @@ public class SpeedTableController {
 			@PathVariable int page, 
 			@PathVariable int size,
 			@AuthenticationPrincipal User user){
-		int uuid = user.getId();
+		int uuid = user.getUid();
 		
 		return plotsService.getDownloadsSpeed(uuid, page, size);
 	}

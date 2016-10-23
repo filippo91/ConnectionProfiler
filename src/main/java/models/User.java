@@ -2,17 +2,12 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
@@ -62,10 +57,6 @@ public class User implements UserDetails {
     private boolean enabled;
     
     private String role;
-    
-    @JsonIgnore
-    @OneToMany(mappedBy="user", cascade=CascadeType.PERSIST)
-    private Set<Subscription> subscriptions = new HashSet<>();
     
     public User() {
 	}
@@ -166,18 +157,6 @@ public class User implements UserDetails {
         authorities.add(new SimpleGrantedAuthority(role));
         
         return authorities;
-	}
-	
-	public Set<Subscription> getSubscriptions() {
-		return subscriptions;
-	}
-
-	public void setSubscriptions(Set<Subscription> subscriptions) {
-		this.subscriptions = subscriptions;
-	}
-
-	public void addSubscription(Subscription s){
-		this.subscriptions.add(s);
 	}
 	
 	@Override

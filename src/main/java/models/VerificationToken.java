@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,8 @@ import org.joda.time.DateTime;
 
 @Entity(name="verificationToken")
 public class VerificationToken {
+	public static final int VERIFICATION_TOKEN_DURATION = 60 * 24; //in minutes 
+	
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -22,7 +25,7 @@ public class VerificationToken {
     private String token;
    
     @OneToOne(targetEntity = User.class)
-    @JoinColumn(nullable = false, name = "id")
+    @JoinColumn(nullable = false, name = "uid")
     private User user;
      
     private Date creationDate;
@@ -34,6 +37,14 @@ public class VerificationToken {
     
     public VerificationToken() {
         super();
+        token = UUID.randomUUID().toString();
+		
+		DateTime creationDate = new DateTime();
+		this.creationDate = creationDate.toDate();
+		
+		DateTime expirationDate = new DateTime(creationDate);
+		expirationDate = expirationDate.plusMinutes(VERIFICATION_TOKEN_DURATION);
+		this.expirationDate = expirationDate.toDate();
     }
     
     public VerificationToken(String token, User user, Date creationDate, Date expirationDate) {

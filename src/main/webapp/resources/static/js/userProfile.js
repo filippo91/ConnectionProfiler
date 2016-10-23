@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('myApp.userProfile', ['ngRoute', 'ngResource'])
+var myAppUserProfile = angular.module('myApp.userProfile', ['ngRoute', 'ngResource'])
 
 .config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/userProfile', {
@@ -8,55 +8,61 @@ angular.module('myApp.userProfile', ['ngRoute', 'ngResource'])
     controller: 'userProfile',
     controllerAs: 'controller'
   });
-}])
+}]);
 
-.controller('userProfile', ['quotesFactory', '$rootScope', function(quotesFactory, $rootScope){
+myAppUserProfile.controller('userProfile', ['userFactory', 'providersFactory', '$rootScope', function(userFactory, providersFactory, $rootScope){
 	$rootScope.enableChangeView = false;
 	console.info("loading controller user profile");
 	var self = this;
-	self.test = "hi there!";
-	self.qod = quotesFactory.getQoq();
-	self.user = {};
 	
-}])
-
-.factory('quotesFactory', ['$resource', function($resource) {
-	var factory = {};
+	self.user = userFactory.getUser();
 	
-	factory.getQoq = function(){
-		return "'The best preparation for tomorrow is doing your best today.', H. Jackson Brown, Jr.";
-	}
+	self.newProvider = {};
 	
-	/* we need to subscribe
-	var qodUrl = 'http://quotes.rest/qod.json';
+	self.providers = providersFactory.getAll();
 	
-	
-	var QodResource =  $resource(qodUrl);
-	var Qod = undefined;
-	
-	factory.getQoq = function(){
-		 
-		if(Qod === undefined){
-			Qod = QodResource.get();
-		}
-		return Qod;
+	self.addProvider = function(){
+		console.info("add new provider");
+		console.info(self.newProvider);
+		var p = self.newProvider;
+		providersFactory.addProvider(p);
+		self.newProvider = {};
+		
+		console.info(self.providers);
 	};
-	*/
-	return factory;
-}])
+	
+}]);
 
-.factory('userFactory', ['$resource', function($resource) {
-	var userUrl = "http://localhost:8080/connectionProfiler/user";
+myAppUserProfile.factory('userFactory', ['$resource', 'appURLs', function($resource, appURLs) {
+	var userUrl = appURLs.root + appURLs.userDetails;
 	var factory = {};
 	
 	var userResource =  $resource(userUrl);
-	var User = undefined;
+	
+	var userProfile = {};
 	
 	factory.getUser = function(){
-		if(User === undefined){
-			User = userResource.get();
-		}
-		return User;
+		userProfile = userResource.get();
+		return userProfile;
+	};
+	
+	return factory;
+}]);
+
+myAppUserProfile.factory('providersFactory', ['$resource', 'REST_API_URLs', function($resource, api) {
+	var factory = {};
+	///subscriptions/:asnum
+	var subscriptionsResource =  $resource(api.subscriptions);
+													
+	console.log(api.subscriptions);
+	factory.getAll = function(){
+		return subscriptionsResource.query();
+	};
+	
+	factory.addProvider = function(p){
+		subscriptionsResource.save(p, function(){
+			console.info('saved');
+		});
 	};
 	
 	return factory;

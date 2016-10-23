@@ -59,8 +59,8 @@ angular.module('myApp', [
     	urls.userDetails = '/user';
     	urls.login = '/login';
     	urls.logout = '/logout';
-    	urls.createUser = '/user';
-    	urls.confirmRegistration = '/user/confirmRegistration';
+    	urls.createUser = '/public/user';
+    	urls.confirmRegistration = '/public/user/confirm';
     	urls.websocket = '/connection-profiler-websocket';
     	
     	return urls;
@@ -85,6 +85,8 @@ angular.module('myApp', [
     	restAPI.speedGraphUser = root + '/speedGraph/:year/:month/:day/:view';    	
         restAPI.speedHistogramPublic = root + '/public/speedHistogram/:year/:month/:day/:view/:bin_width';
         restAPI.speedHistogramUser = root + '/speedHistogram/:year/:month/:day/:view/:bin_width';
+        
+        restAPI.subscriptions = root + '/subscriptions/:asnum';
         
     	return restAPI;
     }])

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import exceptions.TokenNotValidException;
 import exceptions.UsernameAlreadyExistException;
 import listeners.OnRegistrationCompleteEvent;
-import models.Subscription;
 import models.User;
 import models.VerificationToken;
 import repositories.UserRepository;
@@ -25,6 +25,8 @@ public class UserServiceImpl implements UserService {
 	@Autowired private UserRepository userRepository;
 	@Autowired private TokenService tokenService;
 	@Autowired private ApplicationEventPublisher eventPublisher;
+	
+	@Autowired private SubscriptionService subscriptionService;
 	
 	@Transactional
 	@Override
@@ -53,6 +55,7 @@ public class UserServiceImpl implements UserService {
 		 * verification token just created.
 		 */		
 		verificationToken.setUser(user);
+		log.info(verificationToken.toString());
 		tokenService.save(verificationToken);
 
 		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(verificationToken));
@@ -66,7 +69,15 @@ public class UserServiceImpl implements UserService {
 	}
 	@Override
 	public void confirmRegistration(String token, Date confirmationDate) {
+		log.info("try to confirm registration for token: " + token);
 		VerificationToken verificationToken = tokenService.findByToken(token);
+		
+		if(verificationToken != null){
+			log.info("got verification token: " + verificationToken.toString());
+		}else{
+			log.info("token not found");
+			throw new TokenNotValidException();
+		}
 		
 		if(!tokenService.isValid(token, confirmationDate)){
 			throw new TokenNotValidException();
@@ -79,11 +90,8 @@ public class UserServiceImpl implements UserService {
 		User user = verificationToken.getUser();
 		user.setEnabled(true);
 		userRepository.save(user);
-	}
-
-	@Override
-	public void addSubscription(User user, Subscription s) {
-		user.addSubscription(s);
-		userRepository.save(user);
+		log.info("enable user: " + user);
+		//create a corresponding 
+		subscriptionService.create(user.getUid());
 	}
 }

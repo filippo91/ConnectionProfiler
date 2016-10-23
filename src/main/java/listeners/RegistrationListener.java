@@ -21,11 +21,11 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 	private Logger log = LoggerFactory.getLogger(RegistrationListener.class);
 
 	@Value("${confirmation.email.subject}")
-	private static String EMAIL_SUBJECT;
+	private String EMAIL_SUBJECT;
 	@Value("${confirmation.email.from}")
-	private static String EMAIL_FROM;
+	private String EMAIL_FROM;
 	@Value("${confirmation.page}")
-	private static String CONFIRMATION_PAGE;
+	private String CONFIRMATION_PAGE;
 	
 	@Autowired private JavaMailSender mailSender;
 	

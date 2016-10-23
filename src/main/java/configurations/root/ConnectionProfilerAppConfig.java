@@ -15,6 +15,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.WriteResultChecking;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -27,15 +28,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
-import factories.SubscriptionFactory;
-import factories.VerificationTokenFactory;
-
 @Configuration
 @ComponentScan(basePackages = { "services", "configurations.security", "listeners", "configurations.root",
 		"controllers" })
 @EnableMongoRepositories(basePackages = { "repositories" })
 @EnableJpaRepositories(basePackages = { "repositories" })
-@EnableTransactionManagement
+@EnableTransactionManagement()
 @PropertySource("classpath:application.properties")
 public class ConnectionProfilerAppConfig {
 
@@ -46,7 +44,9 @@ public class ConnectionProfilerAppConfig {
 	}
 
 	public @Bean MongoTemplate mongoTemplate() throws Exception {
-		return new MongoTemplate(mongo(), "dbname");
+		MongoTemplate mongoTemplate = new MongoTemplate(mongo(), "dbname");
+		mongoTemplate.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+		return mongoTemplate;
 	}
 
 	public @Bean DataSource dataSource() {
@@ -59,19 +59,7 @@ public class ConnectionProfilerAppConfig {
 		
 		return dataSource;
 	}
-	
-	public @Bean SubscriptionFactory subscriptionFactory(){
-		SubscriptionFactory factory = new SubscriptionFactory();
-		factory.setSingleton(false);
-		return factory;
-	}
-	
-	public @Bean VerificationTokenFactory verificationTokenFactory(){
-		VerificationTokenFactory factory = new VerificationTokenFactory();
-		factory.setSingleton(false);
-		return factory;
-	}
-	
+
 	public @Bean EntityManagerFactory entityManagerFactory(DataSource dataSource) {
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();

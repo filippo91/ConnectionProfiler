@@ -19,13 +19,15 @@ myAppUserProfile.controller('userProfile', ['userFactory', 'providersFactory', '
 	
 	self.newProvider = {};
 	
-	self.providers = providersFactory.getAll();
+	self.providers = providersFactory.getSummary();
+	self.subscriptions = providersFactory.getAllSubscriptions();
 	
 	self.addProvider = function(){
 		console.info("add new provider");
 		console.info(self.newProvider);
 		var p = self.newProvider;
 		providersFactory.addProvider(p);
+		self.subscriptions.push(p);
 		self.newProvider = {};
 		
 		console.info(self.providers);
@@ -55,9 +57,12 @@ myAppUserProfile.factory('providersFactory', ['$resource', 'REST_API_URLs', func
 	var subscriptionsResource =  $resource(api.subscriptions);
 	var subscriptionsSummaryResource =  $resource(api.subscriptionsSummary);
 	
-	console.log(api.subscriptions);
-	factory.getAll = function(){
+	factory.getSummary = function(){
 		return subscriptionsSummaryResource.query();
+	};
+	
+	factory.getAllSubscriptions = function(){
+		return subscriptionsResource.query();
 	};
 	
 	factory.addProvider = function(p){

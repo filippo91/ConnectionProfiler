@@ -1,10 +1,20 @@
-<div class="container" style="height: 700px">
-	<div class="col-md-8 col-md-offset-2">
+<div class="container col-md-8 col-md-offset-2" style="min-height: 700px">
 		<div id="profileHeader" class="">
 			<h1>Home Sweet Home</h1>
 		</div>
-		<p>Here you can find some information about your account and
-			statistics about the providers you tell us about.</p>
+		<p>Hey {{ user.name }}, what's up?</p>
+		<p>
+		If you're tired to go through all that plots, 
+		here you can take a rest, looking at some easy information related to the subscriptions
+		you have registered within your account.
+		</p>
+		<p>
+		We hope you agree with us when we say that this web site rocks! 
+		However, if you have any suggestion how to make it cooler or if you
+		want to get involved in the project,
+		drop us a line (aiproject@polito.it), we'll appreciate it.
+		</p>
+		<p>Have fun!</p>
 		<hr>
 		<div id="profileBody" class="">
 			<h4>Profile</h4>
@@ -19,59 +29,75 @@
 			</div>
 		</div>
 		<hr>
-		<div>
-			<h4>Your registered providers</h4>
-		<div>
-			<form ng-submit="controller.addProvider()" class="form-inline">
-				<div class="form-group"
-					ng-class="{ 'has-error': form.asnum.$dirty && form.asnum.$error.required }">
-					<label for="asnum">asnum</label> <input type="text" name="asnum"
-						id="asnum" class="form-control"
-						ng-model="controller.newProvider.asnum" required /> <span
-						ng-show="form.asnum.$dirty && form.asnum.$error.required"
-						class="help-block">asnum is required</span>
-				</div>
-				<div class="form-group"
-					ng-class="{ 'has-error': form.bandwidth.$dirty && form.bandwidth.$error.required }">
-					<label for="asname">bandwidth</label> <input type="text"
-						name="bandwidth" id="bandwidth" class="form-control"
-						ng-model="controller.newProvider.bandwidth" required /> <span
-						ng-show="form.bandwidth.$dirty && form.bandwidth.$error.required"
-						class="help-block">bandwidth is required</span>
-				</div>
-				<button type="submit" class="btn btn-primary">add</button>
-
-			</form>
-		</div>
-		<p>{{ provider }}</p>
-		<p>{{ provider.providerPlan}}</p>
-		<p>{{ provider.bandwidth}}</p>
 		<div class="row">
-			<table class="table table-bordered table-striped">
-				<tr>
-					<th>Provider</th>
-					<th colspan="4" scope="colgroup">Bandwidth</th>
-					<th>Samples</th>
-				</tr>
-				<tr>
-					<th></th>
-					<th scope="col">Nominal</th>
-					<th scope="col">Average</th>
-					<th scope="col">Maximum</th>
-					<th scope="col">Minimum</th>
-					<th></th>
-				</tr>
-				<tr ng-repeat="provider in controller.providers">
-					<td>{{ provider.providerPlan.asname }}</td>
-					<td>{{ provider.providerPlan.bandwidth }}</td>
-					<td>{{ provider.bandwidth.average | speedFormat }}</td>
-					<td>{{ provider.bandwidth.maximum | speedFormat }}</td>
-					<td>{{ provider.bandwidth.minimum | speedFormat }}</td>
-					<td>{{ provider.bandwidth.samples }}</td>
-				</tr>
-			</table>
-</div>
-		</div>
-		
+			<div id="add-subscription" class="col-md-6">
+				<h4>New Subscription</h4>
+				<form ng-submit="controller.addProvider()" class="form">
+					<div class="form-group"
+						ng-class="{ 'has-error': form.asnum.$dirty && form.asnum.$error.required }">
+						<label for="asnum">asnum</label> <input type="text" name="asnum"
+							id="asnum" class="form-control"
+							ng-model="controller.newProvider.asnum" required /> <span
+							ng-show="form.asnum.$dirty && form.asnum.$error.required"
+							class="help-block">asnum is required</span>
+					</div>
+					<div class="form-group"
+						ng-class="{ 'has-error': form.asname.$dirty && form.asname.$error.required }">
+						<label for="asname">asname</label> <input type="text" name="asname"
+							id="asname" class="form-control"
+							ng-model="controller.newProvider.asname" required /> <span
+							ng-show="form.asname.$dirty && form.asname.$error.required"
+							class="help-block">asname is required</span>
+					</div>
+					<div class="form-group"
+						ng-class="{ 'has-error': form.bandwidth.$dirty && form.bandwidth.$error.required }">
+						<label for="asname">bandwidth(Mbps)</label> <input type="text"
+							name="bandwidth" id="bandwidth" class="form-control"
+							ng-model="controller.newProvider.bandwidth" required /> <span
+							ng-show="form.bandwidth.$dirty && form.bandwidth.$error.required"
+							class="help-block">bandwidth is required</span>
+					</div>
+					<button type="submit" class="btn btn-primary">add</button>
+	
+				</form>
 			</div>
+			<div class="col-md-6">
+				<h4>Your Registered Subscriptions</h4>
+				<div id="subscriptions">
+					<div ng-repeat="subscription in controller.subscriptions">
+						<strong>{{ subscription.asname }} ( {{ subscription.bandwidth }} )</strong>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+		<hr>
+		<div	>
+			<h4>Performance Summary</h4>
+			<div>
+				<table class="table table-bordered table-striped">
+					<tr>
+						<th>Provider</th>
+						<th colspan="4" scope="colgroup">Bandwidth</th>
+						<th>Samples</th>
+					</tr>
+					<tr>
+						<th></th>
+						<th scope="col">Nominal</th>
+						<th scope="col">Average</th>
+						<th scope="col">Maximum</th>
+						<th scope="col">Minimum</th>
+						<th></th>
+					</tr>
+					<tr ng-repeat="provider in controller.providers">
+						<td>{{ provider.providerPlan.asname }}</td>
+						<td>{{ provider.providerPlan.bandwidth }}</td>
+						<td>{{ provider.bandwidth.average | speedFormat }}</td>
+						<td>{{ provider.bandwidth.maximum | speedFormat }}</td>
+						<td>{{ provider.bandwidth.minimum | speedFormat }}</td>
+						<td>{{ provider.bandwidth.samples }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
 </div>

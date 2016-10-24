@@ -12,6 +12,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         $rootScope.enableChangeView = true;
 
+        $rootScope.currentDate = $rootScope.getCurrentDate();
+
         $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
 
         function updateRootScopeCallback(data, t){
@@ -133,14 +135,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             }
             asnameList.forEach(function(ele){ele.downloads.sort(function(a,b){return a.timestamp - b.timestamp;});});
             console.log("SORTED");
-            console.log(JSON.stringify(asnameList));
+            //console.log(JSON.stringify(asnameList));
             return asnameList;
         };
 
         factory.getUserDownloads = function (year,month,day,view,trigger, callback){
             return $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                console.log("arrivati user: \n" + JSON.stringify(downloadList));
+                //console.log("arrivati user: \n" + JSON.stringify(downloadList));
                 callback(downloadList,true);
                 trigger.arrived = ++trigger.count === trigger.nData;
             });
@@ -156,7 +158,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         factory.updateDownloads = function(downloadList, download){
             console.log("downloadList" + JSON.stringify(downloadList));
-            download.timestamp = moment(download.timestamp).millisecond(0).second(0).minute(0).hour(0).valueOf();
+            console.log("download" + JSON.stringify(download));
             var i, j, count = 1;
             if(download.count !== undefined) count = download.count;
             for(i = 0; i < downloadList.length; i++){
@@ -165,7 +167,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         if(downloadList[i].downloads[j].timestamp === download.timestamp){
                             downloadList[i].downloads[j].speed = (downloadList[i].downloads[j].count * downloadList[i].downloads[j].speed + download.speed) / (downloadList[i].downloads[j].count + 1);
                             downloadList[i].downloads[j].count++;
-                            console.log("new speed + " + downloadList[i].downloads[j].speed  );
+                            console.log("new speed: " + downloadList[i].downloads[j].speed +
+                                ", date: " + moment(downloadList[i].downloads[j].timestamp).format("DD-MMM-YYYY") + ", timestamp: "
+                                    + downloadList[i].downloads[j].timestamp
+                            + ", asname: " + downloadList[i].downloads[j].asname);
                             break;
                         }
                     }
@@ -321,20 +326,20 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             $('#user-button-' + asn).css('color', colors(asn));
                         });
 
-
-                        console.log("user: " + JSON.stringify(userDownloadList));
-                        console.log("public: " + JSON.stringify(publicDownloadList));
+                        //
+                        //console.log("user: " + JSON.stringify(userDownloadList));
+                        //console.log("public: " + JSON.stringify(publicDownloadList));
 
                         var valueList_x = [], maxList_y = [];
 
                         publicDownloadList.forEach(function (d, i) {
                             maxList_y[i] = d3.max(d.downloads.map(function (d) {return d.speed;}));
-                            console.log(d3.extent(d.downloads.map(function(v){return v.timestamp;})));
+                            //console.log(d3.extent(d.downloads.map(function(v){return v.timestamp;})));
                             valueList_x = valueList_x.concat(d3.extent(d.downloads.map(function(v){return v.timestamp;})));
                         });
 
-                        console.log("x extend: " + valueList_x + " " +d3.extent(valueList_x));
-                        console.log("y max: " + d3.max(maxList_y));
+                        //console.log("x extend: " + valueList_x + " " +d3.extent(valueList_x));
+                        //console.log("y max: " + d3.max(maxList_y));
 
                         var extentX = d3.extent(valueList_x);
                         if(valueList_x.length === 0 || extentX[0] === extentX[1]){
@@ -535,7 +540,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     function updateGraph(newDownloadList, type, asname){
                         if(asnameList.indexOf(asname) < 0)
                             asnameList.push(asname);
-                        console.log("ASNUM LIST " + JSON.stringify(asnameList));
+                       // console.log("ASNUM LIST " + JSON.stringify(asnameList));
                         //asnameList = scope.publicDownloadList.map(function(d){return d.asname;});
                         var isVisible = $('.point.' + type + "-graph-" + asname).attr("isvisible");
                         var tmpMax = y.domain()[1];
@@ -545,7 +550,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         }
                         if(isVisible === undefined) isVisible = false;
 
-                        console.log("isVisible " + isVisible);
+                        //console.log("isVisible " + isVisible);
                         //togliere linea dell/asname
                         var element =  focus.selectAll("." + type + "-graph-" + asname);
                         console.log(element);

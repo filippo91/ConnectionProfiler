@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -17,18 +18,13 @@ public class AvgDaySpeedDownload {
 		this.count = count;
 		
 		DateTime dateTime = new DateTime(timestamp, DateTimeZone.UTC);
-		dateTime = dateTime.toDateTimeISO();
 		dateTime = dateTime.withTimeAtStartOfDay();
 		this.timestamp = dateTime.toDate();
 	}
 	
-	
-	
 	public String getAsname() {
 		return asname;
 	}
-
-
 
 	public void setAsname(String asname) {
 		this.asname = asname;

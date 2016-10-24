@@ -125,7 +125,7 @@ public class PlotsServiceImpl implements PlotsService{
 			date = date.withDayOfMonth(1).plusMonths(1);
 			break;
 		case months:
-			date = date.withDayOfMonth(1).plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW-1);
+			date = date.withDayOfMonth(1).plusMonths(NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW);
 			break;
 		}
 		

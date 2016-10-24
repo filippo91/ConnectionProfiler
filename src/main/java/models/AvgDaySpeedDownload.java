@@ -17,7 +17,7 @@ public class AvgDaySpeedDownload {
 		
 		DateTime dateTime = new DateTime(timestamp);
 
-		dateTime.withTimeAtStartOfDay();
+		dateTime = dateTime.withTimeAtStartOfDay();
 		this.timestamp = dateTime.toDate();
 	}
 	

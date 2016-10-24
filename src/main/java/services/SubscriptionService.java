@@ -5,7 +5,6 @@ import java.util.List;
 import models.ProviderPlan;
 import models.SubscriptionSummary;
 import models.User;
-import models.UserSubscription;
 
 public interface SubscriptionService {
 	List<ProviderPlan> getSubscriptions(User user);

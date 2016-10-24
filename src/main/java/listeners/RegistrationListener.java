@@ -15,6 +15,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import models.User;
+import models.VerificationToken;
+import services.TokenService;
 
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
@@ -28,18 +30,23 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 	private String CONFIRMATION_PAGE;
 	
 	@Autowired private JavaMailSender mailSender;
-	
 	@Autowired private VelocityEngine velocityEngine;
+	
+	@Autowired private TokenService tokenService;
 
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
-		this.requestConfirmation(event);
+		this.requestConfirmation(event, new VerificationToken());
 	}
 
-	private void requestConfirmation(OnRegistrationCompleteEvent event) {
+	private void requestConfirmation(OnRegistrationCompleteEvent event, VerificationToken verificationToken) {		
 		User user = event.getUser();
+		
+		verificationToken.setUser(user);
+		tokenService.save(verificationToken);
+		
 		String url = event.getAppUrl() + CONFIRMATION_PAGE;
-		String token = event.getToken();
+		String token = verificationToken.getToken();
 		String recipientAddress = user.getEmail();
 
 		SimpleMailMessage email = new SimpleMailMessage();

@@ -64,7 +64,7 @@ public class UserController {
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public void duplicateInformationForNewUser(DataIntegrityViolationException dive) {
-		log.info("Impossible to save the user into the DB");
+		log.info("Unable to save the user into the DB");
 		System.out.println(dive);
 	}
 	

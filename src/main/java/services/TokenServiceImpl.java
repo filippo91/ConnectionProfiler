@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import models.User;
 import models.VerificationToken;
 import repositories.VerificationTokenRepository;
 
@@ -35,5 +36,17 @@ public class TokenServiceImpl implements TokenService {
 	@Override
 	public void save(VerificationToken verificationToken) {
 		tokenRepository.save(verificationToken);
+	}
+
+	@Override
+	public User getUser(String token) {
+		VerificationToken verificationToken = tokenRepository.findByToken(token);
+		User user = null;
+		
+		if(verificationToken != null){
+			user = verificationToken.getUser();
+		}
+		
+		return user;
 	}
 }

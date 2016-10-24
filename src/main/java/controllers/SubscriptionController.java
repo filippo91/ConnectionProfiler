@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import models.ProviderPlan;
 import models.SubscriptionSummary;
 import models.User;
-import models.UserSubscription;
 import services.SubscriptionService;
 
 @RestController

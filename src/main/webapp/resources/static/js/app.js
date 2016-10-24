@@ -385,6 +385,8 @@ angular.module('myApp', [
 
         $rootScope.currentDate = moment();
 
+        $rootScope.getCurrentDate = function(){ return moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);};
+
         /**
 		 * Functions for controlling time
 		 */

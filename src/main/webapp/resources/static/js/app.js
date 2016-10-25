@@ -416,18 +416,20 @@ angular.module('myApp', [
 
                 if ($rootScope.authenticated) {
                     $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
-                        var download = JSON.parse(packet.body).payload;
+                        var downloads = JSON.parse(packet.body).payload;
                         if ($rootScope.websocketCallbackUser != undefined) {
                             console.log("CHIAMO CALLBACK USER");
-                            $rootScope.websocketCallbackUser(download);
+                            downloads.forEach($rootScope.websocketCallbackUser);
+                            //$rootScope.websocketCallbackUser(download);
                         }
                     });
                 }
                 $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
-                    var download = JSON.parse(packet.body).payload;
+                    var downloads = JSON.parse(packet.body).payload;
                     if ($rootScope.websocketCallbackPublic != undefined) {
                         console.log("CHIAMO CALLBACK PUBLIC");
-                        $rootScope.websocketCallbackPublic(download);
+                        downloads.forEach($rootScope.websocketCallbackPublic);
+                        //$rootScope.websocketCallbackPublic(download);
                     }
                 });
             });

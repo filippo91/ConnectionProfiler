@@ -96,18 +96,20 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         link: function(scope,element){
             d3Service.d3().then(function(d3){
 
-                var margin = {top: 10, right: 30, bottom: 60, left: 60},
-                    real_width = 700, real_height = 500,
-                    width = real_width - margin.left - margin.right,
-                    height = real_height - margin.top - margin.bottom,
+                var margin = {top: 10, right: 10, bottom: 60, left: 50},
+                    totalWidth = 730, legendWidth = 100, totalHeight = 500,
+                    width = totalWidth - legendWidth - margin.left - margin.right,
+                    height = totalHeight - margin.top - margin.bottom,
                     radius = Math.min(width, height) / 2;
 
                 var color = d3.scale.category10();
 
                 var f = d3.format(".1f");
+                var scaleYformat = d3.format("d");
+
                 var svg = d3.select(element[0]).append("svg")
-                    .attr("width", real_width)
-                    .attr("height", real_height)
+                    .attr("width", totalWidth)
+                    .attr("height", totalHeight)
                     .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
                 //loading icon
@@ -124,8 +126,8 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     $(element[0]).empty();
 
                     svg = d3.select(element[0]).append("svg")
-                        .attr("width", real_width)
-                        .attr("height", real_height)
+                        .attr("width", totalWidth)
+                        .attr("height", totalHeight)
                         .append("g")
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -162,13 +164,13 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         svg.append("rect")
                             .attr("x", 0)
                             .attr("y", 0)
-                            .attr("width", real_width)
-                            .attr("height", real_height)
+                            .attr("width", totalWidth)
+                            .attr("height", totalHeight)
                             .attr('fill', 'url(#diagonalHatch)');
 
                         svg.append("text")
-                            .attr("x", real_width / 2)
-                            .attr("y", real_height / 2)
+                            .attr("x", totalWidth / 2)
+                            .attr("y", totalHeight / 2)
                             .style("text-anchor", "middle")
                             .style("font-family", "sans-serif")
                             .style("font-size", "20px")
@@ -185,7 +187,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var y = d3.scale.linear().domain([0, maxValueY]).range([height, 0]);
 
                     var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){return (d + 1) * binWidth;});//.tickValues(ris);
-                    var yAxis = d3.svg.axis().scale(y).orient("left");
+                    var yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(scaleYformat);
 
 
                     var bins = svg.selectAll(".bin")
@@ -240,17 +242,17 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         .data(asnameList.slice().reverse())
                         .enter().append("g")
                         .attr("class", "legend")
-                        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+                        .attr("transform", function(d, i) { return "translate(-" + margin.left + "," + i * 20 + ")"; });
 
                     legend.append("rect")
-                        .attr("x", width - 18)
+                        .attr("x", totalWidth - 18)
                         .attr("width", 18)
                         .attr("opacity",.7)
                         .attr("height", 18)
                         .style("fill", color);
 
                     legend.append("text")
-                        .attr("x", width - 24)
+                        .attr("x", totalWidth - 24)
                         .attr("y", 9)
                         .attr("dy", ".35em")
                         .style("text-anchor", "end")

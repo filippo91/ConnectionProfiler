@@ -129,18 +129,19 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             link: function(scope,element){
                 d3Service.d3().then(function(d3){
 
-                    var margin = {top: 10, right: 30, bottom: 50, left: 50},
-                        real_width = 700, real_height = 500,
-                        width = real_width - margin.left - margin.right,
-                        height = real_height - margin.top - margin.bottom,
+                    var margin = {top: 10, right: 10, bottom: 50, left: 50},
+                        totalWidth = 730, legendWidth = 100, totalHeight = 500,
+                        width = totalWidth - legendWidth - margin.left - margin.right,
+                        height = totalHeight - margin.top - margin.bottom,
                         radius = Math.min(width, height) / 2;
 
                     var color = d3.scale.category10();
                     var f = d3.format(".1f");
+                    var scaleYFormat = d3.format("d");
 
                     var svg = d3.select(element[0]).append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
+                        .attr("width", totalWidth)
+                        .attr("height", totalHeight)
                         .append("g")
                         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -158,8 +159,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         $(element[0]).empty();
 
                         svg = d3.select(element[0]).append("svg")
-                            .attr("width", width + margin.left + margin.right)
-                            .attr("height", height + margin.top + margin.bottom)
+                            .attr("width", totalWidth)
+                            .attr("height", totalHeight)
                             .append("g")
                             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -184,9 +185,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         var binWidth = $routeParams.bin_width;
 
-                        if(( (valuesUser == undefined || valuesUser.length == 0) ) &&
-                            (valuesPublic == undefined || valuesPublic.length == 0)){
-                            svg.attr("transform", "translate(" + real_width / 2 + "," + real_height / 2 + ")");
+                        if(valuesPublic == undefined || valuesPublic.length == 0){
+                            svg.attr("transform", "translate(" + totalWidth / 2 + "," + totalHeight / 2 + ")");
                             svg.append('defs')
                                 .append('pattern')
                                 .attr('id', 'diagonalHatch')
@@ -235,7 +235,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         var xAxis = d3.svg.axis().scale(x0).orient("bottom").tickFormat(function(d){
                             return (d + 1) * binWidth + " Mbps";
                             });
-                        var yAxis = d3.svg.axis().scale(y).orient("left");
+                        var yAxis = d3.svg.axis().scale(y).orient("left").tickFormat(scaleYFormat);
 
 
                         var bins = [], bar = [], rect = [],text = [];
@@ -323,17 +323,17 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             .data(asnameList.slice().reverse())
                             .enter().append("g")
                             .attr("class", "legend")
-                            .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+                            .attr("transform", function(d, i) { return "translate(-" + margin.left + "," + i * 20 + ")"; });
 
                         legend.append("rect")
-                            .attr("x", width - 18)
+                            .attr("x", totalWidth - 18)
                             .attr("width", 18)
                             .attr("opacity",.5)
                             .attr("height", 18)
                             .style("fill", color);
 
                         legend.append("text")
-                            .attr("x", width - 24)
+                            .attr("x", totalWidth - 24)
                             .attr("y", 9)
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")

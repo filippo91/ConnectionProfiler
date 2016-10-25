@@ -208,9 +208,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     var legend;
 
                     var margin = {top: 10, right: 10, bottom: 100, left: 50},
-                        margin2 = {top: 430, right: 10, bottom: 20, left: 0},
-                        totalWidth = 700,
-                        width = totalWidth - margin.left - margin.right,
+                        margin2 = {top: 430, right: 10, bottom: 20, left: 50},
+                        totalWidth = 730, legendWidth = 100,
+                        svgWidth = totalWidth - legendWidth,
+                        width = svgWidth - margin.left - margin.right,
                         height = 500 - margin.top - margin.bottom,
                         height2 = 500 - margin2.top - margin2.bottom;
 
@@ -241,7 +242,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         .interpolate("monotone");
 
                     var svg = d3.select(element[0]).append("svg")
-                        .attr("width", width + margin.left + margin.right)
+                        .attr("width", totalWidth)
                         .attr("height", height + margin.top + margin.bottom);
 
                     svg.append("defs").append("clipPath")
@@ -432,14 +433,14 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
                         legend.append("rect")
-                            .attr("x", width - 18)
+                            .attr("x", totalWidth - 18)
                             .attr("width", 18)
                             .attr("opacity",.5)
                             .attr("height", 18)
                             .style("fill", colors);
 
                         legend.append("text")
-                            .attr("x", width - 24)
+                            .attr("x", totalWidth - 24)
                             .attr("y", 9)
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
@@ -475,8 +476,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         }
 
                         brush.extent([$rootScope.startDate, $rootScope.endDate]);
-                        brush(d3.select(".brush").transition().duration(2000));
-                        brush.event(d3.select(".brush").transition().duration(2000));
+                        brush(d3.select(".brush").transition().duration(1000));
+                        brush.event(d3.select(".brush").transition().duration(1000));
 
                         d3.selectAll("path.domain").style("shape-rendering", "geometricPrecision");
 

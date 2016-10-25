@@ -48,7 +48,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             console.log("values: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].asname == ret[j].asname){
+                    if(values[i].asname.localeCompare(ret[j].asname) == 0){
                         ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }

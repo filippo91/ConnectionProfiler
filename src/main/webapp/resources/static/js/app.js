@@ -143,14 +143,14 @@ angular.module('myApp', [
                     year: self.activeView.year,
                     month: self.activeView.month,
                     day: self.activeView.day,
-                    view: view
+                    view: self.activeView.view
                 });
             } else {
                 $route.updateParams({
                     year: self.activeView.year,
                     month: self.activeView.month,
                     day: self.activeView.day,
-                    view: view,
+                    view: self.activeView.view,
                     bin_width: self.binSelector.width
                 });
                 
@@ -182,14 +182,14 @@ angular.module('myApp', [
                     year: self.activeView.year,
                     month: self.activeView.month,
                     day: self.activeView.day,
-                    view: view
+                    view: self.activeView.view
                 });
             } else {
                 $route.updateParams({
                     year: self.activeView.year,
                     month: self.activeView.month,
                     day: self.activeView.day,
-                    view: view,
+                    view: self.activeView.view,
                     bin_width: self.binWidthSelector
                 });
                 
@@ -213,10 +213,6 @@ angular.module('myApp', [
             self.binSelector.width += (self.binSelector.STEP * btn);
 
             $route.updateParams({
-                year: self.activeView.year,
-                month: self.activeView.month,
-                day: self.activeView.day,
-                view: self.activeView.view,
                 bin_width: self.binSelector.width
             });
         };

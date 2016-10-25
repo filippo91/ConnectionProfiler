@@ -12,7 +12,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         $rootScope.enableChangeView = true;
 
-        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};<
+        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
 
         function updateRootScopeCallback(data, t){
 

@@ -26,7 +26,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                 domainsDownloadFactory.updateDomainAccessList($scope.domainList, download);
                 console.log("domainList: " + JSON.stringify($scope.domainList));
                 $scope.$apply(function () {
-                    $scope.trigger.newAccess = $scope.trigger.newAccess !== true;
+                    $scope.trigger.newAccess = $scope.trigger.newAccess != true;
                 });
             }
         };
@@ -55,22 +55,23 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
         factory.updateDomainAccessList = function(domainList,download){
             var i;
             for(i=0;i<domainList.length;i++){
-                if(domainList[i].server_domain === download.server_domain){
+                if(domainList[i].server_domain.localeCompare(download.server_domain) == 0){
                     domainList[i].nRecords++;break;
                 }
             }
-            if(i === domainList.length)
+            if(i == domainList.length)
                 domainList.push({server_domain: download.server_domain, nRecords: 1});
             console.log("domainList: " + JSON.stringify(domainList));
         };
         factory.updateDomainSizeList = function(domainSizeList,download){
+
             var i;
             for(i=0;i<domainSizeList.length;i++){
-                if(domainSizeList[i].server_domain === download.server_domain){
+                if(domainSizeList[i].server_domain.localeCompare(download.server_domain)  == 0){
                     domainSizeList[i].size += download.size; break;
                 }
             }
-            if(i === domainSizeList.length)
+            if(i == domainSizeList.length)
                 domainSizeList.push({server_domain: download.server_domain, size: download.size});
             console.log("updateDomainSizeList: " + JSON.stringify(domainSizeList));
         };
@@ -128,7 +129,7 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                         var data =  scope.domainList;
                         var tot = d3.sum(data,function(d){return d.nRecords;});
 
-                        if(data === undefined || data.length === 0){
+                        if(data == undefined || data.length == 0){
                             svg.append('defs')
                                 .append('pattern')
                                 .attr('id', 'diagonalHatch')
@@ -224,13 +225,13 @@ angular.module('myApp.domainsByAccesses', ['ngRoute', 'ngResource'])
                     }
 
                     scope.$watch('trigger.arrived', function (newVal) {
-                        if(newVal === true) {
+                        if(newVal == true) {
                             console.log("Change");
                             drawPie(true);
                         }
                     });
                     scope.$watch('trigger.newAccess', function(newVal){
-                        if(newVal !== undefined) {
+                        if(newVal != undefined) {
                             console.log("aggiorno pie!");
                             drawPie(false);
                         }

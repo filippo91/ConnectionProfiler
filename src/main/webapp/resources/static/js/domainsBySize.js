@@ -25,7 +25,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                 domainsDownloadFactory.updateDomainSizeList($scope.domainSizeList, download);
                 console.log("domainList: " + JSON.stringify($scope.domainSizeList));
                 $scope.$apply(function () {
-                    $scope.trigger.newData = $scope.trigger.newData !== true;
+                    $scope.trigger.newData = $scope.trigger.newData != true;
                 });
             }
         };
@@ -85,7 +85,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
 
                         var tot = d3.sum(data, function(d){return d.size;});
                         //no data found icon
-                        if(data === undefined || data.length === 0){
+                        if(data == undefined || data.length == 0){
                             svg.append('defs')
                                 .append('pattern')
                                 .attr('id', 'diagonalHatch')
@@ -181,13 +181,13 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                     }
 
                     scope.$watch('trigger.arrived', function (newVal) {
-                        if(newVal === true) {
+                        if(newVal == true) {
                             console.log("Change");
                             drawPie(true);
                         }
                     });
                     scope.$watch('trigger.newData',function(newVal){
-                        if(newVal !== undefined) {
+                        if(newVal != undefined) {
                             console.log("disegno pie!");
                             drawPie(false);
                         }

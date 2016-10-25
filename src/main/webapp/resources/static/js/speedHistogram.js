@@ -42,7 +42,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 speedFactory.updateSpeedData($scope.speedDataUser,download, $routeParams.bin_width);
                 $scope.$apply(function () {
                     console.log("trigger new data user: " +  $scope.trigger.newDataUser);
-                    $scope.trigger.newDataUser = $scope.trigger.newDataUser !== true;
+                    $scope.trigger.newDataUser = $scope.trigger.newDataUser != true;
                 });
                 $scope.$apply();
             }
@@ -53,7 +53,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                 speedFactory.updateSpeedData($scope.speedDataPublic,download, $routeParams.bin_width);
                 $scope.$apply(function () {
                     console.log("trigger new data public: " +  $scope.trigger.newDataPublic);
-                    $scope.trigger.newDataPublic = $scope.trigger.newDataPublic !== true;
+                    $scope.trigger.newDataPublic = $scope.trigger.newDataPublic != true;
                 });
                 $scope.$apply();
             }
@@ -82,11 +82,11 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             var ret = [];
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].asname === ret[j].asname){
+                    if(values[i].asname.localeCompare(ret[j].asname) == 0){
                         ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords}); break;
                     }
                 }
-                if(j === ret.length)
+                if(j == ret.length)
                     ret.push({asname : values[i].asname, values : [{bin : values[i].bin, nRecords : values[i].nRecords}]});
             }
             return ret;
@@ -96,11 +96,11 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             console.log("splitByBin: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].bin === ret[j].bin){
+                    if(values[i].bin == ret[j].bin){
                         ret[j].values.push({nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }
-                if(j === ret.length)
+                if(j == ret.length)
                     ret.push({bin : values[i].bin, values : [{nRecords : values[i].nRecords, asname : values[i].asname}]});
             }
             console.log(JSON.stringify(ret));
@@ -111,11 +111,11 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
             var index = parseInt(download.download_speed / (bin_width * 1000000));
             var i;
             for( i = 0; i<speedList.length; i++){
-                if(speedList[i].asname === download.asname && speedList[i].bin === index){
+                if(speedList[i].asname.localeCompare(download.asname) == 0 && speedList[i].bin == index){
                     speedList[i].nRecords++; break;
                 }
             }
-            if(i === speedList.length)
+            if(i == speedList.length)
                 speedList.push({asname : download.asname, bin : index, nRecords : 1});
             console.log("userSpeedData: " + JSON.stringify(speedList));
 
@@ -184,8 +184,8 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                         var binWidth = $routeParams.bin_width;
 
-                        if(( (valuesUser === undefined || valuesUser.length === 0) ) &&
-                            (valuesPublic === undefined || valuesPublic.length === 0)){
+                        if(( (valuesUser == undefined || valuesUser.length == 0) ) &&
+                            (valuesPublic == undefined || valuesPublic.length == 0)){
                             svg.attr("transform", "translate(" + real_width / 2 + "," + real_height / 2 + ")");
                             svg.append('defs')
                                 .append('pattern')
@@ -354,7 +354,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                     };
 
                     scope.$watch('trigger.arrived',function(newVal){
-                        if(newVal === true){
+                        if(newVal == true){
                             drawHistogram(true);
                             if($rootScope.authenticated)
                                 $(".bin-public").hide();
@@ -363,7 +363,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
 
                     scope.$watch('trigger.newDataUser',function(asname){
                         console.log("asdfsafdasdfsdfasfda\nasdfsadfsadfasdf");
-                        if(asname !== undefined) {
+                        if(asname != undefined) {
                             console.log("DISEGNO USER");
                             drawHistogram(false);
 
@@ -376,7 +376,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                     });
                     scope.$watch('trigger.newDataPublic',function(asname){
                         console.log("asdfsafdasdfsdfasfda\nasdfsadfsadfasdf");
-                        if(asname !== undefined) {
+                        if(asname != undefined) {
                             console.log("DISEGNO PUBLIC");
                             drawHistogram(false);
 

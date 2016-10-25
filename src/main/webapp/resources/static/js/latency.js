@@ -25,7 +25,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             if($rootScope.isRelevant(download)) {
                 latencyFactory.updateLatencyData($scope.latencyData, download, $routeParams.bin_width);
                 $scope.$apply(function () {
-                    $scope.trigger.newData = $scope.trigger.newData !== true;
+                    $scope.trigger.newData = $scope.trigger.newData != true;
                 });
              }
             console.log("CIAONEEEE latency");
@@ -48,11 +48,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             console.log("values: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].asname === ret[j].asname){
+                    if(values[i].asname == ret[j].asname){
                         ret[j].values.push({bin : values[i].bin, nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }
-                if(j === ret.length)
+                if(j == ret.length)
                     ret.push({asname : values[i].asname, values : [{bin : values[i].bin, nRecords : values[i].nRecords, asname : values[i].asname}]});
             }
             console.log(JSON.stringify(ret));
@@ -63,11 +63,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             console.log("splitByBin: " + JSON.stringify(values));
             for(var i = 0;i<values.length; i++){
                 for(var j = 0; j < ret.length; j++){
-                    if(values[i].bin === ret[j].bin){
+                    if(values[i].bin == ret[j].bin){
                         ret[j].values.push({nRecords : values[i].nRecords, asname : values[i].asname}); break;
                     }
                 }
-                if(j === ret.length)
+                if(j == ret.length)
                     ret.push({bin : values[i].bin, values : [{nRecords : values[i].nRecords, asname : values[i].asname}]});
             }
             console.log(JSON.stringify(ret));
@@ -79,11 +79,11 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
             var index = parseInt(download.connect_time / bin_width);
             var i;
             for(i = 0; i < latencyData.length; i++){
-                if(latencyData[i].asname === download.asname && latencyData[i].bin === index){
+                if(latencyData[i].asname.localeCompare(download.asname) == 0 && latencyData[i].bin == index){
                     latencyData[i].nRecords++; console.log("ciaone!!!");break;
                 }
             }
-            if(i === latencyData.length)
+            if(i == latencyData.length)
                 latencyData.push({asname : download.asname, bin : index, nRecords : 1});
             console.log("latencyData: " + JSON.stringify(latencyData));
         };
@@ -143,7 +143,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                     var asnameList = getAsnameListFilter(values);
                     var binWidth = $routeParams.bin_width;
 
-                    if(values === undefined || values.length === 0){
+                    if(values == undefined || values.length == 0){
                         svg.append('defs')
                             .append('pattern')
                             .attr('id', 'diagonalHatch')
@@ -298,13 +298,13 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                 };
 
                 scope.$watch('trigger.arrived',function(newVal){
-                    if(newVal === true){
+                    if(newVal == true){
                         drawHistogram(true);
                     }
                 });
 
                 scope.$watch('trigger.newData',function(asname){
-                    if(asname !== undefined) {
+                    if(asname != undefined) {
                         drawHistogram(false);
                         console.log("disegno new Data");
                     }

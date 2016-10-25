@@ -108,7 +108,7 @@ angular.module('myApp', [
         $rootScope.user = {};
 
         /* Global variable to redirect the user after authentication */
-        if ($rootScope.previousLocation === undefined) {
+        if ($rootScope.previousLocation == undefined) {
             $rootScope.previousLocation = '/';
         }
 
@@ -236,7 +236,7 @@ angular.module('myApp', [
 		 * update parameters.
 		 */
         self.changeBinSize = function ($event) {
-            var btn = $event.currentTarget.id === 'btn-bin-plus' ? 1 : -1;
+            var btn = $event.currentTarget.id.localeCompare('btn-bin-plus') == 0 ? 1 : -1;
 
             if (btn < 0 && self.binSelector.width <= self.binSelector.MIN_WIDTH) {
                 return;
@@ -292,7 +292,7 @@ angular.module('myApp', [
 	            if (self.BIN_SELECTOR_PAGES.indexOf(pagePrefix) < 0) {
 	                self.binSelector = null;
 	            } else {
-	                if (pagePrefix === 'latency') {
+	                if (pagePrefix.localeCompare('latency') == 0) {
 	                    self.binSelector = self.latencyBin;
 	                } else {
 	                    self.binSelector = self.speedHistogramBin;
@@ -385,7 +385,7 @@ angular.module('myApp', [
         $rootScope.enableChangeView = false;
 
         $rootScope.currentDate = moment();
-        
+
         $rootScope.isRelevant = function (download) {
             var time = moment(download.timestamp);
             //var extent = $rootScope.getCurrentExtentDate();
@@ -417,7 +417,7 @@ angular.module('myApp', [
                 if ($rootScope.authenticated) {
                     $rootScope.privateSubscription = stompClient.subscribe('/user/' + $rootScope.user.name + '/downloads', function (packet) {
                         var download = JSON.parse(packet.body).payload;
-                        if ($rootScope.websocketCallbackUser !== undefined) {
+                        if ($rootScope.websocketCallbackUser != undefined) {
                             console.log("CHIAMO CALLBACK USER");
                             $rootScope.websocketCallbackUser(download);
                         }
@@ -425,7 +425,7 @@ angular.module('myApp', [
                 }
                 $rootScope.publicSubscription = stompClient.subscribe('/topic/downloads', function (packet) {
                     var download = JSON.parse(packet.body).payload;
-                    if ($rootScope.websocketCallbackPublic !== undefined) {
+                    if ($rootScope.websocketCallbackPublic != undefined) {
                         console.log("CHIAMO CALLBACK PUBLIC");
                         $rootScope.websocketCallbackPublic(download);
                     }
@@ -556,9 +556,9 @@ angular.module('myApp', [
     .filter('getAsnameList', function () {
         return function (input) {
             var ret = [];
-            if (input.length === 0) return ret;
+            if (input.length == 0) return ret;
             input.forEach(function (download) {
-                if (ret.indexOf(download.asname) === -1)
+                if (ret.indexOf(download.asname) == -1)
                     ret[ret.length] = (download.asname);
             });
             return ret.sort(function (a, b) {

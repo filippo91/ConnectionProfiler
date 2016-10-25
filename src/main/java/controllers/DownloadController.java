@@ -40,6 +40,7 @@ public class DownloadController {
 		 * make sure the authenticated user is uploading the download
 		 * without messing with the record
 		 */
+		log.info(download.toString());
 		download.setUuid(user.getUid());
 		
 		Download downloadCreated = downloadService.saveDownload(download);
@@ -61,7 +62,7 @@ public class DownloadController {
 		 * make sure the authenticated user is uploading the download
 		 * without messing with the record
 		 */
-		
+		log.info(downloads.toString());
 		for(Download download : downloads){
 			download.setUuid(user.getUid());
 			downloadService.saveDownload(download);

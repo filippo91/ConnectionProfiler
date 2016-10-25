@@ -38,8 +38,9 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
             link: function(scope,element){
                 d3Service.d3().then(function(d3){
 
-                    var width = 700,
-                        height = 500,
+                    var width = 760,
+                        height = 400,
+                        pieCenter = 300,
                         radius = Math.min(width, height) / 2;
 
                     var color = d3.scale.category20();
@@ -47,7 +48,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                     var f =  d3.format(".2s");
                     var arc = d3.svg.arc()
                         .outerRadius(radius - 10)
-                        .innerRadius(120);
+                        .innerRadius(0);
 
                     var pie = d3.layout.pie()
                         .sort(null)
@@ -58,7 +59,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                         .attr("height", height);
 
                     var svg = svg_content.append("g")
-                        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+                        .attr("transform", "translate(" + pieCenter + "," + height / 2 + ")");
 
                     // Define the div for the tooltip
                     var div = d3.select(element[0]).append("div")

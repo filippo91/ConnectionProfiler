@@ -211,6 +211,8 @@ angular.module('myApp', [
             self.endDate = computeEndDate(self.startDate.clone(), view);
             setActiveViewDate(self.startDate, self.endDate);
 
+
+
             var currentParam = $routeParams;
             if (self.binWidthSelector == null) {
                 $route.updateParams({

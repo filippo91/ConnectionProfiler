@@ -12,49 +12,30 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         $rootScope.enableChangeView = true;
 
-        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
-
-        $rootScope.dimmi = function(){ console.log($rootScope.publicTimeList);};
+        $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};<
 
         function updateRootScopeCallback(data, t){
-            //alert("ci entro");
-            var toAdd,i;
+
+            var i;
+
             if(t) {
                 for(i = 0; i < data.length; i++) {
-                    toAdd = false;
-                    if ($rootScope.userTimeList[data[i].timestamp] == undefined) {
-                        $rootScope.userTimeList[data[i].timestamp] = [data[i].asname];
-                        toAdd = true;
-                    } else if ($rootScope.userTimeList[data[i].timestamp].indexOf(data[i].asname) < 0) {
-                        $rootScope.userTimeList[data[i].timestamp].push(data[i].asname);
-                        toAdd = true;
-                    }
-                    if (toAdd) {
+                    if ($rootScope.userTimeList[data[i].timestamp] != 1) {
+                        $rootScope.userTimeList[data[i].timestamp] = 1;
                         console.log("aggiungo a user");
                         downloadManager.updateDownloads($rootScope.userSpeedData, data[i]);
-                    }else{
-                        //alert("non inserisco: " + data[i].timestamp + " asname: " + data[i].asname);
                     }
                 }
             }else {
                 for(i = 0; i < data.length; i++) {
-                    toAdd = false;
-                    if ($rootScope.publicTimeList[data[i].timestamp] == undefined) {
-                        $rootScope.publicTimeList[data[i].timestamp] = [data[i].asname];
-                        toAdd = true;
-                    } else if ($rootScope.publicTimeList[data[i].timestamp].indexOf(data[i].asname) < 0) {
-                        $rootScope.publicTimeList[data[i].timestamp].push(data[i].asname);
-                        toAdd = true;
-                    }
-                    if (toAdd) {
+                    if ($rootScope.publicTimeList[data[i].timestamp] != 1) {
+                        $rootScope.publicTimeList[data[i].timestamp] = 1;
                         console.log("aggiungo a public");
                         downloadManager.updateDownloads($rootScope.publicSpeedData, data[i]);
-                    }else{
-                        //console.log("non inserisco: " + data[i].timestamp + " asname: " + data[i].asname);
-                        //1var x =0;
                     }
                 }
             }
+
         }
 
         if ($rootScope.authenticated) {
@@ -167,16 +148,11 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             console.log("download" + JSON.stringify(download));
             var i, j;
             for(i = 0; i < downloadList.length; i++){
-                if(downloadList[i].asname == download.asname){
+                if(downloadList[i].asname.localeCompare(download.asname) == 0){
                     for(j = 0; j < downloadList[i].downloads.length; j++){
                         if(downloadList[i].downloads[j].timestamp == download.timestamp){
                             downloadList[i].downloads[j].speed = (downloadList[i].downloads[j].count * downloadList[i].downloads[j].speed + download.speed) / (downloadList[i].downloads[j].count + 1);
                             downloadList[i].downloads[j].count++;
-                            console.log("new speed: " + downloadList[i].downloads[j].speed +
-                                ", date: " + moment(downloadList[i].downloads[j].timestamp).format("DD-MMM-YYYY") + ", timestamp: "
-                                    + downloadList[i].downloads[j].timestamp
-                            + ", asname: " + downloadList[i].downloads[j].asname);
-                            //alert("asdf");
                             break;
                         }
                     }
@@ -210,7 +186,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
             scriptTag.async = true;
             scriptTag.src = 'http://d3js.org/d3.v3.min.js';
             scriptTag.onreadystatechange = function () {
-                if (this.readyState == 'complete') onScriptLoad();
+                if (this.readyState.localeCompare('complete') == 0) onScriptLoad();
             };
             scriptTag.onload = onScriptLoad;
 
@@ -233,7 +209,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
                     var margin = {top: 10, right: 10, bottom: 100, left: 50},
                         margin2 = {top: 430, right: 10, bottom: 20, left: 0},
-                        width = 700 - margin.left - margin.right,
+                        totalWidth = 700,
+                        width = totalWidth - margin.left - margin.right,
                         height = 500 - margin.top - margin.bottom,
                         height2 = 500 - margin2.top - margin2.bottom;
 
@@ -655,7 +632,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             console.log("arrivato data su websocket public asname:" + asname);
                             var newPublicDownload = [];
                             for(var i = 0; i<scope.publicSpeedData.length; i++){
-                                if(scope.publicSpeedData[i].asname.localCompare(asname) == 0){
+                                if(scope.publicSpeedData[i].asname.localeCompare(asname) == 0){
                                     newPublicDownload = scope.publicSpeedData[i].downloads;
                                     break;
                                 }

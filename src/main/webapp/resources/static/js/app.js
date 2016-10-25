@@ -114,48 +114,13 @@ angular.module('myApp', [
 
         /* Instance variables */
 
-        var self = this;
-
-        /*
-		 * They hold the start and end date of the timespan to show
-		 */
-        self.startDate = moment().startOf('isoWeek');
-        /* compute and set end date */
-        self.endDate = computeEndDate(self.startDate.clone(), 'week');
-
-        /*
-		 * Holds the current view type: {'week', 'month', 'year'} initialize it
-		 * using route params
-		 */
-        self.activeView = {};
-        self.activeView.view = 'week';
-        setActiveViewDate(self.startDate, self.endDate);
-
-        /* URL speedTable View Params */
-        self.speedTableParams = {};
-        self.speedTableParams.page = 0;
-        self.speedTableParams.pageSize = 10;
-
-        /* Bin Width Params */
-        self.BIN_SELECTOR_PAGES = ['speedHistogram', 'latency'];
-        // holds the current bin selector, either latency or speedHistogram
-        self.binSelector = null;
-
-        self.latencyBin = {};
-        self.latencyBin.MIN_WIDTH = 20;
-        self.latencyBin.MAX_WIDTH = 400;
-        self.latencyBin.STEP = 20;
-        self.latencyBin.width = 200;
-
-        self.speedHistogramBin = {};
-        self.speedHistogramBin.MIN_WIDTH = 20;
-        self.speedHistogramBin.MAX_WIDTH = 400;
-        self.speedHistogramBin.STEP = 20;
-        self.speedHistogramBin.width = 200;
+        var self = this;        
 
         /* Time Manager Visualization logic */
         self.TIME_MANAGER_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency'];
         self.REAL_TIME_PAGES = ['speedGraph', 'pieAccesses', 'domainsBySize', 'speedHistogram', 'latency', 'speedTable'];
+        /* Bin Width Params */
+        self.BIN_SELECTOR_PAGES = ['speedHistogram', 'latency'];
         
         self.timeManager = false;
         self.enableRealTime = false;
@@ -257,7 +222,14 @@ angular.module('myApp', [
                 bin_width: self.binSelector.width
             });
         };
-
+        
+        var offInitializeTimeManagement = $scope.$on('$routeChangeSuccess', function() {
+       		initializeTimeManagement();
+       		console.info("kamikaze");
+       		offInitializeTimeManagement();
+        });
+        
+        
         /*
 		 * Basic navigation logic to enable part of the logic or the access to
 		 * 'private' pages.
@@ -316,6 +288,59 @@ angular.module('myApp', [
 
         });
 
+        function initializeTimeManagement(){
+            /*
+    		 * Holds the current view type: {'week', 'month', 'year'} initialize it
+    		 * using route params
+    		 */
+            self.activeView = {};
+            self.activeView.view = 'week';
+            
+            /* URL speedTable View Params */
+            self.speedTableParams = {};
+            self.speedTableParams.page = 0;
+            self.speedTableParams.pageSize = 10;
+
+            
+            // holds the current bin selector, either latency or speedHistogram
+            self.binSelector = null;
+
+            self.latencyBin = {};
+            self.latencyBin.MIN_WIDTH = 20;
+            self.latencyBin.MAX_WIDTH = 400;
+            self.latencyBin.STEP = 20;
+            self.latencyBin.width = 200;
+
+            self.speedHistogramBin = {};
+            self.speedHistogramBin.MIN_WIDTH = 20;
+            self.speedHistogramBin.MAX_WIDTH = 400;
+            self.speedHistogramBin.STEP = 20;
+            self.speedHistogramBin.width = 200;
+            
+            var date = moment().startOf('isoWeek');
+            
+        	if($routeParams.year != undefined 
+        			&& $routeParams.month != undefined 
+        			&& $routeParams.day != undefined
+        			&& $routeParams.view != undefined){
+        		date.set('year', $routeParams.year);
+        		date.set('month', $routeParams.month);
+        		date.set('date', $routeParams.day);
+        		self.activeView.view = $routeParams.view;
+        	}
+        	
+        	if($routeParams.bin_width != undefined){
+        		self.latencyBin.width = $routeParams.bin_width;
+        	}        	
+        	
+        	/*
+    		 * They hold the start and end date of the timespan to show
+    		 */
+            self.startDate = date;
+            /* compute and set end date */
+            self.endDate = computeEndDate(self.startDate.clone(), self.activeView.view);
+            setActiveViewDate(self.startDate, self.endDate);
+        }
         
         /* private methods */
 

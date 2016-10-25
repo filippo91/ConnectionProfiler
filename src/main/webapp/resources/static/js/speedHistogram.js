@@ -202,15 +202,22 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                                 .attr('height', 10)
                                 .attr('opacity', 0.1);
 
-                            svg.append("circle")
-                                .attr("r", radius)
-                                .attr('fill', 'url(#diagonalHatch)');
+                            svg.append("rect")
+                            .attr("x", 0)
+                            .attr("y", 0)
+                            .attr("width", real_width)
+                            .attr("height", real_height)
+                            .attr('fill', 'url(#diagonalHatch)');
 
-                            svg.append("text")
-                                .style("text-anchor", "middle")
-                                .style("font-family", "sans-serif")
-                                .style("font-size", "20px")
-                                .text("No data to show");
+                        svg.append("text")
+                            .attr("x", real_width / 2)
+                            .attr("y", real_height / 2)
+                            .style("text-anchor", "middle")
+                            .style("font-family", "sans-serif")
+                            .style("font-size", "20px")
+                            .text("No data to show");
+
+                        
                             return;
                         }
 

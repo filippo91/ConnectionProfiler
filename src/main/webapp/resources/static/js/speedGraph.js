@@ -16,7 +16,10 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         $scope.trigger = {arrived:false, count: 0, newSpeedDataUser : undefined, newSpeedDataPublic : undefined, nData : 1};
 
+        $rootScope.dimmi = function(){ console.log($rootScope.publicTimeList);};
+
         function updateRootScopeCallback(data, t){
+            alert("ci entro");
             var toAdd,i;
             if(t) {
                 for(i = 0; i < data.length; i++) {
@@ -31,6 +34,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     if (toAdd) {
                         console.log("aggiungo a user");
                         downloadManager.updateDownloads($rootScope.userSpeedData, data[i]);
+                    }else{
+                        //alert("non inserisco: " + data[i].timestamp + " asname: " + data[i].asname);
                     }
                 }
             }else {
@@ -46,6 +51,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     if (toAdd) {
                         console.log("aggiungo a public");
                         downloadManager.updateDownloads($rootScope.publicSpeedData, data[i]);
+                    }else{
+                        //console.log("non inserisco: " + data[i].timestamp + " asname: " + data[i].asname);
+                        //1var x =0;
                     }
                 }
             }
@@ -53,7 +61,6 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
         if ($rootScope.authenticated) {
             $scope.trigger.nData++;
-            console.log("SONO AUTH");
             downloadManager.getUserDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
         }
         downloadManager.getPublicDownloads($routeParams.year, $routeParams.month, $routeParams.day, $routeParams.view, $scope.trigger, updateRootScopeCallback);
@@ -64,6 +71,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         $rootScope.websocketCallbackUser = function (download) {
             console.log("aggiorno user");
             download.speed = download.download_speed;
+            download.timestamp = moment.utc(download.timestamp).startOf('day').valueOf();
+            download.count = 1;
             downloadManager.updateDownloads($rootScope.userSpeedData, download);
             //$scope.userDownloadList = downloadManager.splitByAsname($rootScope.userSpeedData);
             $scope.$apply(function () {
@@ -75,6 +84,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         $rootScope.websocketCallbackPublic = function(download){
             console.log("aggiorno public");
             download.speed = download.download_speed;
+            download.timestamp = moment.utc(download.timestamp).startOf('day').valueOf();
+            download.count = 1;
             downloadManager.updateDownloads($rootScope.publicSpeedData, download);
             //$scope.publicDownloadList = downloadManager.splitByAsname($rootScope.publicSpeedData);
             $scope.$apply(function () {
@@ -140,16 +151,13 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         };
 
         factory.getUserDownloads = function (year,month,day,view,trigger, callback){
-            return $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
-                downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                //console.log("arrivati user: \n" + JSON.stringify(downloadList));
+            $resource(serverURI_user).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 callback(downloadList,true);
                 trigger.arrived = ++trigger.count === trigger.nData;
             });
         };
         factory.getPublicDownloads = function (year,month,day,view,trigger, callback){
-            return $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
-                downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
+            $resource(serverURI_public).query({year: year, month : month, day : day, view : view}, function (downloadList) {
                 console.log("arrivati public:\n" + JSON.stringify(downloadList));
                 callback(downloadList,false);
                 trigger.arrived = ++trigger.count === trigger.nData;
@@ -159,8 +167,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
         factory.updateDownloads = function(downloadList, download){
             console.log("downloadList" + JSON.stringify(downloadList));
             console.log("download" + JSON.stringify(download));
-            var i, j, count = 1;
-            if(download.count !== undefined) count = download.count;
+            var i, j;
             for(i = 0; i < downloadList.length; i++){
                 if(downloadList[i].asname === download.asname){
                     for(j = 0; j < downloadList[i].downloads.length; j++){
@@ -171,18 +178,19 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                                 ", date: " + moment(downloadList[i].downloads[j].timestamp).format("DD-MMM-YYYY") + ", timestamp: "
                                     + downloadList[i].downloads[j].timestamp
                             + ", asname: " + downloadList[i].downloads[j].asname);
+                            //alert("asdf");
                             break;
                         }
                     }
                     if(j === downloadList[i].downloads.length){
-                        downloadList[i].downloads.push({asname : download.asname, count : count,speed : download.speed, timestamp : download.timestamp})
+                        downloadList[i].downloads.push({asname : download.asname, count : download.count,speed : download.speed, timestamp : download.timestamp})
                         downloadList[i].downloads.sort(function(a,b){return a.timestamp - b.timestamp;});
                     }
                     break;
                 }
             }
             if(i === downloadList.length){
-                downloadList.push({asname : download.asname, downloads : [{asname : download.asname, count : count,speed : download.speed, timestamp : download.timestamp}]});
+                downloadList.push({asname : download.asname, downloads : [{asname : download.asname, count : download.count,speed : download.speed, timestamp : download.timestamp}]});
             }
             console.log("downloadList" + JSON.stringify(downloadList));
         };
@@ -343,7 +351,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
                         var extentX = d3.extent(valueList_x);
                         if(valueList_x.length === 0 || extentX[0] === extentX[1]){
-                            extentX = $rootScope.getCurrentExtentDate();
+                            extentX = [$rootScope.startDate, $rootScope.endDate];
                         }
                         x.domain(extentX);
                         y.domain([0, d3.max(maxList_y) * 1.3]);
@@ -482,8 +490,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             .attr("transform", "translate(-40,"+(height/3)+")rotate(-90)")
                             .text("Speed [bps]");
 
-                        console.log($rootScope.getCurrentExtentDate().map(function(d){return d.valueOf();}));
-                        console.log($rootScope.getCurrentExtentDate());
+                        //console.log($rootScope.getCurrentExtentDate().map(function(d){return d.valueOf();}));
+                        //console.log($rootScope.getCurrentExtentDate());
 
                         if($rootScope.lastExtent != undefined) {
                             brush.extent($rootScope.lastExtent);
@@ -492,8 +500,8 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                         }
 
                         brush.extent([$rootScope.startDate, $rootScope.endDate]);
-                        brush(d3.select(".brush").transition().duration(1000));
-                        brush.event(d3.select(".brush").transition().duration(1000));
+                        brush(d3.select(".brush").transition().duration(2000));
+                        brush.event(d3.select(".brush").transition().duration(2000));
 
                         d3.selectAll("path.domain").style("shape-rendering", "geometricPrecision");
 

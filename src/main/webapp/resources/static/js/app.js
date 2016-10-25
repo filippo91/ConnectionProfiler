@@ -385,103 +385,12 @@ angular.module('myApp', [
         $rootScope.enableChangeView = false;
 
         $rootScope.currentDate = moment();
-
-        $rootScope.getCurrentDate = function(){ return moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);};
-
-        /**
-		 * Functions for controlling time
-		 */
-        $rootScope.changeView = function (ele) {
-            $(".view").removeClass("active");
-            var currentParam = $routeParams;
-            switch (ele) {
-                case 'weekBtn':
-                    currentParam.view = "week";
-                    break;
-                case 'monthBtn':
-                    currentParam.view = "month";
-                    break;
-                case 'monthsBtn':
-                    currentParam.view = "months";
-                    break;
-            }
-            $route.updateParams(currentParam);
-            $("#" + $routeParams.view + "Btn").addClass("active");
-
-        };
-        $rootScope.forward = function () {
-            $rootScope.currentDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            switch ($routeParams.view) {
-                case "week":
-                    $rootScope.currentDate.add(7, "days");
-                    break;
-                case "month":
-                    $rootScope.currentDate.add(1, "months");
-                    break;
-                case "months":
-                    $rootScope.currentDate.add(3, "months");
-                    break;
-            }
-            $route.updateParams({
-                year: $rootScope.currentDate.year(),
-                month: $rootScope.currentDate.month(),
-                day: $rootScope.currentDate.date(),
-                view: $routeParams.view
-            });
-        };
-        $rootScope.back = function () {
-            $rootScope.currentDate = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            switch ($routeParams.view) {
-                case "week":
-                    $rootScope.currentDate.subtract(7, "days");
-                    break;
-                case "month":
-                    $rootScope.currentDate.subtract(1, "months");
-                    break;
-                case "months":
-                    $rootScope.currentDate.subtract(3, "months");
-                    break;
-            }
-            $route.updateParams({
-                year: $rootScope.currentDate.year(),
-                month: $rootScope.currentDate.month(),
-                day: $rootScope.currentDate.date(),
-                view: $routeParams.view
-            });
-        };
-        $rootScope.today = function () {
-            $rootScope.currentDate = moment();
-            console.log($rootScope.currentDate.format("YYYY MM DD"));
-            $route.updateParams({
-                year: $rootScope.currentDate.year(),
-                month: $rootScope.currentDate.month(),
-                day: $rootScope.currentDate.date(),
-                view: $routeParams.view
-            });
-        };
-
-        $rootScope.getCurrentExtentDate = function () {
-            var curDate_end = moment().year($routeParams.year).month($routeParams.month).date($routeParams.day);
-            var curDate_start = moment(curDate_end);
-            switch ($routeParams.view) {
-                case "week":
-                    curDate_start.subtract(7, "days");
-                    break;
-                case "month":
-                    curDate_start.subtract(1, "months");
-                    break;
-                case "months":
-                    curDate_start.subtract(3, "months");
-                    break;
-            }
-            return [curDate_start, curDate_end];
-        };
-
+        
         $rootScope.isRelevant = function (download) {
             var time = moment(download.timestamp);
-            var extent = $rootScope.getCurrentExtentDate();
-            var curDate_end = extent[1];
-            var curDate_start = extent[0];
+            //var extent = $rootScope.getCurrentExtentDate();
+            var curDate_end =  moment(self.activeView.endDate);//extent[1];
+            var curDate_start = moment(self.activeView.startDate); //extent[0];
             console.log(time.format('YYYY MM DD') + " è prima di " + curDate_end.format('YYYY MM DD') + " dopo " + curDate_start.format('YYYY MM DD'));
             var ret = (time.isBefore(curDate_end) && curDate_start.isBefore(time));
             console.log(ret);

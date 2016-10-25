@@ -116,6 +116,7 @@ angular.module('myApp', [
 
         var self = this;
 
+        
         /*
 		 * They hold the start and end date of the timespan to show
 		 */

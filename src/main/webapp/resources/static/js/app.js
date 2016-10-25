@@ -354,6 +354,7 @@ angular.module('myApp', [
                     break;
                 case "months":
                     date.add(2, "months");
+                    date.endOf('month');
                     break;
             }
             

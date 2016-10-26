@@ -30,7 +30,9 @@
 <link href="css/app.css" rel="stylesheet">
 </head>
 <body class="ng-cloak">
-	<nav class="navbar navbar-inverse" ng-controller="navigation as nav">
+
+<div ng-controller="navigation as nav">
+	<nav class="navbar navbar-inverse">
 		<div class="container  ng-cloak">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed"
@@ -50,11 +52,11 @@
 					</a>
 						<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
 							<li role="presentation"><a role="menuitem" tabindex="-1"
-								href="#!/speedGraph/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Graph</a></li>
+								ng-href="#!/speedGraph/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Graph</a></li>
 							<li role="presentation"><a role="menuitem" tabindex="-1"
-								href="#!/speedHistogram/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}/{{ nav.speedHistogramBin.width }}">Histogram</a></li>
+                                                       ng-href="#!/speedHistogram/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}/{{ nav.speedHistogramBin.width }}">Histogram</a></li>
 							<li role="presentation"><a role="menuitem" tabindex="-1"
-								href="#!/speedTable/{{nav.speedTableParams.page}}/{{nav.speedTableParams.pageSize}}">Table</a></li>
+                                                       ng-href="#!/speedTable/{{nav.speedTableParams.page}}/{{nav.speedTableParams.pageSize}}">Table</a></li>
 						</ul></li>
 					<li><a class="dropdown-toggle" data-toggle="dropdown" href=""
 						role="button" aria-haspopup="true" aria-expanded="false">
@@ -62,13 +64,13 @@
 					</a>
 						<ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
 							<li role="presentation"><a role="menuitem" tabindex="-1"
-								href="#!/pieAccesses/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Visited</a></li>
+                                                       ng-href="#!/pieAccesses/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Visited</a></li>
 							<li role="presentation"><a role="menuitem" tabindex="-1"
-								href="#!/domainsBySize/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Downloads'
+                                                       ng-href="#!/domainsBySize/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}">Downloads'
 									size</a></li>
 						</ul></li>
 					<li><a
-						href="#!/latency/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}/{{ nav.latencyBin.width }}">Latency</a></li>
+                            ng-href="#!/latency/{{ nav.activeView.year }}/{{ nav.activeView.month }}/{{ nav.activeView.day }}/{{ nav.activeView.view }}/{{ nav.latencyBin.width }}">Latency</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right ng-cloak">
 				<li><a ng-show="!authenticated" href="#!/login"><span class="glyphicon glyphicon-log-in"> Login</a>
@@ -85,13 +87,12 @@
 			<!--/.nav-collapse -->
 		</div>
 	</nav>
-	
-	<div class="container col-md-3 col-md-offset-1" ng-controller="navigation as nav" >
+	<div class="container col-md-3 col-md-offset-1">
 		<div ng-if="enableChangeView || nav.enableRealTime" class="row">
 			<img src="img/icon-set-graph.png" height="70px" width="120px" class="center-block">
 		</div>
 	</div>
-	<div class="container col-md-8" ng-controller="navigation as nav">
+	<div class="container col-md-8">
 		<div ng-if="enableChangeView" class="row" id="container">
 			<div class="btn-group  col-md-3" role="group">
 				<button type="button" class="btn btn-default" ng-click="nav.move('today')">Today</button>
@@ -112,7 +113,7 @@
 					ng-click="nav.changeActiveView('week')"> 
 					<input value="Month" type="button" id="monthBtn" class="btn btn-default" 
 					ng-class="{active : nav.activeView.view === 'month'}"
-					ng-click="nav.changeActiveView('month')"> 
+					ng-click="nav.changeActiveView('month')">
 					<input value="3 Months" type="button" id="monthsBtn" class="btn btn-default" 
 					ng-class="{active : nav.activeView.view === 'months'}"
 					ng-click="nav.changeActiveView('months')">
@@ -120,7 +121,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="container col-md-8" ng-controller="navigation as nav">
+	<div class="container col-md-8">
 		<div class="row">
 			<div ng-show="nav.enableRealTime" class="col-md-3" id="realtimediv">
 				<button ng-click="realtime();" class="btn"
@@ -142,7 +143,7 @@
 			</div>
 		</div>
 	</div>
-		
+</div>
 	
 	<div ng-view></div>
 

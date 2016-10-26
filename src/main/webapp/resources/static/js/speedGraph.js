@@ -197,7 +197,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                 d3: function() { return d.promise; }
             };
         }])
-    .directive('downloadSpeedTemporalGraph',function($route, $routeParams,d3Service, $rootScope, downloadFactory){
+    .directive('downloadSpeedTemporalGraph',function($route, $routeParams,d3Service, $rootScope, downloadFactory, legendShorterFilter){
         return{
             restrict: 'E',
             link: function(scope, element, attrs){
@@ -444,7 +444,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             .attr("y", 9)
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
-                            .text(function(d) { return d; });
+                            .text(function(d) { return legendShorterFilter(d); });
+
+                        legend.append("svg:title").text(function(d){return d;});
 
                         focus.append("g")
                             .attr("class", "x axis")
@@ -593,7 +595,9 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                             .attr("y", 9)
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
-                            .text(function(d) { return d; });
+                            .text(function(d) { return legendShorterFilter(d); });
+
+                        legend.append("svg:title").text(function(d){return d;});
 
                         updateTooltipListener();
 

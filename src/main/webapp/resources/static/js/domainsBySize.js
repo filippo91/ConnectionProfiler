@@ -32,7 +32,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
         $rootScope.websocketCallbackPublic = function(download){};
 }])
 
-    .directive('usagePie',function(d3Service){
+    .directive('usagePie',function(d3Service,legendShorterFilter){
         return {
             restrict: 'E',
             link: function(scope,element){
@@ -79,11 +79,13 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                         svg.selectAll(".arc").remove();
                         svg.selectAll(".noData").remove();
                         svg.selectAll(".loading").remove();
+                        svg.selectAll(".legend").remove();
                         svg.selectAll("text").remove();
                         svg.selectAll("path").remove();
                         
                         var data =  scope.domainSizeList;
 
+                        console.log("DATA: " + JSON.stringify(data));
                         var tot = d3.sum(data, function(d){return d.size;});
                         //no data found icon
                         if(data == undefined || data.length == 0){
@@ -131,7 +133,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                         }
 
                         var legend = svg_content.selectAll(".legend")
-                            .data(data.map(function(d){return d.server_domain;}).reverse())
+                            .data(data.map(function(d){return d.server_domain;}))//.reverse())
                             .enter().append("g")
                             .attr("class", "legend")
                             .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
@@ -148,7 +150,11 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             .attr("y", 9)
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
-                            .text(function(d) { return d; });
+                            .text(function(d) {
+                                console.log(d);
+                                return legendShorterFilter(d); });
+
+                        legend.append("svg:title").text(function(d){ return d;});
 
                         //Tooltip
                         var pane = $('.arc');
@@ -160,7 +166,7 @@ angular.module('myApp.domainsBySize', ['ngRoute'])
                             div.transition()
                                 .duration(200)
                                 .style("opacity", .9);
-                            div.html("<b>" + d3.select(this).data()[0].data.server_domain + "</b><br><i>Size: </i><b>" + f(d3.select(this).data()[0].value) +
+                            div.html("<b>" + legendShorterFilter(d3.select(this).data()[0].data.server_domain) + "</b><br><i>Size: </i><b>" + f(d3.select(this).data()[0].value) +
                                         " bit ("+ Number(((d3.select(this).data()[0].value / tot) * 100).toFixed(1)) + "%)</b>")
                                 .style("left", (x) + "px")
                                 .style("top", (y - 28)  + "px");

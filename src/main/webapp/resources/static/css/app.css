@@ -2,8 +2,8 @@
 div.tooltip {
 	position: absolute;
 	text-align: center;
-	width: 60px;
-	height: 28px;
+	width: 160px;
+	height: 40px;
 	padding: 2px;
 	font: 12px sans-serif;
 	background: lightsteelblue;
@@ -13,8 +13,8 @@ div.tooltip {
 }
 
 div.tooltip-large {
-	height: 30px;
-	width: 120px;
+	height: 40px;
+	width: 160px;
 }
 
 textarea {

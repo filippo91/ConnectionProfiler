@@ -13,9 +13,10 @@
 	              </div>
 					<div ng-repeat="ele in publicSpeedData"
 						id="public-graph-asname-{{ele.asname}}">
-						<a href="" class="list-group-item public-asnameButton"
+						<a href="" 
 							ng-click="showAsname(ele.asname,'public')"
-							id="public-button-{{ele.asname}}"> {{ele.asname}} </a>
+							id="public-button-{{ele.asname}}" 
+							ng-class="authenticated ? 'list-group-item public-asnameButton' : 'list-group-item public-asnameButton active'"> {{ele.asname}} </a>
 					</div>
 				</div>
 			</div>
@@ -28,7 +29,7 @@
 				</div>
 					<div ng-repeat="ele in userSpeedData" 
 						id="user-graph-asname-{{ele.asname}}">
-						<a href="" class="list-group-item user-asnameButton"
+						<a href="" class="list-group-item user-asnameButton active"
 							ng-click="showAsname(ele.asname,'user')"
 							id="user-button-{{ele.asname}}"> {{ele.asname}}</a>
 					</div>

@@ -359,7 +359,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
                             .attr("transform", "translate(-40,"+(height/3)+")rotate(-90)")
-                            .text("Numbers of occurrences");
+                            .text("Numbers of downloads");
                     };
 
                     scope.$watch('trigger.arrived',function(newVal){

@@ -302,9 +302,9 @@ angular.module('myApp', [
             self.binSelector = null;
 
             self.latencyBin = {};
-            self.latencyBin.MIN_WIDTH = 5;
+            self.latencyBin.MIN_WIDTH = 10;
             self.latencyBin.MAX_WIDTH = 100;
-            self.latencyBin.STEP = 20;
+            self.latencyBin.STEP = 10;
             self.latencyBin.width = 20;
 
             self.speedHistogramBin = {};

@@ -25,5 +25,12 @@ public class GlobalControllerExceptionHandler {
 		log.error("duplicateInformationForNewUser.");
 		log.error(iae.getMessage());
 	}
+	
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "TODO") // 409
+	@ExceptionHandler(Exception.class)
+	public void general(Exception e) {
+		log.error("General catch.");
+		log.error(e.getMessage());
+	}
 
 }

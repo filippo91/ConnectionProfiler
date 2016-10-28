@@ -230,7 +230,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     var brush = d3.svg.brush().x(x2).on("brush", brushed);
 
                     var area = d3.svg.area()
-                        .interpolate("monotone")
+                        .interpolate("linear")
                         //.interpolate("linear ")
                         .x(function (d) {return x2(d.timestamp);})
                         .y0(height2)
@@ -239,7 +239,7 @@ angular.module('myApp.speedGraph', ['ngRoute'])
                     var line = d3.svg.line()
                         .x(function (d) {return x(d.timestamp);})
                         .y(function (d) {return y(d.speed);})
-                        .interpolate("monotone");
+                        .interpolate("linear");
 
                     var svg = d3.select(element[0]).append("svg")
                         .attr("width", totalWidth)

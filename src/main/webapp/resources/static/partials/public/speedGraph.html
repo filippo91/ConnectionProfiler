@@ -2,28 +2,8 @@
 	<!-- left panel -->
 	<div-- class="col-md-3 col-md-offset-1">
 		<div class="row col-md-12" id="left-panel-pills">
-			<uib-tabset> <uib-tab index="2"
-				heading="Info">
-			<div ng-controller="speedGraphPlotInfoController as ctrl">
-				<plot-info plot="ctrl.plotInfo"></plot-info>
-			</div>
-			</uib-tab> 
-			
-			<uib-tab ng-if="authenticated" index="1" heading="Your Providers">
-			<div class="providers pre-scrollable">
-				<div class="list-group">
-				<div>
-					<a href="" class="list-group-item active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a>
-				</div>
-					<div ng-repeat="ele in userSpeedData" 
-						id="user-graph-asname-{{ele.asname}}">
-						<a href="" class="list-group-item user-asnameButton"
-							ng-click="showAsname(ele.asname,'user')"
-							id="user-button-{{ele.asname}}"> {{ele.asname}} el </a>
-					</div>
-				</div>
-			</div>
-			</uib-tab> <uib-tab  active="activePill" index="0" heading="Providers">
+			<uib-tabset> 
+			<uib-tab  active="activePill" index="0" heading="Providers">
 			<div class="providers pre-scrollable">
 				<div class="list-group">
 				 <div>
@@ -39,7 +19,29 @@
 					</div>
 				</div>
 			</div>
-			</uib-tab> </uib-tabset>
+			</uib-tab> 
+			<uib-tab ng-if="authenticated" index="1" heading="Your Providers">
+			<div class="providers pre-scrollable">
+				<div class="list-group">
+				<div>
+					<a href="" class="list-group-item active" id="user-showAll" ng-click="showAllAsname('user');">Hide All</a>
+				</div>
+					<div ng-repeat="ele in userSpeedData" 
+						id="user-graph-asname-{{ele.asname}}">
+						<a href="" class="list-group-item user-asnameButton"
+							ng-click="showAsname(ele.asname,'user')"
+							id="user-button-{{ele.asname}}"> {{ele.asname}} el </a>
+					</div>
+				</div>
+			</div>
+			</uib-tab> 
+			<uib-tab index="2"
+				heading="Info">
+			<div ng-controller="speedGraphPlotInfoController as ctrl">
+				<plot-info plot="ctrl.plotInfo"></plot-info>
+			</div>
+			</uib-tab>
+			</uib-tabset>
 		</div>
 	</div-->
 

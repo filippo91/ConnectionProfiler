@@ -502,6 +502,7 @@ angular.module('myApp', [
         authenticate();
         self.credentials = {};
         self.login = function () {
+        	$rootScope.tokenVerified = false;
             self.dataLoading = true;
             authenticate(self.credentials, function () {
                 
@@ -540,7 +541,8 @@ angular.module('myApp', [
         var createUser = function (user) {
             var createUser_url = appURLs.root + appURLs.createUser;
             $http.post(createUser_url, user).then(function () {
-            		$location.path(appURLs.confirmRegistration);
+            		$location.path("/confirmRegistration");
+            		$rootScope.tokenVerified=true;
                 }, function () {
                 	self.error = true;
                 	self.dataLoading = false;
@@ -560,12 +562,15 @@ angular.module('myApp', [
         $rootScope.enableChangeView = false;
         var self = this;
         self.token = "";
+        self.error = false;
         var sendToken = function (token) {
         	var sendToken_url = appURLs.root + appURLs.confirmRegistration;
             $http.post(sendToken_url, token).then(function () {
                     $location.path(appURLs.login);
+                    self.error = false;
+                    self.dataLoading = false;
                 }, function () {
-                    $location.path('/');
+                    self.error = true;
                     self.dataLoading = false;
                 }
             );

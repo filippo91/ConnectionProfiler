@@ -27,9 +27,8 @@ myAppUserProfile.controller('userProfile', ['userFactory', 'providersFactory', '
 		console.info(self.newProvider);
 		var p = self.newProvider;
 		providersFactory.addProvider(p);
-		self.subscriptions.push(p);
+//		self.subscriptions.push(p);
 		self.newProvider = {};
-		
 		console.info(self.providers);
 	};
 	
@@ -52,22 +51,31 @@ myAppUserProfile.factory('userFactory', ['$resource', 'appURLs', function($resou
 }]);
 
 myAppUserProfile.factory('providersFactory', ['$resource', 'REST_API_URLs', function($resource, api) {
+	var self = this;
 	var factory = {};
-	///subscriptions/:asnum
+
 	var subscriptionsResource =  $resource(api.subscriptions);
 	var subscriptionsSummaryResource =  $resource(api.subscriptionsSummary);
 	
+	self.providersSummary = subscriptionsSummaryResource.query();
+	self.subscriptions = subscriptionsResource.query();
+	
 	factory.getSummary = function(){
-		return subscriptionsSummaryResource.query();
+		return self.providersSummary;
 	};
 	
 	factory.getAllSubscriptions = function(){
-		return subscriptionsResource.query();
+		return self.subscriptions;
 	};
 	
 	factory.addProvider = function(p){
-		subscriptionsResource.save(p, function(){
-			console.info('saved');
+		subscriptionsResource.save(p, function(p){
+			subscriptionsSummaryResource.get({asnum: p.asnum})
+			.$promise.then(function(summary) {
+			      self.providersSummary.push(summary);
+			      self.subscriptions.push(summary.providerPlan);
+			      console.log(summary);
+		    });;
 		});
 	};
 	

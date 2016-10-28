@@ -1,7 +1,5 @@
 package controllers.plots;
 
-import java.util.Collection;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import models.Download;
+import models.TableDownload;
 import models.User;
-import services.DownloadService;
 import services.PlotsService;
 
 @RestController
@@ -24,7 +21,7 @@ public class SpeedTableController {
 	@Autowired PlotsService plotsService;
 	
 	@GetMapping("/speedTable/{page}/{size}")
-	public Collection<Download> getDownloadsSpeedByWeek(
+	public TableDownload getDownloadsSpeedByWeek(
 			@PathVariable int page, 
 			@PathVariable int size,
 			@AuthenticationPrincipal User user){

@@ -1,7 +1,14 @@
 
 package controllers;
 
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +39,15 @@ public class DownloadController {
 	@PostMapping(path="/download")
 	@ResponseStatus(value=HttpStatus.CREATED)	
 	public Download saveDownload(
-			@RequestBody Download download,
+			@RequestBody @Valid Download download,
 			@AuthenticationPrincipal User user)
 	{
+		log.info(download.toString());
 		/*
 		 * security concerns: downloadService.setUuid(download);
 		 * make sure the authenticated user is uploading the download
 		 * without messing with the record
 		 */
-		log.info(download.toString());
 		download.setUuid(user.getUid());
 		
 		Download downloadCreated = downloadService.saveDownload(download);
@@ -57,20 +64,38 @@ public class DownloadController {
 			@RequestBody Set<Download> downloads,
 			@AuthenticationPrincipal User user)
 	{
-		/*
-		 * security concerns: downloadService.setUuid(download);
-		 * make sure the authenticated user is uploading the download
-		 * without messing with the record
-		 */
 		log.info(downloads.toString());
+		
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		Validator validator = factory.getValidator();
+		Set<Download> validDownloads = new HashSet<>();
+		
 		for(Download download : downloads){
+			Set<ConstraintViolation<Download>> constraintViolations = validator.validate(download);
+			
+			if(constraintViolations.size() > 0){
+				continue;
+			}
+			
+			validDownloads.add(download);
+			/*
+			 * security concerns: downloadService.setUuid(download);
+			 * make sure the authenticated user is uploading the download
+			 * without messing with the record
+			 */
 			download.setUuid(user.getUid());
 			downloadService.saveDownload(download);
 		}
 		
-		//TODO: Talk with Fra to check if the client supports an array of downloads
-		messagingTemplate.convertAndSend("/topic/downloads", new GenericMessage<Set<Download>>(downloads));
-		messagingTemplate.convertAndSendToUser(user.getUsername(), "/downloads", new GenericMessage<Set<Download>>(downloads));
+		if(validDownloads.size() == 0){
+			/*
+			 * No valid downloads in the set
+			 */
+			throw new IllegalArgumentException();
+		}
+		
+		messagingTemplate.convertAndSend("/topic/downloads", new GenericMessage<Set<Download>>(validDownloads));
+		messagingTemplate.convertAndSendToUser(user.getUsername(), "/downloads", new GenericMessage<Set<Download>>(validDownloads));
 		
 		return;
 	}

@@ -7,9 +7,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import models.AvgDaySpeedDownload;
 import models.BinLatencyDownload;
 import models.BinSpeedDownload;
-import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
+import models.TableDownload;
 
 public interface PlotsService {
 	public static final int NUMBER_OF_MONTH_IN_MULTI_MONTHS_VIEW = 3;
@@ -32,7 +32,7 @@ public interface PlotsService {
 	 * @return
 	 */
 	@PreAuthorize("isAuthenticated()")
-	public Collection<Download> getDownloadsSpeed(int uuid, int page, int pageSize);
+	public TableDownload getDownloadsSpeed(int uuid, int page, int pageSize);
 	
 	/**
 	 * Compute the average download speed for each day between the starting and ending 

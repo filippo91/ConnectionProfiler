@@ -4,9 +4,8 @@
     <div class="col-md-3 col-md-offset-1"
         ng-controller="speedHistogramPlotInfoController as ctrl">
         <div class="row col-md-12" id="left-panel-pills">
-	        <uib-tabset active="activePill"> <uib-tab index="1"
-	            heading="Info"> <plot-info plot="ctrl.plotInfo"></plot-info>
-	        </uib-tab> <uib-tab index="0" heading="Providers">
+	        <uib-tabset active="activePill"> 
+	        <uib-tab index="0" heading="Providers">
 	        <div class="btn-group row " id="btnDivHist">
 	            <div class="btn-group" ng-if="authenticated">
 	                <button type="button" class="btn btn-default active"
@@ -19,7 +18,10 @@
 	                    Public providers</button>
 	            </div>
 	        </div>
-	        </uib-tab> 
+	        </uib-tab>
+	        <uib-tab index="1"
+	            heading="Info"> <plot-info plot="ctrl.plotInfo"></plot-info>
+	        </uib-tab>  
 	        </uib-tabset>
         </div>
     </div>

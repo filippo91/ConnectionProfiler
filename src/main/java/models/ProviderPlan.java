@@ -1,9 +1,16 @@
 package models;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
 
 public class ProviderPlan {
+	@NotNull
 	private Integer asnum;
+	@NotBlank
 	private String asname;	
+	@Range(min=1,max=100)
 	private Integer bandwidth;
 	
 	public Integer getAsnum() {
@@ -22,6 +29,10 @@ public class ProviderPlan {
 		this.asname = asname;
 	}
 
+	/**
+	 * 
+	 * @return bandwidth in Mbps
+	 */
 	public Integer getBandwidth() {
 		return bandwidth;
 	}

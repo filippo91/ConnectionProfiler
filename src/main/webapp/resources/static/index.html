@@ -130,7 +130,7 @@
 						aria-hidden="true"></span> realtime
 			</button>
 			</div>
-			<div ng-show="nav.binSelector" class="col-md-3 col-md-offset-5 btn-group ng-cloak">
+			<div id="btn-bin" ng-show="nav.binSelector" class="col-md-3 col-md-offset-6 btn-group ng-cloak">
 			
 				<button id="btn-bin-minus" type="button" class="btn btn-default" ng-click="nav.changeBinSize($event)">
 					<span class="glyphicon glyphicon-zoom-out"></span>
@@ -138,7 +138,6 @@
 				<button id="btn-bin-plus" type="button" class="btn btn-default" ng-click="nav.changeBinSize($event)">
 					<span class="glyphicon glyphicon-zoom-in"></span>
 				</button>
-				<span>Bin width: {{ nav.binSelector.width }}</span>
 			</div>
 		</div>
 	</div>
@@ -153,7 +152,7 @@
 		<div class="container col-md-12">
 			<hr>
 		</div>
-		<div class="container col-md-offset-1 col-md-11user">
+		<div class="container col-md-offset-1 col-md-11">
 			<p class="text-muted">&copy; 2016 Pelle & Phil</p>
 		</div>
 	</footer>
@@ -179,7 +178,6 @@
 	<script src="js/libraries/angular-route.js"></script>
 	<script
 		src="//cdnjs.cloudflare.com/ajax/libs/angular-resource/1.5.8/angular-resource.min.js"></script>
-
 	<script src="//cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.js"></script>
 

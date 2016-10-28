@@ -1,7 +1,11 @@
 package models;
 
+import javax.validation.constraints.NotNull;
+
 public class SubscriptionSummary {
+	@NotNull
 	private ProviderPlan providerPlan;
+	@NotNull
 	private Bandwidth bandwidth;
 	
 	public ProviderPlan getProviderPlan() {

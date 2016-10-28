@@ -2,6 +2,10 @@ package models;
 
 import java.util.Date;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,27 +20,44 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
  */
 @Document(collection="DOWNLOADS")
 public class Download {
-
 	@Id
 	private String id;
 	
+	@NotNull
 	private Integer uuid;
+	
 	private String client_address;
+	
+	@NotNull
 	private Integer asnum;
+	
+	@NotBlank
 	private String asname;
+	
 	private String server_address;
+	
+	@NotBlank
 	private String server_domain;
+	
+	@NotBlank
 	private String url;
+	
+	@Min(1)
 	private Long size;
+	
+	@Min(1)
 	private Long duration;
+	
+	@Min(1)
 	private Long download_speed;
+
+	@Min(1)
 	private Integer connect_time;
+	
 	private String resource_type;
 	
 	@DateTimeFormat(iso=ISO.DATE_TIME)
 	private Date timestamp; //#milliseconds since 1/1/1970 = Unix epoch
-	
-	public Download(){}
 
 	/**
 	 * 

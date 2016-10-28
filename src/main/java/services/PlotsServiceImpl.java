@@ -15,6 +15,7 @@ import models.BinSpeedDownload;
 import models.Download;
 import models.FrequencyAccess;
 import models.SizeDownload;
+import models.TableDownload;
 import repositories.DownloadRepository;
 
 @Service
@@ -24,10 +25,13 @@ public class PlotsServiceImpl implements PlotsService{
 	@Autowired DownloadRepository downloadRepository;
 	
 	@Override
-	public Collection<Download> getDownloadsSpeed(int uuid, int page, int pageSize) {
+	public TableDownload getDownloadsSpeed(int uuid, int page, int pageSize) {
 		Page<Download> resultPage = downloadRepository.findAllByUuidOrderByTimestampDesc(uuid, new PageRequest(page, pageSize));
 		Collection<Download> downloads = resultPage.getContent();
-		return downloads;
+		TableDownload tableDownloads = new TableDownload();
+		tableDownloads.setDownload(downloads);
+		tableDownloads.setTotalElements(resultPage.getTotalElements());
+		return tableDownloads;
 	}
 
 	

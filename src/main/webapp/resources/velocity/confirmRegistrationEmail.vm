@@ -1,0 +1,12 @@
+Dear ${name},
+
+thank you for registering into our service.
+In order to complete the registration process click on this link: ${link} 
+and copy and paste the following code: 
+	
+	${token}
+
+Hoping see you soon, we would remember you need to verify the account by ${due_date}. 
+
+Enjoy,
+Pelle & Phil

@@ -1,6 +1,7 @@
 package configurations.root;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -86,6 +87,16 @@ public class ConnectionProfilerAppConfig {
 	@Bean
 	public JavaMailSender javaMailService() {
 		JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+		Properties mailProperties = new Properties();
+		//mailProperties.put("mail.smtp.auth", env.getProperty("spring.mail.smtp.auth"));
+		mailProperties.put("mail.smtp.starttls.enable", true);
+		mailProperties.put("mail.smtp.starttls.required", true);
+		javaMailSender.setJavaMailProperties(mailProperties);
+		javaMailSender.setHost("smtp.gmail.com");
+		javaMailSender.setPort(587);
+		javaMailSender.setUsername("aiproject.polito");
+		javaMailSender.setPassword("pellerey");
+		javaMailSender.setProtocol("smtp");
 		return javaMailSender;
 	}
 

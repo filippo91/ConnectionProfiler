@@ -14,8 +14,23 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
 
 	$rootScope.enableChangeView = false;
 	
-        $scope.downloadList = downloadManager.getDownloads($routeParams.page,$routeParams.size);
-        $scope.nRecords = $routeParams.page * $routeParams.size;
+	$scope.downloadList = downloadManager.getDownloads($routeParams.page, $routeParams.size);
+	
+	$scope.totalItems = $rootScope.tableListSize;
+	$scope.currentPage = parseInt($routeParams.page) + 1;
+	$scope.maxSize = 3;
+	$scope.setPage = function (pageNo) {
+	$scope.currentPage = pageNo;
+		console.log("ciaone");
+	};
+	
+	$scope.pageChanged = function() {
+		console.log('Page changed to: ' + $scope.currentPage);
+		$route.updateParams({page: $scope.currentPage-1, size: $routeParams.size});
+	};
+	
+    
+    $scope.nRecords = $routeParams.page * $routeParams.size;
         $scope.succDownload = function() {
             $route.updateParams({page: parseInt($routeParams.page) + 1, size: $routeParams.size});
         };
@@ -27,22 +42,64 @@ angular.module('myApp.speedTable', ['ngRoute', 'ngResource'])
          * Web Socket callbacks
          */
         $rootScope.websocketCallbackUser = function (download) {
-            $scope.downloadList.unshift(download);
-            $scope.$apply();
+        	console.log(download);
+        	//update current view
+        	if($scope.currentPage == 1){
+        		$scope.$apply(function(){
+        			$scope.downloadList.download.unshift(download);	
+            		$scope.downloadList.download.pop();
+        		});
+        	}
+        	//update saved downloads
+        	downloadManager.updateDownloads(download);
         };
-        $rootScope.websocketCallbackPublic = function(download){};
 }])
-.factory('speedTable_downloadManager', ['$resource', 'REST_API_URLs', function($resource, api) {
+.factory('speedTable_downloadManager', ['$resource', 'REST_API_URLs', '$rootScope', function($resource, api, $rootScope) {
         var serverURI = api.speedTable;
-        
         var factory = {};
-        factory.getDownloads = function (page,size) {
-            return $resource(serverURI).query({page: page, size: size}, function (downloadList) {
-                //console.log("arrivate:"+ JSON.stringify(downloadList));
-                //downloadList.sort(function (a, b) {return a.timestamp - b.timestamp;});
-                console.log(JSON.stringify(downloadList));
-            });
+        var self = this;
+        self.downloadsList = [];
+        self.pages = [];
+     
+        $rootScope.tableListSize = 0;
+        
+        factory.updateDownloads = function(download){
+        	self.downloadsList.unshift(download);
+        	$rootScope.tableListSize += 1;
+        }
+        
+        factory.getDownloads = function (page,size) {   
+        	size = parseInt(size);
+        	if(self.pages.indexOf(page) > 0){
+        		var indexStart = page * size;
+	        	var indexEnd = indexStart + size;
+	        	var data = [];
+	        	self.downloadsList.slice(indexStart, indexEnd).forEach( 
+						function(item){
+							console.log(item);
+							data.push(item);
+						}); 
+	        	self.pages.push(page);
+	        	return data;
+        	}
+        	
+        	return $resource(serverURI, null, 
+        			{
+        				'query':{
+        					method: 'GET',
+        					isArray: false
+        				}
+        			}
+        				).query({page: page, size: size}, function (list) {
+
+				list.download.forEach( 
+    					function(item, idx){
+    						self.downloadsList[page*size + idx] = item;
+    					});
+				$rootScope.tableListSize = list.totalElements;
+        	});
         };
+        
         return factory;
 }])
 /*

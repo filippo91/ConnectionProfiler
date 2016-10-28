@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalControllerExceptionHandler {
 	private static final Logger log = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
 	
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Bad User Input")
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public void handleConflict(){
 		log.error("Binding Result contains errors.");
@@ -25,4 +25,5 @@ public class GlobalControllerExceptionHandler {
 		log.error("duplicateInformationForNewUser.");
 		log.error(iae.getMessage());
 	}
+
 }

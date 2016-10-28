@@ -5,6 +5,14 @@ public class Bandwidth {
 	private Integer minimum;
 	private Integer maximum;
 	private Integer samples;
+	
+	public Bandwidth() {
+		this.average = 0;
+		this.minimum = 0; 
+		this.maximum = 0;
+		this.samples = 0;
+	}
+	
 	public Integer getAverage() {
 		return average;
 	}

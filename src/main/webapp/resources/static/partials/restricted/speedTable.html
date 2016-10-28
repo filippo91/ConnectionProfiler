@@ -1,4 +1,5 @@
 <!-- navigation buttons -->
+<!-- 
 <div class="container col-md-8">
  
 	<div class="row btn-group col-md-4">
@@ -6,7 +7,10 @@
 		<button type="button" class="col-md-4 btn btn-default" ng-click="succDownload()">Next
 	</div>
 </div>
-
+ -->
+ <div class="container col-md-8">
+ <ul uib-pagination total-items="tableListSize" ng-model="currentPage" ng-change="pageChanged()" max-size="maxSize" force-ellipses="true" boundary-links="true"></ul>
+ </div>
 <!-- left panel -->
 <div class="col-md-3 col-md-offset-1" ng-controller="speedTablePlotInfoController as ctrl">
 	<div class="row col-md-12" id="left-panel-pills">
@@ -20,10 +24,12 @@
 
 <!-- downloads table -->
 <div class="col-md-7">
+	
 	<div class="row col-md-12">
 		<table class="table table-striped graph" id="download-table">
 		    <tr><th>#</th><th>Resource</th><th>Provider</th><th>Date</th><th>Speed</th><th>Latency</th></tr>
-		    <tr ng-repeat="ele in downloadList">
+		    <tr ng-repeat="ele in downloadList.download">
+		    
 		        <th>{{$index + 1 + nRecords}}</th>
 		        <td>{{ele.url | resource}}</td>
 		        <td>{{ele.asname }}</td>

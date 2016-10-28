@@ -23,11 +23,11 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 	private Logger log = LoggerFactory.getLogger(RegistrationListener.class);
 
 	@Value("${confirmation.email.subject}")
-	private String EMAIL_SUBJECT;
+	private String emailSubject;
 	@Value("${confirmation.email.from}")
-	private String EMAIL_FROM;
+	private String emailFrom;
 	@Value("${confirmation.page}")
-	private String CONFIRMATION_PAGE;
+	private String confirmationPage;
 	
 	@Autowired private JavaMailSender mailSender;
 	@Autowired private VelocityEngine velocityEngine;
@@ -45,22 +45,23 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 		verificationToken.setUser(user);
 		tokenService.save(verificationToken);
 		
-		String url = event.getAppUrl() + CONFIRMATION_PAGE;
+		String url = event.getAppUrl() + confirmationPage;
 		String token = verificationToken.getToken();
 		String recipientAddress = user.getEmail();
 
 		SimpleMailMessage email = new SimpleMailMessage();
 		email.setTo(recipientAddress);
-		email.setSubject(EMAIL_SUBJECT);
-		email.setFrom(EMAIL_FROM);
+		email.setSubject(emailSubject);
+		email.setFrom(emailFrom);
 
 		VelocityContext velocityContext = new VelocityContext();
 		velocityContext.put("name", user.getUsername());
 		velocityContext.put("link", url);
 		velocityContext.put("token", token);
+		velocityContext.put("due_date", verificationToken.getExpirationDate().toString());
 		StringWriter stringWriter = new StringWriter();
-		velocityEngine.mergeTemplate("velocity/confirmRegistrationEmail.html", "UTF-8", velocityContext, stringWriter);
-		
+		velocityEngine.mergeTemplate("velocity/confirmRegistrationEmail.vm", "UTF-8", velocityContext, stringWriter);
+
 		email.setText(stringWriter.toString());
 
 		try {
@@ -74,7 +75,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
 	public String getSubject() {
 		// TODO Auto-generated method stub
-		return EMAIL_SUBJECT;
+		return emailSubject;
 	}
 
 }

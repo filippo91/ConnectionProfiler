@@ -20,19 +20,24 @@ angular.module('myApp.speedGraph', ['ngRoute'])
 
             if(t) {
                 for(i = 0; i < data.length; i++) {
-                    if ($rootScope.userTimeList[data[i].timestamp] != 1) {
-                        $rootScope.userTimeList[data[i].timestamp] = 1;
+                    if ($rootScope.userTimeList[data[i].timestamp] == undefined) {
+                    	$rootScope.userTimeList[data[i].timestamp] = [];
+                    	$rootScope.userTimeList[data[i].timestamp].push(data[i].asname);
                         console.log("aggiungo a user");
                         downloadManager.updateDownloads($rootScope.userSpeedData, data[i]);
+                    }else if ($rootScope.userTimeList[data[i].timestamp].indexOf(data[i].asname) < 0) {
+                    	      $rootScope.userTimeList[data[i].timestamp].push(data[i].asname);
+                    	      downloadManager.updateDownloads($rootScope.userSpeedData, data[i]);
                     }
                 }
             }else {
-                for(i = 0; i < data.length; i++) {
-                    if ($rootScope.publicTimeList[data[i].timestamp] != 1) {
-                        $rootScope.publicTimeList[data[i].timestamp] = 1;
-                        console.log("aggiungo a public");
-                        downloadManager.updateDownloads($rootScope.publicSpeedData, data[i]);
-                    }
+                for(i = 0; i < data.length; i++) {if ($rootScope.publicTimeList[data[i].timestamp] == undefined) {
+                		$rootScope.publicTimeList[data[i].timestamp] = [data[i].asname];
+                		downloadManager.updateDownloads($rootScope.publicSpeedData, data[i]);
+                	 } else if ($rootScope.publicTimeList[data[i].timestamp].indexOf(data[i].asname) < 0) {
+                		$rootScope.publicTimeList[data[i].timestamp].push(data[i].asname);
+                	 	downloadManager.updateDownloads($rootScope.publicSpeedData, data[i]);
+                	}
                 }
             }
 

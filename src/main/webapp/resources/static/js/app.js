@@ -302,16 +302,16 @@ angular.module('myApp', [
             self.binSelector = null;
 
             self.latencyBin = {};
-            self.latencyBin.MIN_WIDTH = 20;
-            self.latencyBin.MAX_WIDTH = 400;
+            self.latencyBin.MIN_WIDTH = 5;
+            self.latencyBin.MAX_WIDTH = 100;
             self.latencyBin.STEP = 20;
-            self.latencyBin.width = 200;
+            self.latencyBin.width = 20;
 
             self.speedHistogramBin = {};
-            self.speedHistogramBin.MIN_WIDTH = 20;
-            self.speedHistogramBin.MAX_WIDTH = 400;
-            self.speedHistogramBin.STEP = 20;
-            self.speedHistogramBin.width = 200;
+            self.speedHistogramBin.MIN_WIDTH = 1;
+            self.speedHistogramBin.MAX_WIDTH = 200;
+            self.speedHistogramBin.STEP = 1;
+            self.speedHistogramBin.width = 4;
             
             var date = moment().startOf('isoWeek');
             
@@ -678,4 +678,12 @@ angular.module('myApp', [
             if (parseInt(d) > 1000) return "" + parseFloat(parseInt(d) / 1000).toFixed(2) + " Kbps";
             return "" + d;
         };
-});
+    })
+    .filter('legendShorter', function(){
+        return function(d){
+            if(d.length > 20){
+                return d.substring(0,16) + "...";
+            }
+            return d;
+        };
+    });

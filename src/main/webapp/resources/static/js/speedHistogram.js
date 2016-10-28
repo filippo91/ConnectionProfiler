@@ -123,7 +123,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
         return factory;
     }])
 
-.directive('speedHistogram',function($route, $routeParams,d3Service,speedFactory,getAsnameListFilter, $rootScope){
+.directive('speedHistogram',function($route, $routeParams,d3Service,speedFactory,getAsnameListFilter, $rootScope, legendShorterFilter){
         return {
             restrict: 'E',
             link: function(scope,element){
@@ -186,7 +186,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         var binWidth = $routeParams.bin_width;
 
                         if(valuesPublic == undefined || valuesPublic.length == 0){
-                            svg.attr("transform", "translate(" + totalWidth / 2 + "," + totalHeight / 2 + ")");
+                            //svg.attr("transform", "translate(" + totalWidth / 2 + "," + totalHeight / 2 + ")");
                             svg.append('defs')
                                 .append('pattern')
                                 .attr('id', 'diagonalHatch')
@@ -205,13 +205,13 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             svg.append("rect")
                             .attr("x", 0)
                             .attr("y", 0)
-                            .attr("width", real_width)
-                            .attr("height", real_height)
+                            .attr("width", totalWidth)
+                            .attr("height", totalHeight)
                             .attr('fill', 'url(#diagonalHatch)');
 
                         svg.append("text")
-                            .attr("x", real_width / 2)
-                            .attr("y", real_height / 2)
+                            .attr("x", totalWidth / 2)
+                            .attr("y", totalHeight / 2)
                             .style("text-anchor", "middle")
                             .style("font-family", "sans-serif")
                             .style("font-size", "20px")
@@ -301,7 +301,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                                     .duration(200)
                                     .style("opacity", .9);
                                 div.html(
-                                    "<i>Provider: </i><b>" + d3.select(this).data()[0].asname + "</b><br>" +
+                                    "<b>" + legendShorterFilter(d3.select(this).data()[0].asname) + "</b><br>" +
                                     "<i>n: </i><b>" + d3.select(this).data()[0].nRecords + " (" +
                                     f((d3.select(this).data()[0].nRecords / tot)*100)  +"%)</b>")
                                     .style("left", (x) + "px")
@@ -337,7 +337,9 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                             .attr("y", 9)
                             .attr("dy", ".35em")
                             .style("text-anchor", "end")
-                            .text(function(d) { return d; });
+                            .text(function(d) { return legendShorterFilter(d); });
+
+                        legend.append("svg:title").text(function(d){return d;});
 
                         svg.append("g")
                             .attr("class", "x axis")
@@ -364,7 +366,7 @@ angular.module('myApp.speedHistogram', ['ngRoute'])
                         if(newVal == true){
                             drawHistogram(true);
                             if($rootScope.authenticated)
-                                $(".bin-public").hide();
+                                $(".bin-user").hide();
                         }
                     });
 

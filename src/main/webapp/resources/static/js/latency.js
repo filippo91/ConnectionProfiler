@@ -90,7 +90,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
         return factory;
     }])
 
-.directive('latencyHistogram',function($route, $routeParams,d3Service,latencyFactory, getAsnameListFilter){
+.directive('latencyHistogram',function($route, $routeParams,d3Service,latencyFactory, getAsnameListFilter, legendShorterFilter){
     return {
         restrict: 'E',
         link: function(scope,element){
@@ -256,7 +256,9 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         .attr("y", 9)
                         .attr("dy", ".35em")
                         .style("text-anchor", "end")
-                        .text(function(d) { return d; });
+                        .text(function(d) { return legendShorterFilter(d); });
+
+                    legend.append("svg:title").text(function(d){return d;});
 
                     var tmp = $(".bar");
                     var offset = tmp.parent().parent().parent().offset();
@@ -266,7 +268,7 @@ angular.module('myApp.latency', ['ngRoute', 'ngResource'])
                         div.transition()
                             .duration(200)
                             .style("opacity", .9);
-                        div.html("<i>Provider: </i><b>" + d3.select(this).data()[0].asname + "</b><br><i>n: </i><b>" +
+                        div.html("<b>" + legendShorterFilter(d3.select(this).data()[0].asname) + "</b><br><i>n: </i><b>" +
                             d3.select(this).data()[0].nRecords + " (" +
                             f((d3.select(this).data()[0].nRecords / tot)*100) + "%)</b>")
                             .style("left", (x) + "px")
